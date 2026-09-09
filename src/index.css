@@ -1,4 +1,17 @@
-:root{
+*{
   margin : 0;
   padding : 0;
+}
+body, html, #root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.desktop {
+  width: 100vw;
+  height: 100vh;
+  background: url('./assets/background.png') center/cover no-repeat;
+  position: relative;
 }
