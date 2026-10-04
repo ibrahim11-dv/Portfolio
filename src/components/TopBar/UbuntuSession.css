@@ -1,0 +1,52 @@
+.ubuntu-session {
+  position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; color: #f2f2f2; background: transparent;
+  font-family: var(--font-ubuntu); overflow: hidden;
+}
+.ubuntu-session::backdrop { background: #0009; }
+.ubuntu-session button { font: inherit; color: inherit; cursor: pointer; border: 0; }
+.ubuntu-session button:focus-visible { outline: 2px solid var(--ubuntu-orange); outline-offset: 4px; }
+.ubuntu-session[data-mode="lock"]::backdrop, .ubuntu-session[data-mode="unlock"]::backdrop { background: #241528; }
+.ubuntu-session__wallpaper {
+  position: absolute; inset: -40px; z-index: -1;
+  background: url('../../assets/background.png') center / cover no-repeat;
+  filter: blur(22px) brightness(0.62); transform: scale(1.06);
+}
+html[data-desktop-dark="true"] .ubuntu-session__wallpaper { background-image: url('../../assets/backgroundDark.png'); }
+.ubuntu-session__status { position: absolute; top: 9px; right: 14px; display: flex; align-items: center; gap: 14px; font-size: 13px; pointer-events: none; z-index: 1; }
+.ubuntu-lock { width: 100%; height: 100%; background: transparent; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.ubuntu-lock:focus-visible { outline: none !important; }
+.ubuntu-lock__clock { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: -8vh; animation: lock-appear 250ms ease-out; }
+.ubuntu-lock__time { font-size: clamp(64px, 12vw, 96px); font-weight: 400; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
+.ubuntu-lock__date { font-size: clamp(19px, 3vw, 27px); font-weight: 400; }
+.ubuntu-lock__hint { position: absolute; bottom: 12%; display: flex; flex-direction: column; align-items: center; gap: 12px; color: #ffffffb3; font-size: 14px; }
+.ubuntu-unlock { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: unlock-rise 220ms ease-out; }
+.ubuntu-unlock__avatar { width: 144px; height: 144px; display: grid; place-items: center; border-radius: 50%; background: #ffffff21; margin-bottom: 24px; }
+.ubuntu-unlock h1 { font-size: 27px; font-weight: 400; margin-bottom: 28px; }
+.ubuntu-unlock__submit { display: flex; justify-content: space-between; align-items: center; width: min(300px, calc(100vw - 64px)); padding: 14px 18px; border-radius: 9px; background: #ffffff26; }
+.ubuntu-unlock__submit:hover { background: #ffffff38; }
+.ubuntu-unlock__back { margin-top: 26px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #ffffff1a; }
+.ubuntu-unlock__back:hover { background: #ffffff30; }
+.ubuntu-session[open][data-mode="power"], .ubuntu-session[open][data-mode="restart"] { display: grid; place-items: center; padding: 20px; }
+.ubuntu-power { width: min(400px, 100%); background: #36363a; border: 1px solid #ffffff1a; border-radius: 18px; padding: 32px 24px 24px; text-align: center; box-shadow: 0 18px 60px #0006; }
+.ubuntu-power__icon { margin-bottom: 18px; color: #f2f2f2; }
+.ubuntu-power h1 { font-size: 24px; font-weight: 500; margin-bottom: 14px; }
+.ubuntu-power p { color: #ffffffbd; font-size: 15px; line-height: 1.6; min-height: 48px; }
+.ubuntu-power__actions { display: flex; gap: 12px; margin-top: 28px; }
+.ubuntu-power__actions button { flex: 1; padding: 13px 8px; background: #ffffff13; border-radius: 10px; font-size: 14px; font-weight: 500; }
+.ubuntu-power__actions button:hover { background: #ffffff26; }
+.ubuntu-power__actions .ubuntu-power__confirm { background: var(--ubuntu-orange); color: white; }
+.ubuntu-power__actions .ubuntu-power__confirm:hover { background: var(--ubuntu-orange-hover); }
+.ubuntu-session[data-mode="off"], .ubuntu-session[data-mode="boot"], .ubuntu-session[data-mode="suspend"] { background: #000; }
+.ubuntu-suspend { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; }
+.ubuntu-suspend:focus-visible { outline: none !important; }
+.ubuntu-session[data-mode="off"]::backdrop, .ubuntu-session[data-mode="boot"]::backdrop { background: #000; }
+.ubuntu-off__start { position: absolute; bottom: 36px; left: calc(50% - 28px); width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: transparent; opacity: 0.4; }
+.ubuntu-off__start:hover, .ubuntu-off__start:focus-visible { opacity: 1; background: #ffffff12; }
+.ubuntu-boot { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 48px; font-size: 48px; font-weight: 300; letter-spacing: -2px; }
+.ubuntu-boot__spinner { width: 30px; height: 30px; border: 3px solid #ffffff30; border-top-color: white; border-radius: 50%; animation: boot-spin 900ms linear infinite; }
+@keyframes boot-spin { to { transform: rotate(360deg); } }
+@keyframes lock-appear { from { opacity: 0; transform: translateY(12px); } }
+@keyframes unlock-rise { from { opacity: 0; transform: translateY(40px); } }
+@media (prefers-reduced-motion: reduce) { .ubuntu-session * { animation: none !important; } }
+html[data-desktop-saver="true"] .ubuntu-session * { animation: none !important; }

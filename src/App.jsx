@@ -1,14 +1,8 @@
-import { useState } from 'react'
+import DesktopShell from './desktop/DesktopShell'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-      <div className='desktop'>
-
-      </div>
-  )
+  return <div className="desktop"><DesktopShell /></div>
 }
 
 export default App

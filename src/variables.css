@@ -1,8 +1,19 @@
 :root {
   --ubuntu-orange: #E95420;
+  --ubuntu-orange-hover: #f06a38;
+  --ubuntu-orange-active: #d64713;
   --ubuntu-aubergine: #77216F;
-  --ubuntu-panel-bg: rgba(19, 19, 19, 0.88);
-  --ubuntu-window-bg: #2D2D2D;
-  --ubuntu-header-bg: #3C3C3C;
+  --ubuntu-aubergine-dark: #5E2750;
+  --ubuntu-panel-bg: #131313;
+  --ubuntu-panel-active: rgba(255, 255, 255, 0.17);
+  --ubuntu-menu-bg: #36363a;
+  --ubuntu-surface: #48484c;
+  --ubuntu-surface-hover: #555559;
+  --ubuntu-surface-active: #333333;
+  --ubuntu-slider-track: #333333;
+  --ubuntu-border: rgba(255, 255, 255, 0.15);
   --ubuntu-text: #FFFFFF;
+  --ubuntu-text-muted: rgba(255, 255, 255, 0.8);
+  --ubuntu-text-subtle: rgba(255, 255, 255, 0.5);
+  --font-ubuntu: "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }

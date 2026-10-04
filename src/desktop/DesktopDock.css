@@ -1,0 +1,13 @@
+.ubuntu-dock { position: fixed; z-index: 7000; top: 42px; bottom: 10px; left: 8px; width: 66px; padding: 9px 7px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid #ffffff1c; border-radius: 22px; background: #181818e8; box-shadow: 0 8px 28px #0007; backdrop-filter: blur(18px); font-family: var(--font-ubuntu); }
+.ubuntu-dock__apps, .ubuntu-dock__bottom { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 100%; }
+.ubuntu-dock__bottom { gap: 4px; }
+.ubuntu-dock__item { position: relative; width: 50px; height: 50px; display: grid; place-items: center; border: 0; border-radius: 12px; color: #fff; background: transparent; cursor: pointer; transition: transform 130ms ease, background 130ms ease; }
+.ubuntu-dock__item:hover, .ubuntu-dock__item:focus-visible { transform: scale(1.12); background: #ffffff1c; outline: none; }
+.ubuntu-dock__item.is-active { background: #ffffff22; }
+.ubuntu-dock__icon { width: 42px; height: 42px; display: grid; place-items: center; filter: drop-shadow(0 4px 4px #0005); }
+.ubuntu-dock__icon img { width: 42px; height: 42px; object-fit: contain; }
+.ubuntu-dock__icon--grid { width: 40px; height: 40px; }
+.ubuntu-dock__running { position: absolute; top: 50%; left: -5px; width: 4px; height: 16px; transform: translateY(-50%); border-radius: 0 3px 3px 0; background: var(--ubuntu-orange); }
+.ubuntu-dock__separator { width: 40px; height: 1px; margin: 3px 0; background: #ffffff31; }
+.ubuntu-dock__trash { margin-top: 1px; }
+@media (max-width: 620px) { .ubuntu-dock { top: auto; right: 9px; bottom: 8px; left: 9px; width: auto; height: 65px; padding: 7px 9px; flex-direction: row; border-radius: 19px; } .ubuntu-dock__apps, .ubuntu-dock__bottom { flex-direction: row; width: auto; } .ubuntu-dock__bottom { gap: 4px; } .ubuntu-dock__separator { width: 1px; height: 40px; margin: 0 2px; } .ubuntu-dock__item { width: 50px; height: 50px; } }
