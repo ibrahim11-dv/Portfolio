@@ -1,0 +1,10 @@
+.ubuntu-confirmation-dialog { width: min(420px, calc(100vw - 32px)); margin: auto; padding: 27px 24px 20px; border: 1px solid #d4cfc9; border-radius: 15px; color: #3d3d3d; background: #faf9f8; box-shadow: 0 15px 60px #0006; font-family: var(--font-ubuntu); animation: desktop-dialog-in 150ms ease-out; }
+.ubuntu-confirmation-dialog::backdrop { background: #0004; }
+.ubuntu-confirmation-dialog h2 { margin: 0 0 14px; text-align: center; font-size: 20px; font-weight: 600; }
+.ubuntu-confirmation-dialog p { margin: 0 0 24px; color: #6c655f; text-align: center; font-size: 14px; line-height: 1.55; }
+.ubuntu-confirmation-dialog > div { display: flex; gap: 10px; }
+.ubuntu-confirmation-dialog button { flex: 1; min-height: 42px; padding: 8px 12px; border: 1px solid #d4cec7; border-radius: 8px; color: inherit; background: white; font: 13px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-confirmation-dialog button:hover { filter: brightness(.96); }
+.ubuntu-confirmation-dialog button:focus-visible { outline: 2px solid #e95420; outline-offset: 2px; }
+.ubuntu-confirmation-dialog button.is-destructive { color: white; border-color: #c01c28; background: #c01c28; }
+@media (prefers-reduced-motion: reduce) { .ubuntu-confirmation-dialog { animation: none; } }

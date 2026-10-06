@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, ChevronUp, LockKeyhole, Power, RotateCw, UserRound } from 'lucide-react';
 import BatteryIndicator from './BatteryIndicator';
+import { PROFILE } from '../../desktop/portfolioData';
 import './UbuntuSession.css';
 
 export default function UbuntuSession({ initialMode, now, battery, onClose }) {
@@ -83,7 +84,7 @@ export default function UbuntuSession({ initialMode, now, battery, onClose }) {
           <span className="ubuntu-lock__hint"><ChevronUp size={20} />Cliquez ou appuyez sur une touche</span>
         </button> : <div className="ubuntu-unlock">
           <div className="ubuntu-unlock__avatar"><UserRound size={72} strokeWidth={1.4} /></div>
-          <h1>Invité</h1>
+          <h1>{PROFILE.name}</h1>
           <button className="ubuntu-unlock__submit" data-session-focus onClick={() => onClose()}>Déverrouiller <ArrowRight size={18} /></button>
           <button className="ubuntu-unlock__back" aria-label="Revenir à l’horloge" onClick={() => setMode('lock')}><ArrowLeft size={20} /></button>
         </div>}

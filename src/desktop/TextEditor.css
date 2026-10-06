@@ -1,0 +1,108 @@
+.ubuntu-editor { height: 100%; display: flex; flex-direction: column; container-type: inline-size; container-name: editor; }
+.ubuntu-editor .ubuntu-editor__toolbar { display: flex; position: relative; gap: 4px; padding: 0 112px 0 7px; flex-shrink: 0; }
+.editor-toolbar__start { display: flex; align-items: center; gap: 4px; margin-right: auto; }
+.ubuntu-editor .ubuntu-editor__toolbar > button, .editor-toolbar__start > button { display: flex; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0; width: 33px; height: 33px; padding: 0; border: 0; border-radius: 6px; background: transparent; }
+.ubuntu-editor .ubuntu-editor__toolbar > button:hover, .ubuntu-editor .ubuntu-editor__toolbar > button[aria-pressed="true"] { background: #0000000b; }
+.ubuntu-editor .ubuntu-editor__toolbar .ubuntu-editor__open { width: auto; padding: 0 6px; margin-right: 0; font-size: 13px; }
+.ubuntu-editor .ubuntu-editor__document-title { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: calc(100% - 390px); pointer-events: none; }
+.ubuntu-editor .ubuntu-editor__document-title strong { min-width: 0; line-height: 18px; }
+.ubuntu-editor .ubuntu-editor__document-title strong > span:not(.ubuntu-editor__unsaved) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: inherit; font-size: 13px; }
+.ubuntu-editor .ubuntu-editor__document-title small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; line-height: 18px; color: #827b74; }
+.editor-tabs { display: flex; flex-shrink: 0; height: 38px; gap: 5px; padding: 3px 6px; overflow-x: auto; scrollbar-width: none; background: #f2f0ee; border-bottom: 1px solid #d9d6d2; }
+.editor-tabs > div { display: flex; flex: 1 0 140px; min-width: 0; max-width: 280px; border-radius: 6px; }
+.editor-tabs > div.is-selected { background: #fff; box-shadow: 0 1px 3px #0002; }
+.editor-tabs button { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0 9px; border: 0; border-radius: 5px; background: transparent; color: #34312f; font: 12px var(--font-ubuntu); cursor: pointer; }
+.editor-tabs [role="tab"] { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.editor-tabs > div > button:last-child { width: 28px; flex-shrink: 0; padding: 0; }
+.editor-tabs button:hover { background: #00000008; }
+.editor-body { position: relative; display: flex; flex: 1; min-height: 0; min-width: 0; }
+.editor-document { display: flex; flex: 1; flex-direction: column; min-height: 0; min-width: 0; }
+.ubuntu-editor .ubuntu-editor__page { position: relative; min-width: 0; overflow: hidden; }
+.ubuntu-editor .ubuntu-editor__page textarea, .editor-highlights { padding: 20px 24px; margin: 0; width: 100%; height: 100%; border: 0; border-radius: 0; font: var(--editor-font-size, 14px)/1.65 'Ubuntu Mono', 'Cascadia Mono', Consolas, monospace; tab-size: 4; letter-spacing: normal; }
+.ubuntu-editor .ubuntu-editor__page textarea { position: relative; z-index: 1; resize: none; outline: none; background: transparent; color: #282828; }
+.editor-highlights { position: absolute; inset: 0; overflow: auto; scrollbar-width: none; pointer-events: none; color: transparent; white-space: pre; }
+.editor-highlights.is-wrapped { white-space: pre-wrap; overflow-wrap: break-word; }
+.editor-highlights mark { color: transparent; background: #f7e799; padding: 0; }
+.editor-highlights mark.is-current { background: #f4bb5e; }
+.ubuntu-editor .ubuntu-editor__status { flex-shrink: 0; align-items: center; min-height: 25px; gap: 10px; padding: 4px 10px; }
+.ubuntu-editor .ubuntu-editor__status > span { white-space: nowrap; }
+.ubuntu-editor .ubuntu-editor__status > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ubuntu-editor .ubuntu-editor__menu { width: min(310px, calc(100% - 16px)); max-height: calc(100% - 70px); }
+.ubuntu-editor .ubuntu-editor__menu > button { flex-direction: row; align-items: center; }
+.ubuntu-editor .ubuntu-editor__picker { width: min(360px, calc(100% - 16px)); left: 8px; right: auto; }
+.ubuntu-editor .ubuntu-editor__picker > button { flex-direction: column; align-items: flex-start; }
+.ubuntu-editor__picker > input { margin: 4px 6px 8px; padding: 8px; border: 1px solid #d5d0ca; border-radius: 6px; font: 13px var(--font-ubuntu); }
+.editor-zoom { display: flex; margin: 5px; border: 1px solid #d8d2cb; border-radius: 7px; }
+.editor-zoom > button { flex: 1; justify-content: center; }
+.editor-external { display: flex; flex-shrink: 0; flex-wrap: wrap; align-items: center; justify-content: center; gap: 7px; padding: 8px 10px; background: #faf0da; border-bottom: 1px solid #e5d3af; font: 12px var(--font-ubuntu); }
+.editor-external button { padding: 5px 8px; border: 1px solid #d7c19b; border-radius: 6px; background: #fff9; color: #4b4031; font: inherit; cursor: pointer; }
+.editor-search-shell { display: grid; grid-template-rows: 1fr; flex-shrink: 0; border-top: 1px solid #d9d6d2; background: #f2f0ee; animation: editor-search-in 250ms cubic-bezier(.33,1,.68,1); transition: grid-template-rows 250ms cubic-bezier(.33,1,.68,1); }
+.editor-search__reveal { min-height: 0; animation: editor-search-clip 250ms; }
+.editor-search-shell.is-closing { grid-template-rows: 0fr; }
+.editor-search-shell.is-closing .editor-search__reveal { overflow: hidden; }
+.editor-search { position: relative; display: grid; grid-template-columns: minmax(50px, 1fr) 58px 28px 28px 28px; align-items: center; gap: 4px; max-width: 500px; margin: auto; padding: 7px 8px; color: #47413b; font: 12px var(--font-ubuntu); }
+.editor-search__entry, .editor-search__replacement { display: flex; min-width: 0; align-items: center; gap: 5px; height: 32px; padding: 0 7px; border: 1px solid #cbc5be; border-radius: 6px; background: white; }
+.editor-search__entry:focus-within, .editor-search__replacement:focus-within { outline: 2px solid #e95420; outline-offset: -1px; }
+.editor-search__entry.is-error { border-color: #c12d43; }
+.editor-search input { min-width: 0; width: 100%; padding: 0; border: 0; background: transparent; color: #34312e; outline: none; font: inherit; }
+.editor-search__entry > svg, .editor-search__replacement > svg { flex-shrink: 0; opacity: .65; }
+.editor-search__entry > span { flex-shrink: 0; font-size: 10px; color: #888078; }
+.editor-search button { display: grid; place-items: center; height: 30px; padding: 0 3px; border: 0; border-radius: 5px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.editor-search button:hover, .editor-search button[aria-pressed="true"] { background: #0000000b; }
+.editor-search button:disabled { opacity: .35; cursor: default; }
+.editor-search__arrows { display: flex; gap: 2px; }
+.editor-search__arrows > button { width: 28px; }
+.editor-search .editor-search__replace, .editor-search .editor-search__replace-all { border: 1px solid #d1cbc4; background: #faf9f8; padding: 0 5px; }
+.editor-search__replace-all { grid-column: 3 / 6; }
+.editor-search__error { grid-column: 1 / 6; margin: 2px 0; color: #b52c3c; font-size: 11px; }
+.editor-search__options { position: absolute; right: 35px; bottom: 100%; z-index: 10; width: 230px; padding: 7px; border: 1px solid #d4cec7; border-radius: 9px; background: #faf9f8; box-shadow: 0 6px 20px #0003; }
+.editor-search__options label { display: flex; gap: 8px; padding: 8px 5px; align-items: center; }
+.editor-search__options input { width: 15px; height: 15px; accent-color: #e95420; }
+.editor-properties { flex: 0 0 350px; width: 350px; overflow: auto; padding: 12px 15px; background: #f2f0ee; border-left: 1px solid #d9d6d2; font: 13px var(--font-ubuntu); }
+.editor-properties header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 17px; }
+.editor-properties h2 { margin: 0; font-size: 15px; }
+.editor-properties header button { display: grid; place-items: center; width: 27px; height: 27px; border: 0; border-radius: 50%; background: #ddd9d5; color: #423c35; cursor: pointer; }
+.editor-properties__group { overflow: hidden; margin-bottom: 18px; border: 1px solid #ded8d1; border-radius: 10px; background: #fff; }
+.editor-properties__group > div, .editor-properties__group > button, .editor-properties__group > label { display: flex; flex-direction: column; width: 100%; gap: 4px; padding: 11px 12px; text-align: left; border: 0; border-bottom: 1px solid #e8e3dd; background: transparent; color: inherit; font: inherit; }
+.editor-properties__group > :last-child { border-bottom: 0; }
+.editor-properties__group strong { color: #82786c; font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
+.editor-properties__group > button { cursor: pointer; }
+.editor-properties__group > button:hover { background: #f8f5f1; }
+.editor-properties__group > label, .editor-properties__group > .editor-properties__stat { flex-direction: row; align-items: center; justify-content: space-between; }
+.editor-properties__group input { accent-color: #e95420; }
+.editor-properties__group select { border: 1px solid #d7d0c7; border-radius: 5px; padding: 2px 4px; color: #423a31; background: #faf9f8; }
+.editor-properties h3 { font-size: 12px; color: #81776b; margin: 8px 0; }
+.editor-properties-backdrop { display: none; }
+.editor-dirty-list { margin: 0 0 22px; padding: 10px 14px; list-style: none; border: 1px solid #ded8d1; border-radius: 8px; background: #fff; text-align: left; }
+.editor-dirty-list li { padding: 6px 0; font-size: 13px; overflow-wrap: anywhere; }
+.editor-file-dialog { width: min(640px, calc(100vw - 24px)); margin: auto; padding: 0; overflow: hidden; border: 1px solid #d4cfc9; border-radius: 13px; background: #faf9f8; color: #34312e; box-shadow: 0 15px 55px #0007; font: 13px var(--font-ubuntu); }
+.editor-file-dialog::backdrop { background: #0005; }
+.editor-file-dialog header { display: flex; height: 52px; gap: 10px; align-items: center; justify-content: space-between; padding: 7px 10px; background: #f2f0ee; border-bottom: 1px solid #ded8d1; }
+.editor-file-dialog h2 { font-size: 14px; margin: 0; }
+.editor-file-dialog button { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid #d5cfc7; border-radius: 6px; background: #fff9; color: inherit; font: inherit; cursor: pointer; }
+.editor-file-dialog button.is-suggested { color: white; background: #e95420; border-color: #e95420; }
+.editor-file-dialog button:disabled { opacity: .4; cursor: default; }
+.editor-file-dialog__location { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid #e2dcd4; }
+.editor-file-dialog__location > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editor-file-dialog__body { display: flex; height: min(270px, 40vh); }
+.editor-file-dialog nav { width: 170px; flex-shrink: 0; padding: 8px; border-right: 1px solid #e2dcd4; background: #f2f0ee; }
+.editor-file-dialog nav button { width: 100%; border: 0; background: transparent; text-align: left; }
+.editor-file-dialog nav button:hover { background: #00000009; }
+.editor-file-dialog__entries { flex: 1; min-width: 0; padding: 8px; overflow: auto; }
+.editor-file-dialog__entries button { width: 100%; border: 0; background: transparent; text-align: left; }
+.editor-file-dialog__entries button:hover { background: #f0ece6; }
+.editor-file-dialog__entries span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editor-file-dialog__entries small { margin-left: auto; color: #8e8579; }
+.editor-file-dialog__name { padding: 14px; border-top: 1px solid #ded8d1; }
+.editor-file-dialog__name label { display: block; margin-bottom: 6px; font-size: 12px; color: #7c7368; }
+.editor-file-dialog__name input { width: 100%; padding: 9px 10px; border: 1px solid #cac2b9; border-radius: 6px; background: white; color: #34312e; font: inherit; outline-color: #e95420; }
+.editor-file-dialog__name p { margin: 8px 0 0; color: #b02b3b; }
+.ubuntu-editor:fullscreen { width: 100vw; height: 100vh; }
+.ubuntu-editor.is-fullscreen .ubuntu-editor__toolbar { padding-right: 8px; }
+.ubuntu-editor.is-fullscreen .ubuntu-editor__document-title { width: calc(100% - 290px); }
+@container editor (max-width: 650px) { .ubuntu-editor .ubuntu-editor__document-title { left: 140px; right: 190px; width: auto; transform: none; } .ubuntu-editor.is-fullscreen .ubuntu-editor__document-title { right: 124px; width: auto; } .editor-properties { position: absolute; bottom: 0; left: 0; right: 0; z-index: 12; width: 100%; max-height: 80%; border-left: 0; border-top: 1px solid #d3ccc3; border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px #0002; } .editor-properties-backdrop { display: block; position: absolute; inset: 0; z-index: 11; border: 0; background: #0003; } }
+@container editor (max-width: 400px) { .ubuntu-editor .ubuntu-editor__toolbar .ubuntu-editor__open > span, .ubuntu-editor .ubuntu-editor__toolbar .ubuntu-editor__open > svg:last-child { display: none; } .ubuntu-editor .ubuntu-editor__toolbar .ubuntu-editor__open { width: 33px; padding: 0; } .ubuntu-editor .ubuntu-editor__document-title { left: 81px; right: 190px; } .ubuntu-editor .ubuntu-editor__page textarea, .editor-highlights { padding: 14px; } .editor-search { gap: 2px; padding: 7px 5px; grid-template-columns: minmax(45px, 1fr) 50px 25px 25px 25px; } .editor-search__arrows > button { width: 24px; } .editor-search__entry > svg { display: none; } }
+@media (max-width: 480px) { .editor-file-dialog nav { display: none; } .editor-file-dialog h2 { font-size: 12px; } .editor-file-dialog header button { padding: 7px; } }
+@keyframes editor-search-in { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
+@keyframes editor-search-clip { from, to { overflow: hidden; } }
+@media (prefers-reduced-motion: reduce) { .editor-search-shell, .editor-search__reveal { animation: none; transition: none; } }

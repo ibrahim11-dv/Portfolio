@@ -1,0 +1,28 @@
+.nautilus-properties { box-sizing: border-box; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 48px); margin: auto; padding: 0; border: 1px solid #0002; border-radius: 12px; color: #303030; background: #fafafa; box-shadow: 0 18px 60px #0006; font: 14px var(--font-ubuntu); animation: nautilus-properties-in 100ms cubic-bezier(.25,.46,.45,.94); }
+.nautilus-properties::backdrop { background: #0004; }
+.nautilus-properties header { position: relative; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 48px; }
+.nautilus-properties header h2 { margin: 0; font-size: 14px; font-weight: 600; }
+.nautilus-properties header button { position: absolute; right: 12px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; color: inherit; background: #e6e6e6; cursor: pointer; }
+.nautilus-properties header button[aria-label="Retour aux propriétés"] { left: 12px; right: auto; border-radius: 6px; background: transparent; }
+.nautilus-properties header button:hover { background: #dcdcdc; }
+.nautilus-properties__body { padding: 12px 24px 24px; }
+.nautilus-properties__identity { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0 0 26px; text-align: center; user-select: text; }
+.nautilus-properties__identity img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 6px; filter: drop-shadow(0 3px 3px #0002); }
+.nautilus-properties__identity h3 { max-width: 100%; margin: 0; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
+.nautilus-properties__identity small { color: #777; font-size: 12px; }
+.nautilus-properties__group { margin-top: 18px; border: 1px solid #0002; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 1px 3px #0001; }
+.nautilus-properties__row { box-sizing: border-box; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 12px 14px; border: 0; color: inherit; background: transparent; font: inherit; text-align: left; }
+.nautilus-properties__row + .nautilus-properties__row { border-top: 1px solid #0001; }
+.nautilus-properties__row > div { flex: 1; min-width: 0; }
+.nautilus-properties__row p { margin: 4px 0 0; color: #777; font-size: 12px; overflow-wrap: anywhere; user-select: text; }
+.nautilus-properties__row > button { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.nautilus-properties__row > button:hover, .nautilus-properties__row.is-navigation:hover { background: #00000009; }
+.nautilus-properties__row.is-navigation { cursor: pointer; }
+.nautilus-properties__access { margin-left: auto; color: #777; font-size: 13px; }
+.nautilus-properties__protection { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 18px 0 0; color: #777; font-size: 11px; }
+.nautilus-properties__explanation, .nautilus-properties__unavailable { color: #777; font-size: 13px; line-height: 1.5; margin: 20px 0; }
+.nautilus-properties__permission-item { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #0001; overflow-wrap: anywhere; }
+.nautilus-properties__permission-item small { flex-shrink: 0; color: #777; }
+.nautilus-properties button:focus-visible { outline: 2px solid #e95420; outline-offset: -3px; }
+@keyframes nautilus-properties-in { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .nautilus-properties { animation: none; } }

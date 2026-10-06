@@ -1,0 +1,8 @@
+.workspace-transition { position: fixed; inset: 32px 0 0; z-index: 6500; overflow: hidden; background: #1c1b20; }
+.workspace-transition[hidden] { display: none; }
+.workspace-transition__pane { position: absolute; inset: 0; overflow: hidden; will-change: transform; }
+.workspace-transition__wallpaper { position: absolute; inset: -32px 0 0; }
+.workspace-transition__shade { position: absolute; inset: 0; }
+.workspace-transition .workspace-transition__window { position: absolute; visibility: visible !important; animation: none !important; transition: none !important; transform: none !important; pointer-events: none !important; }
+.workspace-transition * { pointer-events: none !important; }
+@media (prefers-reduced-motion: reduce) { .workspace-transition { display: none; } }

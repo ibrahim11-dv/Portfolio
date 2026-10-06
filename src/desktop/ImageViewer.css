@@ -1,0 +1,87 @@
+.ubuntu-window[data-app="images"] { background: #fafafa; color: #3d3d3d; border-color: #0003; }
+.ubuntu-window[data-app="images"] .ubuntu-window__header { position: absolute; top: 0; right: 0; z-index: 5; width: 108px; height: 48px; padding: 0 8px 0 0; border: 0; background: transparent; }
+.ubuntu-window[data-app="images"] .ubuntu-window__title { display: none; }
+.ubuntu-window[data-app="images"] .ubuntu-window__content { height: 100%; }
+.ubuntu-window[data-app="images"] .ubuntu-window__controls button { width: 27px; height: 27px; color: #3d3d3d; background: #ddd9d5; }
+.ubuntu-window[data-app="images"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
+.loupe { position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; outline: none; color: #3d3d3d; background: #fafafa; font: 14px var(--font-ubuntu); container: loupe / inline-size; }
+.loupe button { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 6px; color: inherit; background: transparent; font: inherit; cursor: default; }
+.loupe button:hover:not(:disabled) { background: #0000000d; }
+.loupe button:focus-visible { outline: 2px solid #e95420; outline-offset: -2px; }
+.loupe button:disabled { opacity: .35; }
+.loupe__toolbar { position: relative; flex-shrink: 0; display: flex; align-items: center; height: 48px; padding: 0 112px 0 6px; gap: 4px; background: #f2f0ee; box-shadow: 0 1px #00000014; z-index: 3; touch-action: none; }
+.loupe__toolbar > button { width: 34px; height: 34px; }
+.loupe__toolbar > button:first-child { margin-right: auto; }
+.loupe__toolbar > strong { position: absolute; left: 50%; width: calc(100% - 410px); transform: translateX(-50%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; font-size: 14px; pointer-events: none; }
+.loupe.is-fullscreen .loupe__toolbar { padding-right: 6px; }
+.loupe.is-fullscreen .loupe__toolbar > strong { width: calc(100% - 210px); }
+.loupe__body { display: flex; flex: 1; min-height: 0; position: relative; }
+.loupe__stage { min-width: 0; flex: 1; position: relative; overflow: hidden; }
+.loupe__scroll { position: absolute; inset: 0; overflow: auto; touch-action: none; scrollbar-color: #9997 transparent; outline: none; }
+.loupe__space { position: relative; min-width: 100%; min-height: 100%; }
+.loupe__space img { display: block; position: absolute; left: 50%; top: 50%; max-width: none; user-select: none; pointer-events: none; }
+.loupe__scroll.is-panning { cursor: grabbing; }
+.loupe__empty { height: 100%; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; text-align: center; }
+.loupe__empty > svg { color: #aaa; }
+.loupe__empty h2 { font-size: 22px; margin: 18px 0 0; }
+.loupe__empty p { color: #777; margin: 10px 0 20px; }
+.loupe__empty button { padding: 11px 24px; border-radius: 99px; background: #e95420; color: white; font-weight: 600; }
+.loupe__empty button:hover { background: #d74a1b !important; }
+.loupe__osd { position: absolute; bottom: 18px; z-index: 2; display: flex; align-items: center; padding: 6px; border-radius: 12px; background: #f0f0f0bf; backdrop-filter: blur(8px); }
+.loupe__osd button { min-width: 34px; height: 34px; }
+.loupe__navigation { left: 18px; gap: 6px; }
+.loupe__zoom { right: 18px; gap: 6px; }
+.loupe__zoom button:last-child { font-size: 12px; padding: 0 6px; }
+.loupe__zoom button[aria-pressed="true"] { background: #00000012; }
+.loupe__menu { position: absolute; z-index: 8; width: 254px; padding: 6px; border: 1px solid #d6d2ce; border-radius: 12px; background: #fff; box-shadow: 0 8px 30px #0003; animation: loupe-reveal 150ms ease-out; }
+.loupe__main-menu { top: 44px; right: 116px; max-height: calc(100% - 54px); overflow: auto; }
+.loupe.is-fullscreen .loupe__main-menu { right: 8px; }
+.loupe__menu > button { width: 100%; min-height: 35px; padding: 7px 10px; justify-content: space-between; text-align: left; font-size: 13px; }
+.loupe__menu kbd { color: #777; font: 11px var(--font-ubuntu); }
+.loupe__menu hr { border: 0; height: 1px; background: #dedbd7; margin: 5px 4px; }
+.loupe__rotate { display: flex; align-items: center; gap: 8px; padding: 4px 10px; font-size: 13px; }
+.loupe__rotate > span { margin-right: auto; }
+.loupe__rotate button { width: 35px; height: 34px; }
+.loupe__zoom-menu { right: 18px; bottom: 76px; width: 234px; max-height: calc(100% - 84px); overflow: auto; }
+.loupe__zoom-menu form { display: flex; gap: 8px; padding: 6px; }
+.loupe__zoom-menu input { width: 100%; min-width: 0; padding: 7px; border-radius: 6px; border: 1px solid #bbb; background: #fafafa; color: #333; font: inherit; outline-color: #e95420; }
+.loupe__zoom-menu form button { width: 34px; background: #e95420; color: white; }
+.loupe__properties { width: 275px; flex-shrink: 0; overflow: auto; border-left: 1px solid #0002; background: #f6f5f4; padding: 12px; box-sizing: border-box; animation: loupe-reveal 250ms ease-out; }
+.loupe__properties-title { display: flex; align-items: center; gap: 8px; justify-content: space-between; font-size: 13px; }
+.loupe__properties-title button { width: 28px; height: 28px; }
+.loupe__properties dl { margin: 24px 0; background: #fff; border-radius: 10px; box-shadow: 0 1px 3px #0002; overflow: hidden; }
+.loupe__properties dl > div { padding: 11px 12px; }
+.loupe__properties dl > div + div { border-top: 1px solid #eee; }
+.loupe__properties dt { font-size: 11px; color: #777; margin-bottom: 4px; }
+.loupe__properties dd { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin: 0; font-size: 12px; overflow-wrap: anywhere; user-select: text; }
+.loupe__properties dd button { width: 28px; height: 28px; }
+.loupe__picker { display: flex; flex-direction: column; max-height: 350px; overflow: auto; gap: 5px; }
+.loupe__picker > button { display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 10px; border: 0; border-radius: 8px; color: #333; background: #f4f3f2; text-align: left; font: 14px var(--font-ubuntu); }
+.loupe__picker > button:hover { background: #eae7e4; }
+.loupe__picker img { width: 40px; height: 40px; object-fit: contain; }
+.loupe__picker small { display: block; margin-top: 3px; color: #777; }
+.loupe__picker .loupe__import { justify-content: center; color: #e95420; }
+.loupe__about { text-align: center; }
+.loupe__about img { width: 96px; height: 96px; }
+.loupe__shortcuts { max-height: 360px; overflow: auto; font: 12px var(--font-ubuntu); }
+.loupe__shortcuts > div { display: flex; justify-content: space-between; gap: 20px; padding: 9px 0; border-bottom: 1px solid #eee; }
+.loupe__shortcuts dd { margin: 0; white-space: nowrap; }
+.loupe__shortcuts kbd { font: inherit; color: #777; }
+.loupe__notice { position: absolute; bottom: 78px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 40px); display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: white; background: #303033; z-index: 9; box-shadow: 0 5px 18px #0003; font-size: 13px; }
+.loupe__notice button { color: white; width: 24px; height: 24px; }
+@container loupe (max-width: 590px) {
+  .loupe__body { flex-direction: column; }
+  .loupe__properties { width: 100%; max-height: min(210px, 45%); border-left: 0; border-top: 1px solid #0002; }
+  .loupe__properties dl { margin: 12px 0; }
+  .loupe__main-menu { right: 8px; }
+  .loupe__toolbar > strong { left: 46px; right: 194px; width: auto; transform: none; }
+  .loupe.is-fullscreen .loupe__toolbar > strong { right: 96px; width: auto; }
+}
+@container loupe (max-width: 400px) {
+  .loupe__osd { bottom: 12px; padding: 4px; gap: 2px; }
+  .loupe__navigation { left: 8px; }
+  .loupe__zoom { right: 8px; }
+  .loupe__osd button { min-width: 29px; }
+}
+@keyframes loupe-reveal { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .loupe__menu, .loupe__properties { animation: none; } }

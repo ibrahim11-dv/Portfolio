@@ -1,0 +1,39 @@
+.ubuntu-window-overview { position: fixed; z-index: 7900; inset: 32px 0 0; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 30px 96px 28px; overflow: auto; color: white; background: #21192ce8; backdrop-filter: blur(22px); font: 14px var(--font-ubuntu); }
+.ubuntu-window-overview.is-opening { animation: window-overview-in 250ms cubic-bezier(.25,.46,.45,.94) both; }
+.ubuntu-window-overview.is-closing { pointer-events: none; animation: window-overview-out 180ms ease-in both; }
+.ubuntu-window-overview__search { flex-shrink: 0; display: flex; gap: 12px; align-items: center; width: min(560px, 100%); padding: 12px 15px; border: 1px solid #ffffff30; border-radius: 9px; color: #ddd; background: #302b39; }
+.ubuntu-window-overview__search:focus-within { border-color: #e95420; box-shadow: 0 0 0 2px #e9542030; }
+.ubuntu-window-overview__search input { min-width: 0; flex: 1; border: 0; outline: 0; color: white; background: transparent; font: 15px var(--font-ubuntu); }
+.ubuntu-window-overview__search button { display: grid; place-items: center; border: 0; color: #ddd; background: transparent; cursor: pointer; }
+.ubuntu-window-overview__workspaces { display: flex; justify-content: center; max-width: 100%; flex-shrink: 0; gap: 14px; overflow: auto; padding: 5px; }
+.ubuntu-window-overview__workspace { position: relative; width: 145px; height: 80px; flex-shrink: 0; display: grid; place-items: center; padding: 12px; border: 2px solid #ffffff28; border-radius: 10px; color: white; background: url('../assets/background.png') center/cover, #47263e; cursor: pointer; }
+.ubuntu-window-overview__workspace.is-current { border-color: #e95420; box-shadow: 0 0 0 1px #e95420; }
+.ubuntu-window-overview__workspace.is-drop-target { background-color: #e9542050; border-color: #ffaa7f; }
+.ubuntu-window-overview__workspace > span:last-child { position: absolute; right: 7px; bottom: 5px; color: #fff9; font-size: 10px; }
+.ubuntu-window-overview__workspace-preview { position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 7px; pointer-events: none; }
+.ubuntu-window-overview__workspace-stage { position: absolute; transform-origin: top left; pointer-events: none; }
+.ubuntu-window-overview__workspace-stage .ubuntu-window { position: absolute; min-width: 0; min-height: 0; pointer-events: none; }
+.ubuntu-window-overview__workspace-stage .ubuntu-window__resize { display: none; }
+.ubuntu-window-overview__windows { width: min(1050px, 100%); min-height: 190px; flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 26px; align-content: center; }
+.ubuntu-window-overview__window { position: relative; min-width: 0; }
+.ubuntu-window-overview__open { display: flex; width: 100%; height: 100%; flex-direction: column; gap: 10px; padding: 5px; border: 2px solid transparent; border-radius: 14px; color: white; background: transparent; font: 13px var(--font-ubuntu); cursor: pointer; transition: border-color 120ms ease; }
+.ubuntu-window-overview__open:hover, .ubuntu-window-overview__open:focus-visible { border-color: #ffffff55; outline: none; }
+.ubuntu-window-overview__open > span { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.ubuntu-window-overview__open > span img { width: 24px; height: 24px; object-fit: contain; }
+.ubuntu-window-overview__open small { color: #bbb; }
+.ubuntu-window-overview__preview { width: 100%; height: min(270px, 36vh); min-height: 160px; position: relative; overflow: hidden; border-radius: 12px; pointer-events: none; }
+.ubuntu-window-overview__preview .ubuntu-window { position: absolute; min-width: 0; min-height: 0; transform-origin: top left; pointer-events: none; }
+.ubuntu-window-overview__preview .ubuntu-window__resize { display: none; }
+.ubuntu-window-overview__close { position: absolute; top: -6px; right: -6px; width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid #ffffff40; border-radius: 50%; color: white; background: #3b363f; cursor: pointer; }
+.ubuntu-window-overview__close:hover { background: #e95420; }
+.ubuntu-window-overview__empty { display: grid; place-items: center; color: #ffffff90; text-align: center; }
+.ubuntu-window-overview__results { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.ubuntu-window-overview__results button { display: flex; min-width: 120px; align-items: center; gap: 10px; padding: 12px; border: 0; border-radius: 9px; color: white; background: #ffffff0c; font: 13px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-window-overview__results button:hover { background: #ffffff18; }
+.ubuntu-window-overview__results img { width: 34px; height: 34px; object-fit: contain; }
+.ubuntu-window-overview__show-apps { flex-shrink: 0; display: flex; align-items: center; gap: 9px; padding: 10px 15px; border: 1px solid #ffffff22; border-radius: 9px; color: white; background: #ffffff10; font: 13px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-window-overview__show-apps:hover { background: #ffffff20; }
+@keyframes window-overview-in { from { opacity: 0; transform: scale(.98); } }
+@keyframes window-overview-out { to { opacity: 0; transform: scale(.98); } }
+@media (max-width: 620px) { .ubuntu-window-overview { padding: 24px 20px 95px; } .ubuntu-window-overview__workspace { width: 115px; height: 68px; } .ubuntu-window-overview__windows { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; } .ubuntu-window-overview__preview { height: 190px; min-height: 120px; } }
+@media (prefers-reduced-motion: reduce) { .ubuntu-window-overview { animation: none !important; } .ubuntu-window-overview.is-closing { opacity: 0; } .ubuntu-window-overview__open { transition: none; } }

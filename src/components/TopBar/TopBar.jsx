@@ -26,10 +26,11 @@ function SymbolicIcon({ name }) {
   return <span aria-hidden="true" className="ubuntu-symbolic-icon" style={{ '--icon': `url("${import.meta.env.BASE_URL}ubuntu-icons/${name}-symbolic.svg")` }} />;
 }
 
-export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange }) {
+export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, overviewOpen = false }) {
   const [now, setNow] = useState(new Date());
   const [openMenu, setOpenMenu] = useState(null); // "clock" | "system" | null
-  const [activeWorkspace, setActiveWorkspace] = useState(0);
+  const [localWorkspace, setLocalWorkspace] = useState(0);
+  const activeWorkspace = workspace ?? localWorkspace;
   const [viewDate, setViewDate] = useState(new Date()); // month shown in calendar
   const [preferences, setPreferences] = useState(readPreferences);
   const { volume, brightness, ...toggles } = preferences;
@@ -109,11 +110,36 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange 
   const trackRef = useRef(null);
   const activeRef = useRef(0);
   const lastWheelRef = useRef(0);
+  useEffect(() => { activeRef.current = activeWorkspace; }, [activeWorkspace]);
 
   // clock tick
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    function shellShortcut(event) {
+      if (document.querySelector('dialog[open]')) return;
+      const key = event.key.toLowerCase();
+      if (event.metaKey && key === 'v') {
+        event.preventDefault();
+        setViewDate(new Date());
+        setSelectedDate(new Date());
+        setDetail(null);
+        setOpenMenu((current) => current === 'clock' ? null : 'clock');
+        clockRef.current?.focus();
+      }
+      if ((event.metaKey && key === 'l') || (event.ctrlKey && event.altKey && event.key === 'Delete')) {
+        event.preventDefault();
+        setOpenMenu(null);
+        setDetail(null);
+        setDialog(null);
+        setSession(event.metaKey ? 'lock' : 'power');
+      }
+    }
+    document.addEventListener('keydown', shellShortcut);
+    return () => document.removeEventListener('keydown', shellShortcut);
   }, []);
 
   useEffect(() => {
@@ -142,7 +168,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange 
     const clamped = Math.max(0, Math.min(workspaceCount - 1, index));
     if (clamped === activeRef.current) return;
     activeRef.current = clamped;
-    setActiveWorkspace(clamped);
+    setLocalWorkspace(clamped);
     onWorkspaceChange && onWorkspaceChange(clamped);
   }
 
@@ -160,7 +186,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange 
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspaceCount]);
+  }, [workspaceCount, onWorkspaceChange]);
 
   function toggle(key) {
     updatePreference(key, !preferences[key]);
@@ -201,24 +227,25 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange 
     <div ref={containerRef} className="ubuntu-topbar">
       {/* --- Left: workspace dots + app name --- */}
       <div className="ubuntu-topbar__left">
-        <div
+        <button
           ref={trackRef}
           className="ubuntu-topbar__workspace-track"
-          title="Changer de bureau (molette ou clic)"
+          title="Activités · molette pour changer de bureau"
+          aria-label="Activités"
+          aria-expanded={overviewOpen}
+          onClick={() => onOverview?.()}
         >
           {Array.from({ length: workspaceCount }).map((_, i) => (
-            <button
+            <span
               key={i}
-              onClick={() => goToWorkspace(i)}
-              aria-label={`Bureau ${i + 1}`}
-              aria-pressed={i === activeWorkspace}
+              aria-hidden="true"
               className={
                 "ubuntu-topbar__dot" +
                 (i === activeWorkspace ? " ubuntu-topbar__dot--active" : "")
               }
             />
           ))}
-        </div>
+        </button>
         {appName && <span className="ubuntu-topbar__app-name">{appName}</span>}
       </div>
 

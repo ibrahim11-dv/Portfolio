@@ -8,6 +8,7 @@
 .ubuntu-window[data-app="files"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
 .ubuntu-window[data-app="files"] .ubuntu-window__controls button:last-child:hover { background: #c74516; }
 .ubuntu-files { position: relative; background: #fff; color: #3d3d3d; outline: 0; font-size: 14px; }
+.ubuntu-files { container-type: inline-size; container-name: filemanager; }
 .ubuntu-files__toolbar { flex-shrink: 0; min-height: 48px; height: 48px; padding: 0 112px 0 0; gap: 3px; background: #f2f0ee; border-bottom: 1px solid #d9d6d2; cursor: default; }
 .ubuntu-files__toolbar button { flex-shrink: 0; width: 34px; height: 34px; border-radius: 6px; color: #3d3d3d; }
 .ubuntu-files__toolbar button:hover:not(:disabled), .ubuntu-files__toolbar button.is-selected { background: #0000000c; }
@@ -16,6 +17,16 @@
 .ubuntu-files__breadcrumbs { flex: 1; max-width: none; margin: 0 4px; gap: 0; border-radius: 6px; overflow: auto; scrollbar-width: none; }
 .ubuntu-files__breadcrumbs > span { display: flex; align-items: center; gap: 0; }
 .ubuntu-files__breadcrumbs button { width: auto; padding: 0 8px; font: 600 13px var(--font-ubuntu); }
+.ubuntu-files__location { flex: 1; min-width: 50px; margin: 0 4px; display: flex; align-items: center; border: 1px solid #b9b2aa; border-radius: 6px; background: #fff; }
+.ubuntu-files__location:focus-within { border-color: #e95420; box-shadow: 0 0 0 1px #e95420; }
+.ubuntu-files__location input { flex: 1; min-width: 0; padding: 7px 9px; border: 0; outline: 0; background: transparent; color: inherit; font: 13px var(--font-ubuntu); }
+.ubuntu-files__location button { width: 28px; height: 30px; }
+.ubuntu-files__location { position: relative; }
+.ubuntu-files__location-completions { position: absolute; z-index: 50; left: -1px; right: -1px; top: calc(100% + 4px); min-width: 180px; max-height: 240px; overflow: auto; padding: 4px; border: 1px solid #d0cbc6; border-radius: 8px; background: #faf9f8; box-shadow: 0 4px 14px #0003; }
+.ubuntu-files__location-completions button { display: flex; align-items: center; gap: 8px; width: 100%; height: auto; min-height: 34px; padding: 7px 8px; text-align: left; font: 13px var(--font-ubuntu); }
+.ubuntu-files__location-completions button[aria-selected="true"] { color: #94330f; background: #e9542025; }
+.ubuntu-files__location-completions button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ubuntu-files__location-completions button svg { flex-shrink: 0; }
 .ubuntu-files__toolbar-spacer { display: none; }
 .ubuntu-files__view-switch { display: flex; flex-shrink: 0; margin: 0 2px; }
 .ubuntu-files__view-switch button:last-child { width: 22px; }
@@ -30,6 +41,19 @@
 .ubuntu-files__sidebar-separator { height: 1px; min-height: 1px; margin: 10px 8px; background: #d8d4ce; }
 .ubuntu-files__main { min-width: 0; min-height: 0; display: flex; flex: 1; flex-direction: column; background: white; }
 .ubuntu-files__grid { flex: 1; padding: 18px 14px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); grid-auto-rows: 112px; gap: 6px 8px; scrollbar-width: thin; scrollbar-color: #aaa49d transparent; }
+.ubuntu-files__grid { position: relative; user-select: none; }
+.ubuntu-files__selection-box { position: absolute; z-index: 4; pointer-events: none; border: 1px solid #e95420; background: #e9542024; border-radius: 2px; }
+.ubuntu-file { transition: background-color 120ms ease-out, opacity 120ms ease-out, box-shadow 120ms ease-out; animation: ubuntu-file-appear 120ms ease-out; }
+.ubuntu-file.is-cut { opacity: .48; }
+.ubuntu-file.is-dragging { opacity: .55; }
+.ubuntu-file.is-focused:focus-visible, .ubuntu-files:focus-visible .ubuntu-file.is-focused { outline: 2px solid #e95420; outline-offset: -2px; }
+.ubuntu-file.is-drop-target, .ubuntu-files__sidebar button.is-drop-target, .ubuntu-files__breadcrumbs button.is-drop-target { color: #94330f; background: #e954203b; box-shadow: inset 0 0 0 2px #e95420; }
+.ubuntu-files__grid.is-drop-target { box-shadow: inset 0 0 0 2px #e95420; background: #fffaf7; }
+.ubuntu-file-drag-preview { position: fixed; left: -1000px; top: 0; z-index: 9999; display: flex; align-items: center; gap: 10px; padding: 9px 14px 9px 8px; max-width: 280px; border-radius: 9px; background: #f7f5f2; color: #3d3d3d; box-shadow: 0 4px 18px #0005; border: 1px solid #b6b0a9; font: 13px var(--font-ubuntu); }
+.ubuntu-file-drag-preview img { width: 48px; height: 48px; object-fit: contain; }
+.ubuntu-file-drag-preview span { max-width: 210px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes ubuntu-file-appear { from { opacity: .7; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .ubuntu-file { animation: none; transition: none; } }
 .ubuntu-file { padding: 9px 5px; gap: 6px; border-radius: 7px; font-size: 13px; cursor: default; user-select: none; }
 .ubuntu-file:hover { background: #00000006; }
 .ubuntu-file.is-selected { color: #94330f; background: #e9542025; box-shadow: none; }
@@ -38,11 +62,17 @@
 .ubuntu-file > span:not(.ubuntu-file__icon) { max-width: 100%; line-height: 1.35; overflow-wrap: anywhere; text-align: center; }
 .ubuntu-file small, .ubuntu-file__size { display: none; }
 .ubuntu-files__columns { display: grid; grid-template-columns: minmax(0, 1fr) 105px 120px; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #e4e1de; font-size: 12px; color: #77716c; }
+.ubuntu-files__columns button { display: flex; align-items: center; gap: 8px; border: 0; padding: 0; color: inherit; background: transparent; text-align: left; font: inherit; cursor: pointer; }
+.ubuntu-files__columns button:first-child { padding-left: 40px; }
+.ubuntu-files__columns button:focus-visible { outline: 2px solid #e95420; outline-offset: 3px; }
+.ubuntu-files__context-menu button:focus-visible { background: #e8e5e2; outline: 2px solid #e95420; outline-offset: -2px; }
+.ubuntu-files__context-menu kbd { margin-left: auto; color: #827970; font: 10px var(--font-ubuntu); }
 .ubuntu-files__grid.is-list { padding: 4px 8px; gap: 0; }
 .ubuntu-files__grid.is-list .ubuntu-file { display: grid; flex-shrink: 0; grid-template-columns: 28px minmax(0, 1fr) 105px 120px; gap: 12px; min-height: 42px; padding: 5px 12px; }
 .ubuntu-files__grid.is-list .ubuntu-file__icon img { width: 27px; height: 27px; }
 .ubuntu-files__grid.is-list .ubuntu-file > span:not(.ubuntu-file__icon) { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ubuntu-files__grid.is-list .ubuntu-file small, .ubuntu-files__grid.is-list .ubuntu-file__size { display: block; margin: 0; font-size: 12px; color: #77716c; }
+.ubuntu-files__grid.is-list .ubuntu-file small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ubuntu-files__grid.is-list .ubuntu-file:nth-child(even):not(.is-selected) { background: #faf9f8; }
 .ubuntu-files__empty { padding: 32px; gap: 16px; }
 .ubuntu-files__empty svg { color: #b7b1ab; }
@@ -66,10 +96,20 @@
   .ubuntu-files__grid.is-list .ubuntu-file { grid-template-columns: 28px minmax(0, 1fr) 90px; }
   .ubuntu-files__search-row { padding-left: 165px; }
 }
-@media (max-width: 480px) {
-  .ubuntu-files__sidebar { display: none; }
-  .ubuntu-files__sidebar-title { display: none; }
+.ubuntu-files.is-compact .ubuntu-files__sidebar-title { display: flex; flex: 0 0 42px; width: 42px; margin-right: 0; padding: 0 4px; border-right: 0; }
+.ubuntu-files.is-compact .ubuntu-files__sidebar-title strong { display: none; }
+.ubuntu-files.is-compact .ubuntu-files__sidebar { position: absolute; display: flex; z-index: 31; top: 48px; left: 0; bottom: 28px; width: min(220px, calc(100% - 48px)); transform: translateX(-100%); visibility: hidden; transition: transform 250ms cubic-bezier(.25,.46,.45,.94), visibility 250ms; box-shadow: 5px 0 20px #0002; }
+.ubuntu-files.is-compact.is-sidebar-overlay-open .ubuntu-files__sidebar { visibility: visible; transform: none; }
+.ubuntu-files__sidebar-backdrop { position: absolute; z-index: 30; inset: 48px 0 28px; padding: 0; border: 0; border-radius: 0; background: #0004; cursor: default; animation: files-sidebar-dim 250ms ease-out; }
+.ubuntu-files.is-compact .ubuntu-files__search-row { padding-left: 12px; }
+@container filemanager (max-width: 460px) {
   .ubuntu-files__toolbar { padding-left: 5px; }
+  .ubuntu-files__toolbar > button[aria-label="Précédent"], .ubuntu-files__toolbar > button[aria-label="Suivant"], .ubuntu-files__toolbar > button[aria-label="Créer un fichier ou un dossier"], .ubuntu-files__view-switch { display: none; }
   .ubuntu-files__breadcrumbs button { font-size: 12px; }
   .ubuntu-files__search-row { padding-left: 12px; }
+  .ubuntu-files__columns { grid-template-columns: minmax(0, 1fr) 75px; }
+  .ubuntu-files__columns button:last-child, .ubuntu-files__grid.is-list .ubuntu-file small { display: none; }
+  .ubuntu-files__grid.is-list .ubuntu-file { grid-template-columns: 28px minmax(0, 1fr) 75px; }
 }
+@keyframes files-sidebar-dim { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ubuntu-files.is-compact .ubuntu-files__sidebar { transition: none; } .ubuntu-files__sidebar-backdrop { animation: none; } }

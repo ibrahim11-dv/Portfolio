@@ -1,11 +1,37 @@
-.ubuntu-overview { position: fixed; z-index: 8000; inset: 32px 0 0; padding: 7vh 8vw; display: flex; justify-content: center; background: #1b1525c9; backdrop-filter: blur(20px); animation: overview-in 180ms ease-out; font-family: var(--font-ubuntu); }
+.ubuntu-overview { position: fixed; z-index: 8000; inset: 32px 0 0; padding: 7vh 8vw; display: flex; justify-content: center; overflow-y: auto; background: #1b1525c9; backdrop-filter: blur(20px); font-family: var(--font-ubuntu); }
+.ubuntu-overview.is-opening { animation: overview-in 180ms ease-out both; }
+.ubuntu-overview.is-closing { pointer-events: none; animation: overview-out 160ms ease-in both; }
 .ubuntu-overview__panel { width: min(900px, 100%); }
+.ubuntu-overview.is-opening .ubuntu-overview__panel { animation: overview-panel-in 220ms cubic-bezier(.16, 1, .3, 1) both; }
+.ubuntu-overview.is-closing .ubuntu-overview__panel { animation: overview-panel-out 160ms ease-in both; }
 .ubuntu-overview__search { width: min(560px, 100%); margin: 0 auto 48px; padding: 12px 18px; display: flex; align-items: center; gap: 12px; border: 1px solid #ffffff38; border-radius: 9px; background: #302b39; box-shadow: 0 8px 30px #0005; color: #fff; }
-.ubuntu-overview__search input { flex: 1; border: 0; outline: 0; color: #fff; background: transparent; font: 16px var(--font-ubuntu); }
+.ubuntu-overview__search:focus-within { border-color: var(--ubuntu-orange); box-shadow: 0 0 0 2px #e9542050, 0 8px 30px #0005; }
+.ubuntu-overview__search input { flex: 1; min-width: 0; border: 0; outline: 0; color: #fff; background: transparent; font: 16px var(--font-ubuntu); }
 .ubuntu-overview__search input::placeholder { color: #ffffff9c; }
+.ubuntu-overview__clear { width: 26px; height: 26px; display: grid; place-items: center; flex-shrink: 0; border: 0; border-radius: 50%; background: transparent; color: #ddd; cursor: pointer; }
+.ubuntu-overview__clear:hover { background: #ffffff20; }
+.ubuntu-overview__clear:focus-visible { outline: 2px solid var(--ubuntu-orange); outline-offset: 2px; }
 .ubuntu-overview__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 30px 22px; padding: 18px 20px; }
-.ubuntu-overview__app { min-height: 125px; padding: 15px 8px; display: flex; flex-direction: column; align-items: center; gap: 13px; border: 0; border-radius: 12px; color: #fff; background: transparent; cursor: pointer; font: 14px var(--font-ubuntu); }
-.ubuntu-overview__app:hover, .ubuntu-overview__app:focus-visible { background: #ffffff18; outline: none; }
+.ubuntu-overview__app { min-height: 125px; padding: 15px 8px; display: flex; flex-direction: column; align-items: center; gap: 13px; border: 0; border-radius: 12px; color: #fff; background: transparent; cursor: pointer; font: 14px var(--font-ubuntu); transition: background 120ms ease; }
+.ubuntu-overview__app:hover { background: #ffffff18; }
+.ubuntu-overview__app:focus-visible { background: #ffffff18; outline: 2px solid var(--ubuntu-orange); outline-offset: 3px; }
+.ubuntu-overview__app:active { background: #ffffff30; }
 .ubuntu-overview__app img { width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 4px 8px #0005); }
+.ubuntu-overview__app { position: relative; user-select: none; }
+.ubuntu-overview__app img, .ubuntu-overview__app span { pointer-events: none; }
+.ubuntu-overview__app.is-being-dragged { opacity: .38; }
+.ubuntu-overview__app[data-drop-before]::before, .ubuntu-overview__app[data-drop-after]::after { content: ""; position: absolute; width: 3px; top: 12px; bottom: 12px; border-radius: 3px; background: var(--ubuntu-orange); pointer-events: none; }
+.ubuntu-overview__app[data-drop-before]::before { left: -10px; }
+.ubuntu-overview__app[data-drop-after]::after { right: -10px; }
+.ubuntu-overview.is-app-dragging { pointer-events: none; background: #1b152542; backdrop-filter: blur(3px); }
+.ubuntu-overview.is-app-dragging .ubuntu-overview__panel, .ubuntu-overview.is-app-dragging .ubuntu-overview__grid { pointer-events: none; }
+.ubuntu-overview.is-app-dragging .ubuntu-overview__app { pointer-events: auto; }
+.ubuntu-overview.is-app-dragging .ubuntu-overview__search { opacity: .3; }
 .ubuntu-overview__empty { color: #ffffffb0; text-align: center; }
-@keyframes overview-in { from { opacity: 0; } }
+.ubuntu-overview__accessible { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@keyframes overview-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overview-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes overview-panel-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes overview-panel-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(.98); } }
+@media (max-width: 620px) { .ubuntu-overview { padding: 30px 20px 105px; } .ubuntu-overview__search { margin-bottom: 22px; } .ubuntu-overview__grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; padding: 12px 4px; } .ubuntu-overview__app img { width: 64px; height: 64px; } }
+@media (prefers-reduced-motion: reduce) { .ubuntu-overview, .ubuntu-overview__panel { animation: none !important; } .ubuntu-overview.is-closing { opacity: 0; } .ubuntu-overview__app { transition: none; } }
