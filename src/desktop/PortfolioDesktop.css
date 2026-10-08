@@ -1,5 +1,5 @@
 .portfolio-desktop { position: absolute; inset: 32px 0 0; z-index: 1; pointer-events: none; color: #f7f7f5; font-family: var(--font-ubuntu); }
-.portfolio-desktop__welcome { position: absolute; right: 34px; bottom: 34px; width: min(390px, calc(100vw - 238px)); padding: 18px 19px 15px; border: 1px solid #ffffff32; background: #101114e8; box-shadow: 0 18px 50px #0006; pointer-events: auto; animation: ibrahimos-entry 330ms cubic-bezier(.2,.8,.2,1) both; }
+.portfolio-desktop__welcome { position: absolute; right: 34px; bottom: 34px; width: min(390px, calc(100vw - 238px)); padding: 18px 19px 15px; border: 1px solid #ffffff32; background: #101114e8; box-shadow: 0 18px 50px #0006; pointer-events: auto; animation: ibrahimos-entry var(--motion-content, 180ms) var(--motion-ease) both; }
 .portfolio-desktop__welcome::before { content: ''; position: absolute; inset: 6px; border: 1px solid #ffffff12; pointer-events: none; }
 .portfolio-desktop__system-line { display: flex; align-items: center; gap: 7px; color: #c7ccc9; font: 10px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .09em; }
 .portfolio-desktop__system-line i { width: 6px; height: 6px; margin-left: auto; border-radius: 50%; background: #a6ddd3; box-shadow: 0 0 0 3px #a6ddd319; }
@@ -10,7 +10,7 @@
 .portfolio-desktop__availability { margin: 14px 0 0; color: #f1f3f2; font-size: 12px; line-height: 1.55; }
 .portfolio-desktop__focus { margin: 8px 0 0; color: #aab0ae; font: 10px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .portfolio-desktop__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 17px; }
-.portfolio-desktop__actions button { min-height: 36px; display: inline-flex; justify-content: center; align-items: center; gap: 7px; border: 1px solid #ffffff2e; color: #f8faf9; background: transparent; font: 11px var(--font-ubuntu); cursor: pointer; transition: color 150ms ease, background 150ms ease, border-color 150ms ease; }
+.portfolio-desktop__actions button { min-height: 36px; display: inline-flex; justify-content: center; align-items: center; gap: 7px; border: 1px solid #ffffff2e; color: #f8faf9; background: transparent; font: 11px var(--font-ubuntu); cursor: pointer; transition: color var(--motion-feedback, 120ms) ease, background var(--motion-feedback, 120ms) ease, border-color var(--motion-feedback, 120ms) ease; }
 .portfolio-desktop__actions button:hover { border-color: #ffffff72; background: #ffffff10; }
 .portfolio-desktop__actions .is-primary { border-color: #bdeee5; color: #111514; background: #bdeee5; }
 .portfolio-desktop__actions .is-primary:hover { background: #e0fbf5; }
@@ -18,7 +18,22 @@
 .portfolio-desktop__links a { display: inline-flex; align-items: center; gap: 5px; color: #c9cfcc; font-size: 10px; text-decoration: none; }
 .portfolio-desktop__links a:hover { color: #fff; text-decoration: underline; }
 .portfolio-desktop__welcome :is(button, a):focus-visible { outline: 2px solid #bdeee5; outline-offset: 3px; }
-@keyframes ibrahimos-entry { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes ibrahimos-entry { from { opacity: 1; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (max-width: 620px) { .portfolio-desktop__welcome { right: 14px; bottom: 96px; width: min(390px, calc(100vw - 28px)); } }
 @media (max-height: 520px) and (max-width: 620px) { .portfolio-desktop__focus, .portfolio-desktop__links { display: none; } .portfolio-desktop__identity { padding-block: 14px 10px; } .portfolio-desktop__availability { margin-top: 9px; } }
 @media (prefers-reduced-motion: reduce) { .portfolio-desktop__welcome { animation: none; } .portfolio-desktop__actions button { transition: none; } }
+.portfolio-desktop__welcome { width: min(500px, calc(100vw - 250px)); bottom: 40px; background: #121617; animation-duration: var(--motion-window); }
+.portfolio-desktop__identity h1 { font-size: clamp(27px, 3vw, 38px); line-height: 1.12; }
+.portfolio-desktop__availability { font-size: 15px; }
+.portfolio-desktop__location { margin: 7px 0; color: #d7e2e0; font-size: 13px; }
+.portfolio-desktop__focus { font-size: 12px; color: #c1cecc; }
+.portfolio-desktop__actions .is-primary { grid-column: 1 / -1; }
+.portfolio-desktop__actions :is(a, button) { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px; border: 1px solid #ffffff40; color: #f3f8f6; font-size: 13px; text-decoration: none; }
+.portfolio-desktop__actions .is-primary { color: #101817; }
+.portfolio-desktop__links { gap: 8px 18px; }
+.portfolio-desktop__links a { min-height: 36px; font-size: 12px; }
+@media (max-width: 620px) { .portfolio-desktop__welcome { top: 12px; bottom: auto; right: 12px; width: calc(100vw - 24px); max-height: calc(100dvh - 136px); overflow: auto; padding: 16px; } .portfolio-desktop__identity { padding: 16px 0; } }
+@media (max-height: 520px) and (max-width: 620px) { .portfolio-desktop__focus, .portfolio-desktop__links { display: flex; } .portfolio-desktop__identity { padding: 8px 0; } }
+.portfolio-desktop__explore { display: none; }
+.portfolio-desktop__restore { position: absolute; bottom: 100px; right: 12px; pointer-events: auto; min-height: 44px; padding: 10px 16px; border: 1px solid #9bc7bf; background: #121617; color: #e8f4f1; font: inherit; }
+@media (max-width: 620px) { .portfolio-desktop__explore { display: block; width: 100%; min-height: 44px; margin-top: 8px; border: 1px solid #ffffff40; background: transparent; color: #d7e2e0; font: inherit; } }

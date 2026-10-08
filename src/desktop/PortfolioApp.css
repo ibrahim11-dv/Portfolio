@@ -12,7 +12,7 @@
 .portfolio-app__identity strong { display: block; color: #fff; font-size: 13px; font-weight: 500; letter-spacing: .03em; }
 .portfolio-app__identity span { display: block; margin-top: 3px; color: #aeb5b2; font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .09em; }
 .portfolio-app__sidebar nav { display: flex; flex-direction: column; gap: 2px; }
-.portfolio-app__sidebar nav button { position: relative; width: 100%; min-height: 42px; display: flex; align-items: center; gap: 9px; padding: 0 8px; border: 1px solid transparent; color: #c7cdca; background: transparent; text-align: left; font-size: 12px; transition: border-color 130ms ease, background 130ms ease, color 130ms ease; }
+.portfolio-app__sidebar nav button { position: relative; width: 100%; min-height: 42px; display: flex; align-items: center; gap: 9px; padding: 0 8px; border: 1px solid transparent; color: #c7cdca; background: transparent; text-align: left; font-size: 12px; transition: border-color var(--motion-feedback, 120ms) ease, background var(--motion-feedback, 120ms) ease, color var(--motion-feedback, 120ms) ease; }
 .portfolio-app__sidebar nav button:hover { color: #fff; background: #ffffff0c; }
 .portfolio-app__sidebar nav button.is-active { color: #fff; border-color: #ffffff24; background: #ffffff12; }
 .portfolio-app__sidebar nav button.is-active::before { content: ''; position: absolute; left: -10px; width: 2px; height: 25px; background: var(--ib-accent); }
@@ -29,7 +29,7 @@
 .portfolio-app__toolbar-cv, .portfolio-app__utility-link { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 6px 8px; border: 1px solid var(--ib-line); color: #292d2d; background: #fff; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; }
 .portfolio-app__toolbar-cv:hover, .portfolio-app__utility-link:hover { border-color: #8d9694; }
 .portfolio-app__content { position: relative; flex: 1; min-height: 0; overflow: auto; padding: 36px; outline: none; scrollbar-color: #9fa5a3 transparent; scrollbar-width: thin; }
-.portfolio-app__content > :not(.project-report) { animation: portfolio-section-in 280ms cubic-bezier(.2,.8,.2,1) both; }
+.portfolio-app__content > :not(.project-report) { animation: portfolio-section-in var(--motion-content, 180ms) var(--motion-ease) both; }
 .portfolio-app__eyebrow { display: block; color: #4d8780; font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .11em; }
 .portfolio-app__section-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid var(--ib-line); }
 .portfolio-app__section-heading h1 { margin-top: 8px; max-width: 620px; color: #16191a; font-size: clamp(28px, 4.4cqw, 46px); font-weight: 500; letter-spacing: -.055em; line-height: 1.04; }
@@ -38,7 +38,7 @@
 .portfolio-app__profile-screen::before { content: ''; position: absolute; inset: 41px 0 0; z-index: 0; pointer-events: none; opacity: .4; border-top: 1px dashed #c7cbca; border-bottom: 1px dashed #c7cbca; }
 .portfolio-app__profile-index, .portfolio-app__profile-grid, .portfolio-app__profile-readouts { position: relative; z-index: 1; }
 .portfolio-app__profile-index { display: flex; align-items: center; gap: 9px; color: #5f6966; font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .1em; }
-.portfolio-app__profile-index i { width: 38px; height: 1px; background: #8fd8cf; animation: index-line 700ms ease-out both; }
+.portfolio-app__profile-index i { width: 38px; height: 1px; background: #8fd8cf; animation: index-line var(--motion-content, 180ms) ease-out both; }
 .portfolio-app__profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) 205px; gap: 46px; padding: 35px 0 31px; }
 .portfolio-app__profile-copy { max-width: 690px; }
 .portfolio-app__kicker { display: flex; align-items: center; gap: 6px; color: #52615e; font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
@@ -148,7 +148,7 @@
 .portfolio-app__contact-copy button { display: inline-flex; align-items: center; gap: 6px; border: 0; color: #396e68; background: transparent; font-size: 10px; }
 .portfolio-app__contact-copy button:hover { color: #0f302b; text-decoration: underline; }
 .portfolio-app__contact-copy span { color: #64706c; font-size: 10px; }
-@keyframes portfolio-section-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+@keyframes portfolio-section-in { from { opacity: 1; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes caret { 50% { opacity: 0; } }
 @keyframes index-line { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); } }
 @container portfolio (max-width: 760px) {
@@ -211,4 +211,54 @@
   .portfolio-app__contact-actions a { min-height: 76px; border-right: 0; border-bottom: 1px solid #c7cdca; }
   .portfolio-app__contact-actions a:last-child { border-bottom: 0; }
 }
+@media (max-width: 480px) {
+  .portfolio-app__profile-grid { grid-template-columns: minmax(0, 1fr); }
+  .portfolio-app__profile-portrait-panel { display: none; }
+  .portfolio-app__profile-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .portfolio-app__profile-actions :is(button, a) { min-width: 0; justify-content: center; }
+  .portfolio-app__sidebar nav button { min-width: 0; flex: 1; }
+}
 @media (prefers-reduced-motion: reduce) { .portfolio-app__content > :not(.project-report), .portfolio-app__profile-index i { animation: none; } .portfolio-app :is(button, a, .portfolio-app__case-file) { transition: none; } .portfolio-app__kicker i { animation: none; } }
+
+.portfolio-app__toolbar :is(a, button) { min-height: 44px; }
+.portfolio-app__toolbar-contact { padding: 8px 12px; border: 1px solid #bcc8c4; background: transparent; color: #253733; cursor: pointer; }
+.ubuntu-window[data-app="portfolio"] { container: portfolio-window / inline-size; }
+@container portfolio-window (max-width: 720px) {
+  .portfolio-app { flex-direction: column; }
+  .portfolio-app__sidebar { width: 100%; min-height: 58px; padding: 6px; }
+  .portfolio-app__identity, .portfolio-app__sidebar-status { display: none; }
+  .portfolio-app__sidebar nav { flex-direction: row; }
+  .portfolio-app__sidebar nav button { min-width: 0; flex: 1; flex-direction: column; gap: 4px; padding: 6px; font-size: 11px; }
+  .portfolio-app__sidebar nav :is(small, b) { display: none; }
+  .portfolio-app__profile-grid { grid-template-columns: minmax(0, 1fr); }
+  .portfolio-app__profile-portrait-panel { display: none; }
+}
+.portfolio-app__profile-location { font-size: 13px; line-height: 1.7; color: #40524d; margin: 12px 0; }
+.portfolio-app__profile-actions :is(a, button) { min-height: 44px; }
+.portfolio-app__active-filters { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 12px; line-height: 1.5; }
+.portfolio-app__active-filters button { min-height: 44px; padding: 7px 10px; border: 1px solid #899b94; background: white; color: #20382f; }
+.portfolio-app__contact-copy { flex-wrap: wrap; }
+.portfolio-app__contact-copy input { width: 100%; padding: 10px; font: inherit; }
+.portfolio-app__case-list { grid-template-columns: 1fr; }
+.portfolio-app__case-file { display: grid; grid-template-columns: minmax(160px, .7fr) minmax(0, 1.3fr); border-bottom: 1px solid #b9c2be; }
+.portfolio-app__case-file .project-art { height: auto; align-self: stretch; }
+.portfolio-app__case-head { position: static; grid-column: 1 / -1; border-bottom: 1px solid #c7cecb; background: #e7ece9; }
+.portfolio-app__case-file:hover, .portfolio-app__case-file:focus-visible { background: #edf4f0; }
+.portfolio-app__case-file:focus-visible { outline: 2px solid #24665c; outline-offset: -3px; }
+.portfolio-app__content > :not(.project-report) { animation-duration: var(--motion-content); animation-timing-function: var(--motion-ease); }
+.portfolio-app h1:focus-visible { outline: 2px solid #24665c; outline-offset: 4px; }
+@container portfolio (max-width: 760px) {
+  .portfolio-app__toolbar { flex-wrap: wrap; gap: 5px; padding-block: 5px; }
+  .portfolio-app__toolbar-caption { overflow-wrap: anywhere; }
+  .portfolio-app__case-file, .portfolio-app__case-file.is-featured:nth-child(1) { display: block; }
+  .portfolio-app__case-file .project-art { max-height: 200px; }
+}
+@media (max-width: 620px) { .portfolio-app__toolbar-caption { display: none; } .portfolio-app__back { flex: 1; } .portfolio-app__toolbar { padding-inline: 8px; } .portfolio-app__toolbar-contact { font-size: 11px; } }
+.portfolio-app__filters button { min-height: 44px; }
+.portfolio-app__profile-availability { font-size: 13px; line-height: 1.5; }
+.portfolio-app h1:focus-visible { outline: 2px solid #39796e; outline-offset: 4px; }
+.portfolio-app__toolbar-caption { white-space: normal; overflow-wrap: anywhere; }
+@container portfolio-window (max-width: 720px) {
+  .portfolio-app__toolbar.has-project { flex-wrap: wrap; }
+  .portfolio-app__toolbar.has-project .portfolio-app__toolbar-caption { display: block; order: 5; flex-basis: 100%; padding: 4px 0 7px; font-size: 11px; }
+}

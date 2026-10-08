@@ -4,7 +4,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  ChevronRight,
   Code2,
   FileText,
   GitBranch,
@@ -12,30 +11,19 @@ import {
   Play,
   RotateCcw,
 } from 'lucide-react';
-import { PROFILE, PROJECTS } from './portfolioData';
+import { PROJECTS } from './portfolioData';
+import { PROJECT_MEDIA } from './projectMedia';
+import ProjectGallery from './ProjectGallery';
+import { CVAction } from './PortfolioActions';
 import './ProjectReport.css';
+import { PROJECT_PRESENTATION } from './projectPresentation';
 
 export function ProjectArtwork({ project, step = 0, compact = false }) {
-  return <div
-    className={`project-art project-art--${project.visual} ${compact ? 'is-compact' : ''}`}
-    style={{ '--project-accent': '#8fd8cf' }}
-    aria-hidden="true"
-  >
-    <div className="project-art__grid" />
-    {project.visual === 'fleet' ? <svg className="project-art__map" viewBox="0 0 600 230" fill="none">
-      <path className="project-art__roads" d="M0 42H600M0 120H600M0 199H600M85 0V230M231 0V230M418 0V230M537 0V230M0 230L250 0M336 230L600 10" />
-      <path className="project-art__route" d="M85 199V120H231V42H418V120H537V199" />
-      {[['85', '199'], ['231', '42'], ['537', '199']].map(([cx, cy], index) => <g key={cx} className={step === index ? 'is-current' : ''}><circle cx={cx} cy={cy} r="17" /><circle cx={cx} cy={cy} r="5" /></g>)}
-      <rect x="265" y="146" width="173" height="45" rx="4" /><text x="280" y="173">{['MISSION / PRÉPARATION', 'PARCOURS / SIMULATION', 'ARCHIVES / DOCUMENTS'][step]}</text>
-    </svg> : project.visual === 'campus' ? <div className="project-art__campus">
-      {['Administration', 'Enseignant', 'Étudiant'].map((role, index) => <div key={role} className={step === index ? 'is-current' : ''}><span>0{index + 1}</span><strong>{role}</strong><i /><i /><i /></div>)}
-    </div> : project.visual === 'document' ? <div className="project-art__document"><div className="project-art__paper"><FileText size={23} /><span>ATTESTATION</span><i /><i /><i /><div className={step === 2 ? 'is-current' : ''}>PDF <Check size={19} /></div></div><span className="project-art__document-label">{['Dossier', 'Données', 'Document'][step]}</span></div>
-      : project.visual === 'video' ? <div className="project-art__video"><div className="project-art__screen"><Play size={38} fill="currentColor" /><span>APERÇU VIDÉO</span></div><div className="project-art__formats">{['360p', '480p', '720p', '1080p'].map((format) => <span key={format} className={format === '720p' && step > 0 ? 'is-current' : ''}>{format}</span>)}</div><div className="project-art__transfer"><i style={{ width: `${(step + 1) / 3 * 100}%` }} /></div></div>
-        : project.visual === 'chat' ? <div className="project-art__chat"><span>ÉCHANGE ILLUSTRATIF</span><div>Bonjour !<small>Vous</small></div>{step > 0 && <i>send-message → receive-message</i>}{step > 1 && <div className="is-reply">Message reçu.<small>Autre client</small></div>}</div>
-          : project.visual === 'activity' ? <div className="project-art__activity"><span>EXEMPLE DE JOURNAL</span><div>{[35, 67, 45, 85, 60, 95, 75].map((height, index) => <i key={index} style={{ height: `${height}%`, opacity: step === 2 && index < 4 ? 0.2 : 1 }} />)}</div><code>{['POST /api/users', 'POST /api/users/:id/exercises', 'GET /api/users/:id/logs'][step]}</code></div>
-            : project.visual === 'link' ? <div className="project-art__link"><span>https://example.com/un/long/chemin</span><ChevronRight size={26} /><strong>{step === 0 ? 'HTTP · HTTPS' : '/api/shorturl/1'}</strong>{step === 2 && <small>→ Adresse d’origine</small>}</div>
-              : <div className="project-art__code"><Code2 size={52} strokeWidth={1} /><span>LearnXcompile</span><small>DOCUMENTATION EN COURS</small></div>}
-  </div>;
+  const cover = PROJECT_MEDIA[project.id]?.[0];
+  if (compact && cover) return <div className="project-art project-art--capture is-compact" aria-hidden="true"><img src={cover.src} alt="" loading="lazy" decoding="async" /><span>CAPTURE DU PROJET</span></div>;
+  const flow = PROJECT_PRESENTATION[project.id]?.flow;
+  if (flow) return <div className={`project-art project-flow ${compact ? 'is-compact' : ''}`} aria-label={`Schéma explicatif : ${project.name}`}><span>SCHÉMA EXPLICATIF</span><ol>{flow.map((label, index) => <li key={label} className={index === step ? 'is-current' : ''}><small>0{index + 1}{index === step ? ' · ÉTAPE ACTIVE' : ''}</small><strong>{label}</strong>{index < flow.length - 1 && <ArrowRight size={18} aria-hidden="true" />}</li>)}</ol></div>;
+  return <div className={`project-art project-art--pending ${compact ? 'is-compact' : ''}`}><div className="project-art__code"><Code2 size={52} strokeWidth={1} /><span>LearnXcompile</span><small>DOCUMENTATION EN COURS</small></div></div>;
 }
 
 function ProjectTour({ project }) {
@@ -110,19 +98,32 @@ function ProjectTour({ project }) {
   </section>;
 }
 
-function ReportSummary({ project, report }) {
-  const firstDecision = report.decisions?.[0];
+function ReportSummary({ project }) {
+  const summary = PROJECT_PRESENTATION[project.id];
   return <section className="project-report__summary" aria-label="Synthèse d’ingénierie">
-    <div><span>PROBLÈME</span><p>{report.problem}</p></div>
-    <div><span>CONTRIBUTION</span><p>{project.role}. {project.technicalFocus}.</p></div>
-    <div><span>DÉCISION TECHNIQUE</span><p>{firstDecision ? `${firstDecision[0]} — ${firstDecision[1]}` : report.solution}</p></div>
-    <div><span>RÉSULTAT</span><p>{report.outcome}</p></div>
+    <div><span>PROBLÈME</span><p>{summary.problem}</p></div>
+    <div><span>CONTRIBUTION</span><p>{summary.contribution}</p></div>
+    <div><span>DÉCISION TECHNIQUE</span><p>{summary.decision}</p></div>
+    <div><span>RÉSULTAT</span><p>{summary.result}</p></div>
   </section>;
 }
 
 export default function ProjectReport({ project, onBack, onSelectProject }) {
   const reportRef = useRef(null);
+  const [chapter, setChapter] = useState('context');
   const report = project.report;
+
+  useEffect(() => {
+    const root = reportRef.current.closest('.portfolio-app__content');
+    function track() {
+      const top = root.getBoundingClientRect().top + 110;
+      const sections = [...reportRef.current.querySelectorAll('[data-chapter]')];
+      const current = sections.filter((item) => item.getBoundingClientRect().top <= top).at(-1);
+      setChapter(current?.dataset.chapter || 'context');
+    }
+    root.addEventListener('scroll', track, { passive: true });
+    return () => root.removeEventListener('scroll', track);
+  }, [project.id]);
 
   useEffect(() => {
     const element = reportRef.current;
@@ -153,15 +154,14 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
 
   return <article className="project-report" ref={reportRef} style={{ '--project-accent': '#8fd8cf' }}>
     <header className="project-report__hero">
-      <div className="project-report__hero-top"><span>CASE FILE / {String(PROJECTS.findIndex((item) => item.id === project.id) + 1).padStart(2, '0')}</span><span>{project.group === 'main' ? 'SELECTED WORK' : 'PROJECT ARCHIVE'}</span></div>
+      <div className="project-report__hero-top"><span>DOSSIER / {String(PROJECTS.findIndex((item) => item.id === project.id) + 1).padStart(2, '0')}</span><span>{project.group === 'main' ? 'PROJET PRINCIPAL' : 'AUTRE PROJET'}</span></div>
       <div className="project-report__hero-grid">
         <div>
           <span className="project-report__eyebrow">{project.category} · {project.context}</span>
           <h1>{project.name}</h1>
           <p className="project-report__tagline">{project.tagline}</p>
-          <p className="project-report__intro">{report?.intro || project.description}</p>
+          <p className="project-report__intro">{project.description}</p>
         </div>
-        <ProjectArtwork project={project} compact />
       </div>
       <dl className="project-report__metadata">
         <div><dt>CONTEXTE</dt><dd>{project.context}</dd></div>
@@ -172,8 +172,8 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
       </dl>
       {project.stack.length > 0 && <div className="project-report__stack project-report__stack--hero" aria-label="Stack technique">{project.stack.map((item) => <span key={item}>{item}</span>)}</div>}
       <div className="project-report__hero-links">
-        {links.map(({ label, href, icon: Icon }) => <a key={label} href={href} target="_blank" rel="noreferrer"><Icon size={15} />{label}<ArrowUpRight size={14} /></a>)}
-        {project.group === 'main' && <a href={PROFILE.cvUrl} target="_blank" rel="noreferrer"><FileText size={15} />CV<ArrowUpRight size={14} /></a>}
+        {links.map(({ label, href, icon: Icon }) => <a key={label} href={href} target="_blank" rel="noreferrer" title="Ouvrir le code source dans un nouvel onglet"><Icon size={15} />{label}<ArrowUpRight size={14} /></a>)}
+        {project.group === 'main' && <CVAction><FileText size={15} />Lire le CV</CVAction>}
       </div>
     </header>
 
@@ -181,17 +181,19 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
       <span className="project-report__eyebrow">ARCHIVE PARTIEL</span>
       <h2>Documentation en cours.</h2>
       <p>Aucun dépôt ou document source de LearnXcompile n’a été fourni pour l’instant. Cette fiche reste volontairement limitée aux informations disponibles ; elle sera complétée lorsque les éléments du projet seront documentés.</p>
-      <button onClick={onBack}>Retour à l’index <ArrowRight size={16} /></button>
+      <button onClick={onBack}>Retour aux projets <ArrowRight size={16} /></button>
     </section> : <>
       <nav className="project-report__chapters" aria-label="Chapitres du rapport">
-        {[['context', '01', 'Synthèse'], ['tour', '02', 'Flux'], ['architecture', '03', 'Architecture'], ['decisions', '04', 'Décisions'], ['outcome', '05', 'Bilan']].map(([id, number, label]) => <button key={id} onClick={() => jump(id)}><small>{number}</small>{label}</button>)}
+        {[['context', '01', 'Synthèse'], ...(PROJECT_MEDIA[project.id] ? [['screens', '↗', 'Captures']] : []), ['tour', '02', 'Flux'], ['architecture', '03', 'Architecture'], ['decisions', '04', 'Décisions'], ['outcome', '05', 'Bilan']].map(([id, number, label]) => <button key={id} aria-current={chapter === id ? 'location' : undefined} onClick={() => { setChapter(id); jump(id); }}><small>{number}</small>{label}</button>)}
       </nav>
       <section className="project-report__chapter project-report__chapter--summary" data-chapter="context" tabIndex={-1}>
         <span className="project-report__eyebrow">SYNTHÈSE D’INGÉNIERIE / 01</span>
         <h2>Ce qui a été construit.</h2>
-        <ReportSummary project={project} report={report} />
+        <ReportSummary project={project} />
+        <details className="project-report__context-detail"><summary>Comprendre le contexte et la solution</summary><p>{report.problem}</p><p>{report.solution}</p></details>
         <div className="project-report__features">{project.highlights.map((item) => <span key={item}><Check size={14} />{item}</span>)}</div>
       </section>
+      {PROJECT_MEDIA[project.id] && <div className="project-report__chapter" data-chapter="screens" tabIndex={-1}><ProjectGallery key={project.id} project={project} images={PROJECT_MEDIA[project.id]} /></div>}
       <div className="project-report__chapter" data-chapter="tour" tabIndex={-1}><ProjectTour project={project} /></div>
       <section className="project-report__chapter" data-chapter="architecture" tabIndex={-1}>
         <span className="project-report__eyebrow">ARCHITECTURE / 03</span>
@@ -210,14 +212,14 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
         <details><summary>Sources, limites et niveau de preuve</summary><p>{report.boundaries}</p></details>
         <div className="project-report__sources">
           <span>SOURCES CONSULTABLES</span>
-          {report.sources.map((source) => project.github && <a key={source.path} href={`${project.github}/blob/${project.branch || 'main'}/${source.path}`} target="_blank" rel="noreferrer">{source.label}<ArrowUpRight size={14} /></a>)}
-          {project.group === 'main' && <a href={PROFILE.cvUrl} target="_blank" rel="noreferrer"><FileText size={14} />CV d’Ibrahim<ArrowUpRight size={14} /></a>}
+          {report.sources.map((source) => project.github && <a key={source.path} href={`${project.github}/blob/${project.branch || 'main'}/${source.path}`} target="_blank" rel="noreferrer" title="Ouvrir le code source dans un nouvel onglet">{source.label}<ArrowUpRight size={14} /></a>)}
+          {project.group === 'main' && <CVAction><FileText size={14} />Lire le CV</CVAction>}
         </div>
       </section>
     </>}
     <footer className="project-report__next">
-      <button onClick={onBack}><ArrowLeft size={16} />Retour à l’index</button>
-      <button onClick={() => onSelectProject(nextProject.id)}><span>PROCHAIN DOSSIER<strong>{nextProject.name}</strong></span><ArrowRight size={21} /></button>
+      <button onClick={onBack}><ArrowLeft size={16} />Retour aux projets</button>
+      <button onClick={() => onSelectProject(nextProject.id)}><span>PROJET SUIVANT<strong>{nextProject.name}</strong></span><ArrowRight size={21} /></button>
     </footer>
   </article>;
 }

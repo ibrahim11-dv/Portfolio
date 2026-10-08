@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Columns2, Copy, Download, FileText, Grid2X2, Info, List, Maximize, Menu, Minus, MoreVertical, Moon, PanelLeft, Plus, RotateCw, Search, X } from 'lucide-react';
 import { getDocument, GlobalWorkerOptions, TextLayer } from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import 'pdfjs-dist/web/pdf_viewer.css';
 import { PROFILE } from './portfolioData';
 import './DocumentViewer.css';
+import { normalizeReadingState } from './recruiterJourney';
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-function PdfPage({ pdf, number, scale, rotation, query = '', thumbnail = false, onNavigate }) {
+function PdfPage({ pdf, number, scale, rotation, query = '', thumbnail = false, onNavigate, onReady }) {
   const canvasRef = useRef(null);
   const textRef = useRef(null);
   const textLayerRef = useRef(null);
@@ -17,6 +18,9 @@ function PdfPage({ pdf, number, scale, rotation, query = '', thumbnail = false, 
   const [links, setLinks] = useState([]);
   const [rendered, setRendered] = useState(0);
   const [error, setError] = useState('');
+  const [canvasReady, setCanvasReady] = useState(false);
+  const readyRef = useRef(onReady);
+  useEffect(() => { readyRef.current = onReady; }, [onReady]);
   useEffect(() => {
     let cancelled = false;
     let renderTask;
@@ -34,7 +38,7 @@ function PdfPage({ pdf, number, scale, rotation, query = '', thumbnail = false, 
         setDimensions({ width: viewport.width, height: viewport.height });
         renderTask = page.render({ canvas, viewport, transform: density === 1 ? null : [density, 0, 0, density, 0, 0] });
         await renderTask.promise;
-        if (!cancelled) setError('');
+        if (!cancelled) { setError(''); setCanvasReady(true); if (!thumbnail) readyRef.current?.(); }
         if (cancelled || thumbnail) return;
         const content = await page.getTextContent();
         if (cancelled) return;
@@ -88,8 +92,9 @@ function PdfPage({ pdf, number, scale, rotation, query = '', thumbnail = false, 
   }, [query, rendered]);
 
   return <div className={`papers-page ${thumbnail ? 'is-thumbnail' : ''}`} data-pdf-page={thumbnail ? undefined : number} style={{ ...dimensions, '--total-scale-factor': scale, '--scale-factor': scale, '--user-unit': 1 }}>
-    <canvas ref={canvasRef} aria-hidden="true" style={dimensions || undefined} />
-    {!thumbnail && <><div ref={textRef} className="textLayer" /><div className="papers-page__links">{links.map((link) => link.url ? <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" style={link.box} aria-label={link.url} /> : <button key={link.id} style={link.box} aria-label="Suivre le lien dans le document" onClick={() => onNavigate(link.dest)} />)}</div></>}
+    <canvas ref={canvasRef} className={canvasReady ? 'is-ready' : undefined} aria-hidden="true" style={dimensions || undefined} />
+    {!canvasReady && !thumbnail && !error && <span className="papers-page__render-status" role="status">Rendu de la page {number}…</span>}
+    {!thumbnail && <><div ref={textRef} className="textLayer" /><div className="papers-page__links">{links.map((link) => link.url ? <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" title="Ouvrir dans un nouvel onglet" style={link.box} aria-label={link.url} /> : <button key={link.id} style={link.box} aria-label="Suivre le lien dans le document" onClick={() => onNavigate(link.dest)} />)}</div></>}
     {error && <span className="papers-page__error" role="alert">{error}</span>}
   </div>;
 }
@@ -98,18 +103,22 @@ function Outline({ items, onNavigate }) {
   return <ul className="papers-outline">{items.map((item, index) => <li key={`${index}-${item.title}`}><button onClick={() => onNavigate(item.dest)}>{item.title}</button>{item.items?.length > 0 && <Outline items={item.items} onNavigate={onNavigate} />}</li>)}</ul>;
 }
 
-export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf', onOpenCopy, onOpenFiles }) {
+export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf', onOpenCopy, onOpenFiles, onBack, backLabel = 'Retour au portfolio', onContact, onNotify, initialReadingState, onReadingState }) {
+  const [saved] = useState(() => normalizeReadingState(initialReadingState || {}));
   const [documentState, setDocumentState] = useState({ pdf: null, pages: [], outline: [], metadata: null, error: '' });
-  const [sidebar, setSidebar] = useState(true);
+  const [sidebar, setSidebar] = useState(saved.sidebar);
   const [sidebarMode, setSidebarMode] = useState('thumbnails');
   const [query, setQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(saved.page);
   const [pageDraft, setPageDraft] = useState(null);
-  const [zoom, setZoom] = useState('automatic');
-  const [rotation, setRotation] = useState(0);
-  const [continuous, setContinuous] = useState(true);
-  const [dual, setDual] = useState(false);
-  const [night, setNight] = useState(false);
+  const [zoom, setZoom] = useState(saved.zoom);
+  const [rotation, setRotation] = useState(saved.rotation);
+  const [continuous, setContinuous] = useState(saved.continuous);
+  const [dual, setDual] = useState(saved.dual);
+  const [night, setNight] = useState(saved.night);
+  const [retry, setRetry] = useState(0);
+  const [indexing, setIndexing] = useState(true);
+  const [notice, setNotice] = useState('');
   const [menu, setMenu] = useState(null);
   const [dialog, setDialog] = useState(null);
   const [fullscreen, setFullscreen] = useState(false);
@@ -121,7 +130,18 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
   const searchRef = useRef(null);
   const menuRef = useRef(null);
   const dialogRef = useRef(null);
+  const ratioRef = useRef(saved.scrollRatio);
+  const lastViewport = useRef(viewport);
+  const restoreRef = useRef(true);
+  const stateCallback = useRef(onReadingState);
+  useEffect(() => { stateCallback.current = onReadingState; }, [onReadingState]);
   const { pdf, pages, outline, metadata, error } = documentState;
+
+  useEffect(() => {
+    if (!notice) return undefined;
+    const timer = setTimeout(() => setNotice(''), 5000);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,21 +149,43 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
     async function load() {
       try {
         const loaded = await task.promise;
+        const first = await loaded.getPage(1);
+        const bounds = first.getViewport({ scale: 1 });
+        if (cancelled) return;
+        setDocumentState({ pdf: loaded, pages: Array.from({ length: loaded.numPages }, (_, i) => ({ number: i + 1, text: '', width: bounds.width, height: bounds.height, annotations: [] })), outline: [], metadata: null, error: '' });
         const summaries = await Promise.all(Array.from({ length: loaded.numPages }, async (_, index) => {
           const page = await loaded.getPage(index + 1);
           const [content, annotations] = await Promise.all([page.getTextContent(), page.getAnnotations()]);
           const bounds = page.getViewport({ scale: 1 });
           return { number: index + 1, text: content.items.map((item) => item.str || '').join(' '), width: bounds.width, height: bounds.height, annotations: annotations.filter((item) => ['Text', 'FreeText', 'Highlight', 'Underline', 'StrikeOut', 'Ink'].includes(item.subtype)) };
         }));
-        const [toc, info] = await Promise.all([loaded.getOutline(), loaded.getMetadata()]);
-        if (!cancelled) setDocumentState({ pdf: loaded, pages: summaries, outline: toc || [], metadata: info.info, error: '' });
+        const [toc, info] = await Promise.all([loaded.getOutline().catch(() => []), loaded.getMetadata().catch(() => ({ info: null }))]);
+        if (!cancelled) { setDocumentState({ pdf: loaded, pages: summaries, outline: toc || [], metadata: info.info, error: '' }); setIndexing(false); }
       } catch (failure) {
-        if (!cancelled) setDocumentState({ pdf: null, pages: [], outline: [], metadata: null, error: failure.name === 'PasswordException' ? 'Ce document est protégé par un mot de passe.' : 'Impossible d’ouvrir ce document.' });
+        if (!cancelled) {
+          setIndexing(false);
+          setDocumentState((current) => current.pdf
+            ? { ...current, searchError: 'La recherche n’a pas pu être préparée. Le document reste lisible.' }
+            : { pdf: null, pages: [], outline: [], metadata: null, error: failure.name === 'PasswordException' ? 'Ce document est protégé par un mot de passe.' : 'Impossible d’ouvrir ce document.' });
+        }
       }
     }
     load();
     return () => { cancelled = true; task.destroy(); };
-  }, [url]);
+  }, [url, retry]);
+
+  useEffect(() => {
+    stateCallback.current?.({ page: currentPage, scrollRatio: ratioRef.current, zoom, rotation, sidebar, continuous, dual, night });
+  }, [currentPage, zoom, rotation, sidebar, continuous, dual, night]);
+  const restorePosition = useCallback(() => {
+    if (!restoreRef.current) return;
+    requestAnimationFrame(() => {
+      const area = scrollRef.current;
+      if (!area) return;
+      area.scrollTop = ratioRef.current * Math.max(0, area.scrollHeight - area.clientHeight);
+      restoreRef.current = false;
+    });
+  }, []);
 
   useEffect(() => {
     if (rootRef.current?.closest('.is-active-window') && !document.querySelector('dialog[open]')) rootRef.current.focus({ preventScroll: true });
@@ -178,6 +220,14 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
   const widthScale = Math.max(.15, (viewport.width - 48) / ((dual && !presentation ? 2 : 1) * pageWidth));
   const fitScale = Math.max(.15, Math.min(widthScale, (viewport.height - 36) / pageHeight));
   const scale = presentation || zoom === 'fit-page' ? fitScale : zoom === 'fit-width' ? widthScale : zoom === 'automatic' ? Math.min(1, widthScale) : zoom;
+  useLayoutEffect(() => { restoreRef.current = true; }, [scale, rotation, pdf]);
+  useLayoutEffect(() => {
+    const resized = lastViewport.current.width !== viewport.width || lastViewport.current.height !== viewport.height;
+    lastViewport.current = viewport;
+    if (!resized || typeof zoom !== 'number') return;
+    restoreRef.current = true;
+    restorePosition();
+  }, [viewport, zoom, restorePosition]);
   const hits = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
     if (!needle) return [];
@@ -191,9 +241,11 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
   }, [pages, query]);
 
   function goToPage(number) {
+    restoreRef.current = false;
     const target = clamp(Number(number) || 1, 1, pages.length || 1);
     setCurrentPage(target);
     setPageDraft(null);
+    if (rootRef.current?.clientWidth < 720) setSidebar(false);
     requestAnimationFrame(() => scrollRef.current?.querySelector(`[data-pdf-page="${target}"]`)?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' }));
   }
   async function goToDestination(destination) {
@@ -204,7 +256,7 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
     } catch { /* An invalid document link does not leave the current page. */ }
   }
   function changeZoom(direction) { setZoom(clamp(Math.round(scale * (direction > 0 ? 1.2 : 1 / 1.2) * 100) / 100, .15, 5)); }
-  function saveCopy() { const link = document.createElement('a'); link.href = url; link.download = filename; link.click(); setMenu(null); }
+  function saveCopy() { const link = document.createElement('a'); link.href = url; link.download = filename; link.click(); setMenu(null); setNotice('Téléchargement demandé.'); onNotify?.('Téléchargement demandé.'); }
   async function enterFullscreen(slideshow = false) {
     setMenu(null);
     try {
@@ -253,10 +305,17 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
       <form className="papers__page-selector" onSubmit={(event) => { event.preventDefault(); goToPage(pageDraft ?? currentPage); rootRef.current?.focus(); }}><input ref={pageRef} aria-label="Numéro de page" inputMode="numeric" value={pageDraft ?? currentPage} onChange={(event) => setPageDraft(event.target.value)} onBlur={() => { if (pageDraft !== null) goToPage(pageDraft); }} /><span>sur {pdf?.numPages || '…'}</span></form>
       <button aria-label="Menu du document" onClick={() => setMenu(menu === 'document' ? null : 'document')}><MoreVertical size={18} /></button>
     </header>
+    <div className="papers__journey" aria-label="Actions du CV">
+      {onBack && <button onClick={onBack}>{backLabel}</button>}
+      <button onClick={() => { setSidebar(true); setSidebarMode('search'); }}>Rechercher</button>
+      <button onClick={saveCopy}><Download size={15} />Télécharger</button>
+      {onContact && <button onClick={onContact}>Contact</button>}
+    </div>
+    <span className="papers__status" role="status">{notice || documentState.searchError || (error ? 'Échec du chargement du CV' : !pdf ? 'Chargement du CV…' : indexing ? 'CV affiché · préparation de la recherche…' : 'CV prêt à lire')}</span>
     <div className="papers__body">
       {sidebar && <aside className="papers__sidebar" aria-label="Panneau du document">
         <div className="papers__sidebar-content">
-          {sidebarMode === 'search' ? <><div className="papers__search"><Search size={16} /><input ref={searchRef} aria-label="Rechercher dans le PDF" placeholder="Rechercher…" value={query} onChange={(event) => setQuery(event.target.value)} /><button aria-label="Fermer la recherche du PDF" onClick={() => { setSidebarMode('thumbnails'); setQuery(''); }}><X size={15} /></button></div><span className="papers__search-count" role="status">{query ? `${hits.length} résultat${hits.length === 1 ? '' : 's'}` : 'Rechercher dans le document'}</span>{hits.map((hit, index) => <button className="papers__search-hit" key={`${hit.page}-${hit.index}`} onClick={() => goToPage(hit.page)}><strong>Page {hit.page} · Résultat {index + 1}</strong><span>{hit.snippet}</span></button>)}</>
+          {sidebarMode === 'search' ? <><div className="papers__search"><Search size={16} /><input ref={searchRef} aria-label="Rechercher dans le PDF" placeholder="Rechercher…" value={query} onChange={(event) => setQuery(event.target.value)} /><button aria-label="Fermer la recherche du PDF" onClick={() => { setSidebarMode('thumbnails'); setQuery(''); }}><X size={15} /></button></div><span className="papers__search-count" role="status">{indexing ? 'Préparation de la recherche…' : query ? `${hits.length} résultat${hits.length === 1 ? '' : 's'}` : 'Rechercher dans le document'}</span>{hits.map((hit, index) => <button className="papers__search-hit" key={`${hit.page}-${hit.index}`} onClick={() => goToPage(hit.page)}><strong>Page {hit.page} · Résultat {index + 1}</strong><span>{hit.snippet}</span></button>)}</>
           : sidebarMode === 'outline' ? outline.length ? <Outline items={outline} onNavigate={goToDestination} /> : <p className="papers__empty"><List size={32} />Ce document ne possède pas de sommaire.</p>
           : sidebarMode === 'annotations' ? annotations.length ? annotations.map((annotation) => <button className="papers__search-hit" key={annotation.id} onClick={() => goToPage(annotation.page)}><strong>Page {annotation.page}</strong><span>{annotation.contentsObj?.str || annotation.subtype}</span></button>) : <p className="papers__empty"><FileText size={32} />Aucune annotation dans ce document.</p>
           : pages.map((page) => <button className={`papers__thumbnail ${page.number === currentPage ? 'is-current' : ''}`} key={page.number} aria-label={`Afficher la page ${page.number}`} aria-pressed={page.number === currentPage} onClick={() => goToPage(page.number)}><PdfPage pdf={pdf} number={page.number} scale={135 / page.width} rotation={0} thumbnail /><span>{page.number}</span></button>)}
@@ -264,14 +323,15 @@ export default function DocumentViewer({ url = PROFILE.cvUrl, filename = 'CV.pdf
         <nav className="papers__sidebar-tabs" aria-label="Contenu du panneau">{[['thumbnails', 'Vignettes', Grid2X2], ['outline', 'Sommaire', List], ['annotations', 'Annotations', FileText]].map(([mode, label, Icon]) => <button key={mode} aria-label={label} aria-pressed={sidebarMode === mode} onClick={() => setSidebarMode(mode)}><Icon size={18} /></button>)}</nav>
       </aside>}
       <div className="papers__main">
-        <div ref={scrollRef} className={`papers__scroll ${dual && !presentation ? 'is-dual' : ''}`} aria-label="Pages du document" tabIndex={-1} onScroll={() => {
+        <div ref={scrollRef} className={`papers__scroll ${dual && !presentation ? 'is-dual' : ''}`} aria-label="Pages du document" tabIndex={0} onScroll={() => {
+          if (!restoreRef.current) { const area = scrollRef.current; ratioRef.current = area.scrollTop / Math.max(1, area.scrollHeight - area.clientHeight); stateCallback.current?.({ page: currentPage, scrollRatio: ratioRef.current, zoom, rotation, sidebar, continuous, dual, night }); }
           if (!continuous || presentation) return;
           const viewportBounds = scrollRef.current.getBoundingClientRect();
           const candidates = [...scrollRef.current.querySelectorAll('[data-pdf-page]')];
           const nearest = candidates.sort((a, b) => Math.abs(a.getBoundingClientRect().top - viewportBounds.top) - Math.abs(b.getBoundingClientRect().top - viewportBounds.top))[0];
           if (nearest) setCurrentPage(Number(nearest.dataset.pdfPage));
         }}>
-          {error ? <div className="papers__loading" role="alert"><FileText size={44} /><strong>{error}</strong><a href={url} download={filename}>Enregistrer le document</a></div> : !pdf ? <div className="papers__loading" role="status"><span className="papers__spinner" />Ouverture du document…</div> : pages.filter((page) => continuous && !presentation || page.number === currentPage).map((page) => <PdfPage key={page.number} pdf={pdf} number={page.number} scale={scale} rotation={rotation} query={query} onNavigate={goToDestination} />)}
+          {error ? <div className="papers__loading" role="alert"><FileText size={44} /><strong>{error}</strong><button onClick={() => { setIndexing(true); setDocumentState({ pdf: null, pages: [], outline: [], metadata: null, error: '' }); setRetry((value) => value + 1); }}>Réessayer</button><a href={url} download={filename}>Télécharger le CV</a><a href={url} target="_blank" rel="noreferrer">Ouvrir le PDF original</a></div> : !pdf ? <div className="papers__loading" role="status"><span className="papers__spinner" />Ouverture du document…</div> : pages.filter((page) => continuous && !presentation || page.number === currentPage).map((page) => <PdfPage key={page.number} pdf={pdf} number={page.number} scale={scale} rotation={rotation} query={query} onNavigate={goToDestination} onReady={restorePosition} />)}
         </div>
         {pdf && !presentation && <div className="papers__zoom" aria-label="Zoom du document"><button aria-label="Ajuster automatiquement" title="Ajuster automatiquement" onClick={() => setZoom('automatic')}><Maximize size={17} /></button><button aria-label="Agrandir le document" title="Agrandir" disabled={scale >= 5} onClick={() => changeZoom(1)}><Plus size={19} /></button><button aria-label="Réduire le document" title="Réduire" disabled={scale <= .15} onClick={() => changeZoom(-1)}><Minus size={19} /></button><span>{Math.round(scale * 100)} %</span></div>}
         {fullscreen && <button className="papers__exit-fullscreen" onClick={() => document.exitFullscreen()}>Quitter le plein écran</button>}

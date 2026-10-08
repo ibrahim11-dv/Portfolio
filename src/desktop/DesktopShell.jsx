@@ -21,6 +21,7 @@ import { canDeletePath, readFiles, ROOT, trashPaths, uniquePath, writeFiles } fr
 import './DesktopShell.css';
 import './FileManager.css';
 import './Applications.css';
+import { findReusableWindow } from './recruiterJourney';
 
 const DocumentViewer = lazy(() => import('./DocumentViewer'));
 
@@ -47,6 +48,9 @@ export default function DesktopShell() {
   const zIndex = useRef(10);
   const nextInstance = useRef(1);
   const pendingLaunches = useRef(new Map());
+  const cvOrigin = useRef(null);
+  const [cvBackLabel, setCVBackLabel] = useState('Retour au portfolio');
+  const [cvReadingState, setCVReadingState] = useState(null);
   const metaChord = useRef(false);
   const hiddenByDesktop = useRef({});
   const workspaceTransition = useRef(null);
@@ -103,11 +107,11 @@ export default function DesktopShell() {
     const { newWindow = false, workspace: requestedWorkspace, ...options } = payload;
     const pendingLaunch = pendingLaunches.current.get(appId);
     const candidates = [...windows.filter((item) => item.appId === appId), ...(pendingLaunch && !windows.some((item) => item.id === pendingLaunch.id) ? [pendingLaunch] : [])].sort((a, b) => b.zIndex - a.zIndex);
-    const existing = newWindow ? null : candidates.find((item) => !options.filePath || item.filePath === options.filePath) || candidates[0];
+    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow);
     if (existing) {
       zIndex.current += 1;
       const layer = zIndex.current;
-      const navigation = options.directory || appId === 'trash' || (appId === 'editor' || appId === 'images') && options.filePath ? { navigationRequest: layer } : {};
+      const navigation = options.directory || appId === 'portfolio' && options.section || appId === 'trash' || (appId === 'editor' || appId === 'images') && options.filePath ? { navigationRequest: layer, restoreContext: null } : {};
       const targetWorkspace = requestedWorkspace ?? existing.workspace;
       if (targetWorkspace !== workspace) switchWorkspace(targetWorkspace);
       setActiveApp(existing.id);
@@ -131,6 +135,28 @@ export default function DesktopShell() {
     setWindows((current) => current.filter((window) => window.id !== id));
     setActiveApp((current) => current === id ? frontWindow(windows, id, workspace) : current);
     setSwitcher(null);
+  }
+
+  function openCV(sourceId, trigger, context) {
+    cvOrigin.current = { sourceId, trigger, context };
+    setCVBackLabel(sourceId ? 'Retour au portfolio' : 'Retour au bureau');
+    openApp('cv');
+    setDesktopNotice('CV ouvert dans le lecteur.');
+  }
+  function returnFromCV() {
+    const origin = cvOrigin.current;
+    const source = windows.find((item) => item.id === origin?.sourceId);
+    const cv = windows.find((item) => item.id === activeApp && item.appId === 'cv');
+    if (cv) focusApp(cv.id, 'minimize');
+    if (source) {
+      focusApp(source.id);
+      if (origin.context) {
+        const request = ++zIndex.current;
+        setWindows((current) => current.map((item) => item.id === source.id ? { ...item, restoreContext: origin.context, navigationRequest: request } : item));
+      }
+    }
+    else if (origin?.sourceId !== null) openApp('portfolio');
+    requestAnimationFrame(() => { if (origin?.trigger?.isConnected) origin.trigger.focus({ preventScroll: true }); });
   }
 
   function dockAction(id) {
@@ -225,7 +251,7 @@ export default function DesktopShell() {
     <TopBar appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
     <DesktopDock openApps={[...new Set(windows.map((item) => item.appId))]} activeApp={windows.find((item) => item.id === activeApp)?.appId} onOpen={dockAction} onLaunch={openApp} onQuit={quitApp} onTrashPaths={trashDrop} isFileProtected={(path) => !canDeletePath(files, path)} onShowApps={() => { setShowOverview(false); setShowApps((value) => !value); }} />
     <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onFocusDesktop={() => setActiveApp(null)} />
-    <PortfolioDesktop profile={PROFILE} onOpen={openApp} onFocusDesktop={() => setActiveApp(null)} />
+    <PortfolioDesktop profile={PROFILE} onOpen={openApp} onOpenCV={(trigger) => openCV(null, trigger)} onNotify={setDesktopNotice} />
     <main className="desktop-shell__workspace" aria-label="Espace de travail">
       {windows.map((window) => {
         const kind = window.appId;
@@ -233,8 +259,8 @@ export default function DesktopShell() {
         const title = kind === 'trash' ? 'Corbeille' : app?.name || 'Application';
         const icon = app?.icon || '/ubuntu-apps/trash.png';
         let content;
-        if (kind === 'portfolio') content = <PortfolioApp key={window.section || 'profile'} initialSection={window.section || 'profile'} />;
-        else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…</div>}><DocumentViewer key={window.filePath || 'cv'} filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
+        if (kind === 'portfolio') content = <PortfolioApp initialSection={window.section || 'profile'} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
+        else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('portfolio', { section: 'contact' })} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
         else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;
         else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} />;
         else if (kind === 'editor') content = <TextEditor key={window.id} windowId={window.id} files={files} filePath={window.filePath} navigationRequest={window.navigationRequest} openRequests={window.editorRequests} initialDocument={window.editorDocument} setFiles={setFiles} onNewWindow={(editorDocument) => openApp('editor', { newWindow: true, editorDocument: editorDocument || createDocument(files, uniquePath(files, `${ROOT}/Documents`, 'Sans titre.txt'), 0, true) })} onOpenDirectory={(directory) => openApp('files', { directory })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;

@@ -1,4 +1,9 @@
 :root {
+  --motion-feedback: 120ms;
+  --motion-content: 180ms;
+  --motion-window: 240ms;
+  --motion-ease: cubic-bezier(.2, .8, .2, 1);
+  --ib-accent: #8fd8cf;
   --ubuntu-orange: #E95420;
   --ubuntu-orange-hover: #f06a38;
   --ubuntu-orange-active: #d64713;

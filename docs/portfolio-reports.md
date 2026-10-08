@@ -18,7 +18,7 @@ Implemented:
 - Generated project README files contain the reports. Exact older generated documents are migrated; visitor copies and changed documents are preserved.
 - ParcVision Mobile is absent from the catalog, terminal output and fresh/updated project folders. Its known generated README and empty folder are removed without deleting visitor content.
 
-**Incomplete: LearnXcompile's detailed report and project-specific tour.** Its main-project placement and an honest presentation-in-preparation page exist. Neither the CV nor the public repositories inspected supplied its functionality or technologies. A GitHub URL or a description from Ibrahim is needed. Do not mark the full goal complete while this remains unresolved, and do not invent its features from its name.
+**Content limitation: LearnXcompile.** The current brief explicitly permits a “Documentation en cours” page. No functionality, technology or result is inferred from its name; a source is still needed to write a detailed report.
 
 ## Sources
 
@@ -31,7 +31,27 @@ Implemented:
 - Exercise Tracker: https://github.com/ibrahim11-dv/exerciceTracker-freeCodeCamp_/blob/main/index.js
 - URL Shortener: https://github.com/ibrahim11-dv/url-shortening/blob/main/index.js
 
-Illustrations are explanatory, not screenshots or live connections to these services. No usage or performance metrics have been invented. The YouTube report distinguishes audio streaming from MP3 transcoding and notes the absence of audio/video merging in the inspected server.
+Interactive diagrams are explanatory, not live connections to these services. The separate screenshot galleries contain original images supplied by Ibrahim. No usage or performance metrics have been invented. The YouTube report distinguishes audio streaming from MP3 transcoding and notes the absence of audio/video merging in the inspected server.
+
+## Screenshot integration, 8 October 2026
+
+- `projectMedia.js` maps five supplied ParcVision screenshots and four PFE-ESTO screenshots to factual captions.
+- Preview cards and report headers use the real cover image. Screenshots retain their original colors; the surrounding interface and diagrams use the restrained monochrome/teal palette.
+- `ProjectGallery.jsx` provides thumbnails, a native modal dialog, original-size viewing, previous/next controls, arrow/Home/End navigation, Escape dismissal and focus restoration. There is no automatic slideshow.
+- Reports have a direct Captures chapter shortcut and clearly distinguish original captures from illustrative tours.
+- Returning from a report restores the project list position, selected card focus and existing search/filter state.
+- Removed negative report margins that caused internal horizontal scrolling on narrow screens; simplified the profile layout below 480px.
+- No filesystem, window manager, terminal, editor or viewer implementation was changed in this integration.
+
+Verification for this integration:
+
+- Lint and production build pass; all 65 existing tests pass (filesystem protection, transfers, terminal, editor, catalog migration, metadata, completion and battery).
+- Browser: opened all eight reports; five ParcVision and four PFE screenshots loaded with nonzero natural dimensions.
+- Checked the gallery at 1280px, 390px and 319px. At 319px the report content and scroll widths both measure 307px; at 390px the modal has no horizontal overflow.
+- Checked thumbnail selection, previous/next, original-size mode, keyboard arrows, Escape and focus return. Search for PFE survives report/back and restores focus to its card. Category filtering and accent-insensitive search (`réact`) work.
+- Inspected CV/GitHub/email destinations and ran `projects` in the visible terminal. Maximizing the portfolio works. Browser console has no errors.
+- Reduced-motion behavior audited in the CSS media queries and the tour's media-query subscription: transitions and entrance animations are disabled; playback is disabled. No new automatic motion was added to the gallery.
+- Final screenshot: `.artifacts/ibrahimos-project-gallery.png`. Temporary viewport override was reset.
 
 ## Verification, 6 October 2026
 
