@@ -15,8 +15,8 @@
 .portfolio-desktop__actions .is-primary { border-color: #bdeee5; color: #111514; background: #bdeee5; }
 .portfolio-desktop__actions .is-primary:hover { background: #e0fbf5; }
 .portfolio-desktop__links { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 13px; margin-top: 14px; border-top: 1px solid #ffffff1c; }
-.portfolio-desktop__links a { display: inline-flex; align-items: center; gap: 5px; color: #c9cfcc; font-size: 10px; text-decoration: none; }
-.portfolio-desktop__links a:hover { color: #fff; text-decoration: underline; }
+.portfolio-desktop__links :is(a, button) { display: inline-flex; align-items: center; gap: 5px; color: #c9cfcc; font-size: 10px; text-decoration: none; }
+.portfolio-desktop__links :is(a, button):hover { color: #fff; text-decoration: underline; }
 .portfolio-desktop__welcome :is(button, a):focus-visible { outline: 2px solid #bdeee5; outline-offset: 3px; }
 @keyframes ibrahimos-entry { from { opacity: 1; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (max-width: 620px) { .portfolio-desktop__welcome { right: 14px; bottom: 96px; width: min(390px, calc(100vw - 28px)); } }
@@ -31,9 +31,11 @@
 .portfolio-desktop__actions :is(a, button) { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px; border: 1px solid #ffffff40; color: #f3f8f6; font-size: 13px; text-decoration: none; }
 .portfolio-desktop__actions .is-primary { color: #101817; }
 .portfolio-desktop__links { gap: 8px 18px; }
-.portfolio-desktop__links a { min-height: 36px; font-size: 12px; }
+.portfolio-desktop__links :is(a, button) { min-height: 36px; font-size: 12px; }
 @media (max-width: 620px) { .portfolio-desktop__welcome { top: 12px; bottom: auto; right: 12px; width: calc(100vw - 24px); max-height: calc(100dvh - 136px); overflow: auto; padding: 16px; } .portfolio-desktop__identity { padding: 16px 0; } }
 @media (max-height: 520px) and (max-width: 620px) { .portfolio-desktop__focus, .portfolio-desktop__links { display: flex; } .portfolio-desktop__identity { padding: 8px 0; } }
 .portfolio-desktop__explore { display: none; }
 .portfolio-desktop__restore { position: absolute; bottom: 100px; right: 12px; pointer-events: auto; min-height: 44px; padding: 10px 16px; border: 1px solid #9bc7bf; background: #121617; color: #e8f4f1; font: inherit; }
 @media (max-width: 620px) { .portfolio-desktop__explore { display: block; width: 100%; min-height: 44px; margin-top: 8px; border: 1px solid #ffffff40; background: transparent; color: #d7e2e0; font: inherit; } }
+
+.portfolio-desktop__links button { padding: 0; border: 0; background: none; cursor: pointer; font-family: inherit; }

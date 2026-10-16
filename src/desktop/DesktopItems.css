@@ -33,6 +33,7 @@
 
 @keyframes desktop-icon-in { from { opacity: 0; transform: scale(.94); } }
 @media (max-width: 620px) {
+  .desktop-items { bottom: 94px; touch-action: pan-y; }
   .desktop-items__notice { top: 42px; right: 10px; max-width: calc(100vw - 20px); gap: 7px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .desktop-context-menu, .desktop-items__notice, .desktop-items__item { animation: none; } .desktop-items__item, .desktop-items__icon, .desktop-items__drop-cell { transition: none; } }

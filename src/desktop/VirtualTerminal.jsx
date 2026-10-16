@@ -80,7 +80,7 @@ function TerminalSession({ ref, files, setFiles, onOpenFile, active, search, sea
     result.effects.forEach((effect) => {
       if (effect.type === 'open') onOpenFile(effect.path);
       if (effect.type === 'cv') onOpenCV?.();
-      if (effect.type === 'portfolio') onOpenPortfolio?.('profile');
+      if (effect.type === 'portfolio') onOpenPortfolio?.(effect.section || 'profile');
     });
     if (result.exit) onExit();
   }

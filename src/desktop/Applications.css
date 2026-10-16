@@ -76,11 +76,11 @@
 .ubuntu-help-topics p { font-size: 13px; }
 .ubuntu-trash-list { background: white; border-color: #e2ddd7; }
 .ubuntu-trash-list div { color: #3d3d3d; border-color: #e2ddd7; }
-.ubuntu-window[data-app="portfolio"] { width: min(1040px, calc(100vw - 110px)); height: min(710px, calc(100vh - 100px)); background: #faf9f8; color: #3d3d3d; border-color: #0003; }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) { width: min(1040px, calc(100vw - 110px)); height: min(710px, calc(100vh - 100px)); background: #faf9f8; color: #3d3d3d; border-color: #0003; }
 .ubuntu-window[data-app="cv"] { width: min(800px, calc(100vw - 110px)); height: min(760px, calc(100vh - 100px)); background: #f2f0ee; color: #3d3d3d; border-color: #0003; }
-.ubuntu-window[data-app="portfolio"] .ubuntu-window__header, .ubuntu-window[data-app="cv"] .ubuntu-window__header { background: #f2f0ee; border-bottom: 1px solid #d9d6d2; }
-.ubuntu-window[data-app="portfolio"] .ubuntu-window__controls button, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button { color: #3d3d3d; background: #ddd9d5; width: 27px; height: 27px; }
-.ubuntu-window[data-app="portfolio"] .ubuntu-window__controls button:last-child, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__header, .ubuntu-window[data-app="cv"] .ubuntu-window__header { background: #f2f0ee; border-bottom: 1px solid #d9d6d2; }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__controls button, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button { color: #3d3d3d; background: #ddd9d5; width: 27px; height: 27px; }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__controls button:last-child, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
 .ubuntu-cv { height: 100%; display: flex; flex-direction: column; }
 .ubuntu-cv__toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; }
 .ubuntu-cv__toolbar > span { margin-right: auto; }

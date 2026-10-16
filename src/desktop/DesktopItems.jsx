@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ClipboardPaste, Copy, FilePlus2, FolderOpen, FolderPlus, LockKeyhole, Pencil, Scissors, Terminal, Trash2, X } from 'lucide-react';
 import { canDeletePath, DIRECTORY_MARKER, isDirectory, listDirectory, normalizePath, readTrash, renamePath, restoreFromTrash, ROOT, trashPaths, transferPaths, uniquePath, writeFiles } from './virtualFs';
-import { endAppDrag, hasAppDrag, readAppDrag, readAppShortcut } from './apps';
+import { DESKTOP_APPS, PORTFOLIO_APP_IDS, endAppDrag, hasAppDrag, readAppDrag, readAppShortcut } from './apps';
 import { endFileDrag, FILE_CLIPBOARD_EVENT, FILE_DRAG_END_EVENT, fileDragCopies, readFileClipboard, readFileDrag, writeFileClipboard, writeFileDrag } from './dragDrop';
 import FileNameDialog from './FileNameDialog';
 import { readImage } from './imageFiles';
@@ -13,11 +13,10 @@ const POSITIONS_KEY = 'portfolio.desktop-positions.v1';
 const DESKTOP_DRAG = 'application/x-ubuntu-desktop';
 const CELL_WIDTH = 116;
 const CELL_HEIGHT = 116;
-const SHORTCUTS = [
-  { id: '@projects', name: 'Mes projets', icon: '/ubuntu-apps/folder.png', app: 'portfolio', options: { section: 'projects' }, protected: true },
-  { id: '@cv', name: 'Mon CV', icon: '/ubuntu-apps/file.png', app: 'cv', protected: true },
-  { id: '@profile', name: 'À propos', icon: '/ubuntu-apps/editor.png', app: 'portfolio', options: { section: 'profile' }, protected: true },
-];
+const SHORTCUTS = DESKTOP_APPS.filter((app) => PORTFOLIO_APP_IDS.includes(app.id) || app.id === 'cv').map((app) => ({
+  id: app.id === 'presentation' ? '@profile' : `@${app.id}`,
+  name: app.id === 'cv' ? 'Mon CV' : app.name, icon: app.icon, app: app.id, protected: true,
+}));
 
 function readPositions() {
   try {
@@ -241,6 +240,7 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onFo
     focusDesktop(result.changed ? result.paths : selection);
   }
   function startBand(event) {
+    if (event.pointerType === 'touch') return;
     if (event.button !== 0 || event.target !== event.currentTarget || bandRef.current) return;
     onFocusDesktop(); setMenu(null); surfaceRef.current.focus();
     const rect = surfaceRef.current.getBoundingClientRect();

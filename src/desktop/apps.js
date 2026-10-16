@@ -1,5 +1,9 @@
 export const DESKTOP_APPS = [
-  { id: 'portfolio', name: 'Portfolio', icon: '/ubuntu-apps/portfolio.svg' },
+  { id: 'presentation', name: 'Présentation', icon: '/ubuntu-apps/presentation.svg' },
+  { id: 'projects', name: 'Projets', icon: '/ubuntu-apps/projects.svg' },
+  { id: 'skills', name: 'Compétences', icon: '/ubuntu-apps/skills.svg' },
+  { id: 'journey', name: 'Parcours', icon: '/ubuntu-apps/journey.svg' },
+  { id: 'contact', name: 'Contact', icon: '/ubuntu-apps/contact.svg' },
   { id: 'cv', name: 'Curriculum vitæ', icon: '/ubuntu-apps/file.png' },
   { id: 'files', name: 'Fichiers', icon: '/ubuntu-apps/files.png', shortcut: 'Super+E' },
   { id: 'terminal', name: 'Terminal', icon: '/ubuntu-apps/terminal.png', shortcut: 'Ctrl+Alt+T' },
@@ -9,9 +13,9 @@ export const DESKTOP_APPS = [
   { id: 'store', name: 'App Center', icon: '/ubuntu-apps/store.png' },
 ];
 
-export const DOCK_APPS = ['portfolio', 'files', 'terminal', 'editor'];
+export const DOCK_APPS = ['presentation', 'projects', 'cv', 'files', 'terminal'];
 
-export function appById(id) { return DESKTOP_APPS.find((app) => app.id === id); }
+export function appById(id) { return DESKTOP_APPS.find((app) => app.id === (id === 'portfolio' ? 'presentation' : id)); }
 
 export const APP_DRAG_TYPE = 'application/x-ubuntu-app';
 export const APPS_LAYOUT_EVENT = 'portfolio:apps-layout';
@@ -21,11 +25,11 @@ let memoryFavorites = [...DOCK_APPS];
 let memoryOrder = DESKTOP_APPS.map((app) => app.id);
 
 function validIds(value) {
-  return Array.isArray(value) ? [...new Set(value.filter((id) => appById(id)))] : null;
+  return Array.isArray(value) ? [...new Set(value.map((id) => id === 'portfolio' ? 'presentation' : id).filter((id) => appById(id)))] : null;
 }
 
 function readLayout(key, fallback) {
-  try { return validIds(JSON.parse(localStorage.getItem(key))) || [...fallback]; }
+  try { const stored = JSON.parse(localStorage.getItem(key)); return key === FAVORITES_KEY ? migrateFavorites(stored, fallback) : validIds(stored) || [...fallback]; }
   catch { return [...fallback]; }
 }
 
@@ -78,4 +82,11 @@ export function readAppShortcut(content) {
     const shortcut = JSON.parse(content);
     return shortcut?.type === 'ubuntu-app-shortcut' && shortcut.version === 1 ? appById(shortcut.appId) || null : null;
   } catch { return null; }
+}
+
+export const PORTFOLIO_APP_IDS = ['presentation', 'projects', 'skills', 'journey', 'contact'];
+export function resolveAppId(id, section) { return id === 'portfolio' ? ({ profile: 'presentation', projects: 'projects', skills: 'skills', journey: 'journey', contact: 'contact' }[section] || 'presentation') : id === 'profile' ? 'presentation' : id; }
+export function migrateFavorites(value, fallback = DOCK_APPS) {
+  if (JSON.stringify(value) === JSON.stringify(['portfolio', 'files', 'terminal', 'editor'])) return [...DOCK_APPS];
+  return validIds(value) || [...fallback];
 }

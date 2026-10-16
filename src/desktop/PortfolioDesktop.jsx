@@ -22,14 +22,14 @@ export default function PortfolioDesktop({ profile, onOpen, onOpenCV, onNotify }
         <p className="portfolio-desktop__location">{profile.location}</p>
         <p className="portfolio-desktop__focus">Spring Boot · Laravel · React<br />Architecture applicative · Interfaces métier</p>
         <div className="portfolio-desktop__actions">
-          <button type="button" className="is-primary" onClick={() => onOpen('portfolio', { section: 'projects' })}><FolderGit2 size={16} />Voir les projets sélectionnés</button>
+          <button type="button" className="is-primary" onClick={() => onOpen('projects')}><FolderGit2 size={16} />Voir les projets sélectionnés</button>
           <CVAction>Lire le CV</CVAction>
-          <button type="button" onClick={() => onOpen('portfolio', { section: 'profile' })}>Ouvrir le portfolio <ArrowUpRight size={15} /></button>
+          <button type="button" onClick={() => onOpen('presentation')}>Me découvrir <ArrowUpRight size={15} /></button>
         </div>
         <div className="portfolio-desktop__links">
           {profile.cvUrl && <CVAction download><Download size={14} />Télécharger le CV</CVAction>}
           {profile.github && <a href={profile.github} target="_blank" rel="noreferrer" title="Ouvrir GitHub dans un nouvel onglet">GitHub <ArrowUpRight size={13} /></a>}
-          {profile.email && <a href={`mailto:${profile.email}`}><Mail size={14} />Contact</a>}
+          {profile.email && <button onClick={() => onOpen('contact')}><Mail size={14} />Contact</button>}
         </div>
         <button className="portfolio-desktop__explore" onClick={toggleWelcome}>Afficher le bureau</button>
       </aside>}

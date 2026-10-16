@@ -33,7 +33,7 @@ export const PROJECTS = [
     },
   },
   {
-    id: 'pfe-esto', name: 'PFE-ESTO', group: 'main', category: 'Application métier', accent: '#a99cec', visual: 'campus',
+    id: 'pfe-esto', name: 'PFE-ESTO · Système de gestion scolaire', group: 'main', category: 'Application métier', accent: '#a99cec', visual: 'campus',
     tagline: 'Le parcours académique, connecté.', context: 'Projet de fin d’études · ESTO', period: '2025 – 2026',
     role: 'Projet de fin d’études · travail collaboratif', status: 'Projet de fin d’études', technicalFocus: 'Portail multi-rôles et données académiques', evidence: 'CV et routes publiques du dépôt inspectés',
     description: 'Un portail académique multi-rôles pour les notes, les modules et le suivi pédagogique.',

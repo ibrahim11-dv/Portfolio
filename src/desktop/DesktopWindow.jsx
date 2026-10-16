@@ -12,7 +12,7 @@ const MINIMUM_WINDOW_SIZE = [320, 210];
 const APP_MINIMUMS = { images: [360, 294] };
 const APP_SIZES = {
   files: [860, 610], trash: [860, 610], terminal: [900, 570], editor: [820, 600],
-  portfolio: [1040, 710], cv: [1000, 760],
+  presentation: [900, 710], projects: [1040, 710], skills: [780, 650], journey: [840, 700], contact: [730, 570], cv: [1000, 760],
   images: [600, 498],
 };
 const WINDOW_SIZE_KEY = 'portfolio.window-sizes.v1';

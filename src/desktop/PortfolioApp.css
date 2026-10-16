@@ -53,6 +53,12 @@
 .portfolio-app__profile-actions :is(button, a):hover { border-color: #3d4b48; background: #fff; }
 .portfolio-app__profile-actions .is-primary { border-color: #181d1b; color: #f9fbfa; background: #181d1b; }
 .portfolio-app__profile-actions .is-primary:hover { color: #101211; background: var(--ib-accent); border-color: var(--ib-accent); }
+.portfolio-app__profile-project { width: min(100%, 530px); position: relative; display: grid; gap: 4px; margin-top: 18px; padding: 13px 43px 13px 14px; border: 1px solid #b8c5c0; color: #1d2a27; background: #eef3f0; text-align: left; }
+.portfolio-app__profile-project:hover { border-color: #3f746c; background: #f8fbf9; }
+.portfolio-app__profile-project span { color: #3b796f; font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .08em; }
+.portfolio-app__profile-project strong { font-size: 13px; font-weight: 500; }
+.portfolio-app__profile-project small { color: #5d6a66; font-size: 10px; }
+.portfolio-app__profile-project svg { position: absolute; top: 50%; right: 14px; color: #34766d; transform: translateY(-50%); }
 .portfolio-app__profile-portrait-panel { align-self: end; display: grid; grid-template-rows: 1fr auto; gap: 8px; min-height: 248px; padding: 9px; border: 1px solid #aeb6b3; background: #e6e9e6; }
 .portfolio-app__profile-avatar { width: 100%; height: 100%; min-height: 196px; border: 0; background: #202426; }
 .portfolio-app__profile-portrait-panel > span { color: #58615e; font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .08em; }
@@ -84,12 +90,10 @@
 .portfolio-app__filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 25px; }
 .portfolio-app__filters button { padding: 5px 8px; border: 1px solid #c6ccca; color: #66706d; background: transparent; font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .03em; }
 .portfolio-app__filters button:hover, .portfolio-app__filters button.is-active { border-color: #202523; color: #f7f9f8; background: #202523; }
-.portfolio-app__case-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; border-top: 1px solid #bfc5c3; border-left: 1px solid #bfc5c3; background: #bfc5c3; }
+.portfolio-app__case-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1px; border-top: 1px solid #bfc5c3; border-left: 1px solid #bfc5c3; background: #bfc5c3; }
 .portfolio-app__case-file { position: relative; min-width: 0; padding: 0; border: 0; color: #1b2220; background: #f7f8f6; text-align: left; transition: background 160ms ease; }
 .portfolio-app__case-file:hover { background: #fff; }
 .portfolio-app__case-file.is-featured { background: #eef1ee; }
-.portfolio-app__case-file.is-featured:nth-child(1) { grid-column: span 2; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(260px, .95fr); }
-.portfolio-app__case-file.is-featured:nth-child(1) .project-art { height: 100%; min-height: 283px; border: 0; border-right: 1px solid #c5cac8; }
 .portfolio-app__case-head { position: absolute; z-index: 1; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 10px 12px; color: #59635f; font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .04em; pointer-events: none; }
 .portfolio-app__case-head > span:last-child { padding: 3px 5px; border: 1px solid #aeb8b3; background: #f7f8f6db; }
 .portfolio-app__case-file > .project-art { height: 150px; border: 0; border-bottom: 1px solid #c5cac8; border-radius: 0; }
@@ -222,7 +226,7 @@
 
 .portfolio-app__toolbar :is(a, button) { min-height: 44px; }
 .portfolio-app__toolbar-contact { padding: 8px 12px; border: 1px solid #bcc8c4; background: transparent; color: #253733; cursor: pointer; }
-.ubuntu-window[data-app="portfolio"] { container: portfolio-window / inline-size; }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) { container: portfolio-window / inline-size; }
 @container portfolio-window (max-width: 720px) {
   .portfolio-app { flex-direction: column; }
   .portfolio-app__sidebar { width: 100%; min-height: 58px; padding: 6px; }
@@ -262,3 +266,6 @@
   .portfolio-app__toolbar.has-project { flex-wrap: wrap; }
   .portfolio-app__toolbar.has-project .portfolio-app__toolbar-caption { display: block; order: 5; flex-basis: 100%; padding: 4px 0 7px; font-size: 11px; }
 }
+
+.portfolio-app--standalone .portfolio-app__toolbar { flex-wrap: wrap; padding-block: 5px; }
+.portfolio-app--standalone .portfolio-app__content { scroll-padding-top: 12px; }

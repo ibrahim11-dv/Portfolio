@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { HelpCircle, PackageOpen } from 'lucide-react';
 import TopBar from '../components/TopBar/TopBar';
 import DesktopDock from './DesktopDock';
@@ -11,12 +11,11 @@ import { createDocument } from './editorDocument';
 import VirtualTerminal from './VirtualTerminal';
 import AppGrid from './AppGrid';
 import PortfolioApp from './PortfolioApp';
-import PortfolioDesktop from './PortfolioDesktop';
 import DesktopItems from './DesktopItems';
 import WindowOverview from './WindowOverview';
 import WorkspaceTransition from './WorkspaceTransition';
 import { CV_DOCUMENT, PROFILE } from './portfolioData';
-import { appById, DESKTOP_APPS, readAppShortcut } from './apps';
+import { appById, DESKTOP_APPS, readAppShortcut, PORTFOLIO_APP_IDS, resolveAppId } from './apps';
 import { canDeletePath, readFiles, ROOT, trashPaths, uniquePath, writeFiles } from './virtualFs';
 import './DesktopShell.css';
 import './FileManager.css';
@@ -49,6 +48,8 @@ export default function DesktopShell() {
   const nextInstance = useRef(1);
   const pendingLaunches = useRef(new Map());
   const cvOrigin = useRef(null);
+  const [appSessions, setAppSessions] = useState(() => Object.fromEntries(PORTFOLIO_APP_IDS.map((id) => [id, {}])));
+  const saveAppSession = useCallback((id, state) => setAppSessions((current) => current[id] === state ? current : { ...current, [id]: state }), []);
   const [cvBackLabel, setCVBackLabel] = useState('Retour au portfolio');
   const [cvReadingState, setCVReadingState] = useState(null);
   const metaChord = useRef(false);
@@ -101,17 +102,18 @@ export default function DesktopShell() {
   }
 
   function openApp(appId, payload = {}) {
+    appId = resolveAppId(appId, payload.section);
     setShowApps(false);
     setShowOverview(false);
     setSwitcher(null);
     const { newWindow = false, workspace: requestedWorkspace, ...options } = payload;
     const pendingLaunch = pendingLaunches.current.get(appId);
     const candidates = [...windows.filter((item) => item.appId === appId), ...(pendingLaunch && !windows.some((item) => item.id === pendingLaunch.id) ? [pendingLaunch] : [])].sort((a, b) => b.zIndex - a.zIndex);
-    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow);
+    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow && !PORTFOLIO_APP_IDS.includes(appId));
     if (existing) {
       zIndex.current += 1;
       const layer = zIndex.current;
-      const navigation = options.directory || appId === 'portfolio' && options.section || appId === 'trash' || (appId === 'editor' || appId === 'images') && options.filePath ? { navigationRequest: layer, restoreContext: null } : {};
+      const navigation = options.directory || PORTFOLIO_APP_IDS.includes(appId) && (options.projectId !== undefined || options.restoreContext) || appId === 'trash' || (appId === 'editor' || appId === 'images') && options.filePath ? { navigationRequest: layer, restoreContext: options.restoreContext || null } : {};
       const targetWorkspace = requestedWorkspace ?? existing.workspace;
       if (targetWorkspace !== workspace) switchWorkspace(targetWorkspace);
       setActiveApp(existing.id);
@@ -124,7 +126,7 @@ export default function DesktopShell() {
     const targetWorkspace = requestedWorkspace ?? workspace;
     if (targetWorkspace !== workspace) switchWorkspace(targetWorkspace);
     setActiveApp(id);
-    const created = { id, appId, ...options, workspace: targetWorkspace, navigationRequest: options.directory || appId === 'images' && options.filePath ? layer : undefined, ...(appId === 'editor' && options.filePath ? { editorRequests: [{ id: layer, path: options.filePath }] } : {}), minimized: false, zIndex: layer };
+    const created = { id, appId, ...options, workspace: targetWorkspace, navigationRequest: layer, ...(appId === 'editor' && options.filePath ? { editorRequests: [{ id: layer, path: options.filePath }] } : {}), minimized: false, zIndex: layer };
     // Coordinate launches issued in one event before React has rendered the first window.
     pendingLaunches.current.set(appId, created);
     queueMicrotask(() => { if (pendingLaunches.current.get(appId)?.id === id) pendingLaunches.current.delete(appId); });
@@ -138,8 +140,9 @@ export default function DesktopShell() {
   }
 
   function openCV(sourceId, trigger, context) {
-    cvOrigin.current = { sourceId, trigger, context };
-    setCVBackLabel(sourceId ? 'Retour au portfolio' : 'Retour au bureau');
+    const sourceApp = windows.find((item) => item.id === sourceId)?.appId;
+    cvOrigin.current = { sourceId, sourceApp, trigger, context };
+    setCVBackLabel(sourceApp ? (sourceApp === 'projects' ? 'Retour aux Projets' : 'Retour à ' + appById(sourceApp).name) : 'Retour au bureau');
     openApp('cv');
     setDesktopNotice('CV ouvert dans le lecteur.');
   }
@@ -155,7 +158,7 @@ export default function DesktopShell() {
         setWindows((current) => current.map((item) => item.id === source.id ? { ...item, restoreContext: origin.context, navigationRequest: request } : item));
       }
     }
-    else if (origin?.sourceId !== null) openApp('portfolio');
+    else if (origin?.sourceApp) openApp(origin.sourceApp, { restoreContext: origin.context });
     requestAnimationFrame(() => { if (origin?.trigger?.isConnected) origin.trigger.focus({ preventScroll: true }); });
   }
 
@@ -251,7 +254,6 @@ export default function DesktopShell() {
     <TopBar appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
     <DesktopDock openApps={[...new Set(windows.map((item) => item.appId))]} activeApp={windows.find((item) => item.id === activeApp)?.appId} onOpen={dockAction} onLaunch={openApp} onQuit={quitApp} onTrashPaths={trashDrop} isFileProtected={(path) => !canDeletePath(files, path)} onShowApps={() => { setShowOverview(false); setShowApps((value) => !value); }} />
     <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onFocusDesktop={() => setActiveApp(null)} />
-    <PortfolioDesktop profile={PROFILE} onOpen={openApp} onOpenCV={(trigger) => openCV(null, trigger)} onNotify={setDesktopNotice} />
     <main className="desktop-shell__workspace" aria-label="Espace de travail">
       {windows.map((window) => {
         const kind = window.appId;
@@ -259,8 +261,8 @@ export default function DesktopShell() {
         const title = kind === 'trash' ? 'Corbeille' : app?.name || 'Application';
         const icon = app?.icon || '/ubuntu-apps/trash.png';
         let content;
-        if (kind === 'portfolio') content = <PortfolioApp initialSection={window.section || 'profile'} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
-        else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('portfolio', { section: 'contact' })} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
+        if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
+        else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('contact')} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
         else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;
         else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} />;
         else if (kind === 'editor') content = <TextEditor key={window.id} windowId={window.id} files={files} filePath={window.filePath} navigationRequest={window.navigationRequest} openRequests={window.editorRequests} initialDocument={window.editorDocument} setFiles={setFiles} onNewWindow={(editorDocument) => openApp('editor', { newWindow: true, editorDocument: editorDocument || createDocument(files, uniquePath(files, `${ROOT}/Documents`, 'Sans titre.txt'), 0, true) })} onOpenDirectory={(directory) => openApp('files', { directory })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;

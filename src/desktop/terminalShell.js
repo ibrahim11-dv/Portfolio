@@ -1,7 +1,7 @@
 import { canDeletePath, canModifyPath, DIRECTORY_MARKER, isDirectory, listDirectory, normalizePath, removePath, ROOT } from './virtualFs.js';
 import { CV_DOCUMENT, PROFILE, PROJECTS } from './portfolioData.js';
 
-export const SHELL_COMMANDS = ['cat', 'cd', 'clear', 'contact', 'cp', 'cv', 'date', 'echo', 'exit', 'false', 'grep', 'head', 'help', 'ls', 'mkdir', 'mv', 'neofetch', 'open', 'portfolio', 'profile', 'projects', 'pwd', 'rm', 'rmdir', 'skills', 'tail', 'touch', 'true', 'wc', 'whoami'];
+export const SHELL_COMMANDS = ['cat', 'cd', 'clear', 'contact', 'cp', 'cv', 'date', 'echo', 'exit', 'false', 'grep', 'head', 'help', 'ls', 'mkdir', 'mv', 'neofetch', 'open', 'portfolio', 'presentation', 'journey', 'profile', 'projects', 'pwd', 'rm', 'rmdir', 'skills', 'tail', 'touch', 'true', 'wc', 'whoami'];
 const operators = ['&&', '||', '>>', '<<', ';', '|', '>', '<', '&', '(', ')'];
 const parentOf = (path) => path.slice(0, path.lastIndexOf('/')) || '/';
 const exists = (files, path) => Object.hasOwn(files, path) || isDirectory(files, path);
@@ -130,11 +130,13 @@ function runCommand(words, context, stdin) {
   try {
     switch (name) {
       case undefined: break;
-      case 'help': print('Portfolio : profile, projects, skills, contact, cv, portfolio\nFichiers : ls [-aAF1], cd, pwd, cat, touch, mkdir [-p], cp [-r], mv, rm [-rf], rmdir, open\nTexte : echo [-n], grep [-Finv], head [-n N], tail [-n N], wc [-lwc]\nShell : guillemets, échappements, ~, >, >>, <, |, ;, &&, ||\nSession : whoami, date, clear, exit\nCe terminal utilise les fichiers du bureau. Seuls vos éléments sont modifiables.'); break;
-      case 'profile': print(`${PROFILE.name}\n${PROFILE.role}\n${PROFILE.location}\n\n${PROFILE.bio}`); break;
-      case 'projects': print(['main', 'other'].map((group) => `${group === 'main' ? 'PROJETS PRINCIPAUX' : 'AUTRES PROJETS'}\n\n${PROJECTS.filter((project) => project.group === group).map((project) => `${project.name}\n  ${project.description}${project.github ? `\n  ${project.github}` : ''}`).join('\n\n')}`).join('\n\n')); break;
-      case 'skills': print(PROFILE.skills.map((group) => `${group.category}: ${group.items.join(', ')}`).join('\n')); break;
-      case 'contact': print(`${PROFILE.email}\n${PROFILE.github}\n${PROFILE.location}`); break;
+      case 'help': print('Applications : presentation, profile, projects, skills, journey, contact, cv, portfolio\nFichiers : ls [-aAF1], cd, pwd, cat, touch, mkdir [-p], cp [-r], mv, rm [-rf], rmdir, open\nTexte : echo [-n], grep [-Finv], head [-n N], tail [-n N], wc [-lwc]\nShell : guillemets, échappements, ~, >, >>, <, |, ;, &&, ||\nSession : whoami, date, clear, exit\nCe terminal utilise les fichiers du bureau. Seuls vos éléments sont modifiables.'); break;
+      case 'presentation': context.effects.push({ type: 'portfolio', section: 'profile' }); break;
+      case 'journey': context.effects.push({ type: 'portfolio', section: 'journey' }); break;
+      case 'profile': context.effects.push({ type: 'portfolio', section: 'profile' }); print(`${PROFILE.name}\n${PROFILE.role}\n${PROFILE.location}\n\n${PROFILE.bio}`); break;
+      case 'projects': context.effects.push({ type: 'portfolio', section: 'projects' }); print(['main', 'other'].map((group) => `${group === 'main' ? 'PROJETS PRINCIPAUX' : 'AUTRES PROJETS'}\n\n${PROJECTS.filter((project) => project.group === group).map((project) => `${project.name}\n  ${project.description}${project.github ? `\n  ${project.github}` : ''}`).join('\n\n')}`).join('\n\n')); break;
+      case 'skills': context.effects.push({ type: 'portfolio', section: 'skills' }); print(PROFILE.skills.map((group) => `${group.category}: ${group.items.join(', ')}`).join('\n')); break;
+      case 'contact': context.effects.push({ type: 'portfolio', section: 'contact' }); print(`${PROFILE.email}\n${PROFILE.github}\n${PROFILE.location}`); break;
       case 'cv': context.effects.push({ type: 'cv' }); break;
       case 'portfolio': context.effects.push({ type: 'portfolio' }); break;
       case 'exit': context.exit = true; break;
