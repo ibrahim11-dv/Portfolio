@@ -9,7 +9,7 @@
 .ubuntu-session[data-mode="lock"]::backdrop, .ubuntu-session[data-mode="unlock"]::backdrop { background: #241528; }
 .ubuntu-session__wallpaper {
   position: absolute; inset: -40px; z-index: -1;
-  background: var(--desktop-wallpaper) center / var(--desktop-wallpaper-size) no-repeat, #24262a;
+  background: var(--desktop-wallpaper) center / var(--desktop-wallpaper-size) no-repeat var(--desktop-wallpaper-color, #24262a);
   filter: blur(22px) brightness(0.62); transform: scale(1.06);
 }
 .ubuntu-session__status { position: absolute; top: 9px; right: 14px; display: flex; align-items: center; gap: 14px; font-size: 13px; pointer-events: none; z-index: 1; }

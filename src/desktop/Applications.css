@@ -25,95 +25,95 @@
 .ubuntu-terminal__input-line strong { color: #729fcf; }
 .ubuntu-terminal__input-line input { caret-color: #fff; line-height: 1.45; flex: 1 1 12ch; min-width: 6ch; }
 .ubuntu-terminal__line { overflow-wrap: anywhere; }
-.ubuntu-app-popover { position: absolute; z-index: 10; top: 52px; right: 112px; width: 255px; max-width: calc(100% - 24px); max-height: calc(100% - 66px); overflow: auto; padding: 6px; display: flex; flex-direction: column; gap: 2px; border: 1px solid #ccc7c1; border-radius: 10px; box-shadow: 0 8px 24px #0003; color: #3d3d3d; background: #faf9f8; font: 13px var(--font-ubuntu); cursor: default; }
+.ubuntu-app-popover { position: absolute; z-index: 10; top: 52px; right: 112px; width: 255px; max-width: calc(100% - 24px); max-height: calc(100% - 66px); overflow: auto; padding: 6px; display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--app-line, #ccc7c1); border-radius: 10px; box-shadow: 0 8px 24px #0003; color: var(--app-ink, #3d3d3d); background: var(--app-surface, #faf9f8); font: 13px var(--font-ubuntu); cursor: default; }
 .ubuntu-app-popover button { min-height: 34px; padding: 7px 10px; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 6px; background: transparent; color: inherit; text-align: left; font: inherit; cursor: pointer; }
-.ubuntu-app-popover button:hover { background: #0000000a; }
-.ubuntu-app-popover kbd { margin-left: auto; color: #888079; font: 11px var(--font-ubuntu); }
-.ubuntu-app-popover input { width: 100%; min-width: 0; padding: 8px; border: 1px solid #c6beb7; border-radius: 6px; background: white; color: #333; font: inherit; outline-color: #e95420; }
+.ubuntu-app-popover button:hover { background: var(--app-hover, #0000000a); }
+.ubuntu-app-popover kbd { margin-left: auto; color: var(--app-muted, #888079); font: 11px var(--font-ubuntu); }
+.ubuntu-app-popover input { width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--app-line, #c6beb7); border-radius: 6px; background: var(--app-surface, white); color: var(--app-ink, #333); font: inherit; outline-color: #e95420; }
 .ubuntu-terminal__menu { color: #f4eaf1; background: #382432; border-color: #ffffff22; }
 .ubuntu-terminal__menu button:hover { background: #ffffff14; }
 .ubuntu-terminal__menu kbd { color: #c9b5c3; }
 .ubuntu-terminal__zoom { display: flex; justify-content: space-evenly; margin: 5px; padding: 3px; border: 1px solid #ffffff22; border-radius: 7px; }
 .ubuntu-terminal__zoom button { flex: 1; justify-content: center; }
-.ubuntu-editor { position: relative; color: #3d3d3d; background: #fff; }
-.ubuntu-editor__toolbar { height: 48px; min-height: 48px; padding: 0 112px 0 9px; gap: 5px; align-items: center; border-bottom: 1px solid #d9d6d2; background: #f2f0ee; }
-.ubuntu-editor__toolbar button { height: 34px; padding: 0 8px; color: #3d3d3d; background: transparent; font: 13px var(--font-ubuntu); }
-.ubuntu-editor__toolbar button:hover:not(:disabled) { background: #0000000a; }
-.ubuntu-editor__toolbar .ubuntu-editor__open, .ubuntu-editor__toolbar .ubuntu-editor__save { border: 1px solid #d3cec8; background: #faf9f8; }
+.ubuntu-editor { position: relative; color: var(--app-ink, #3d3d3d); background: var(--app-surface, #fff); }
+.ubuntu-editor__toolbar { height: 48px; min-height: 48px; padding: 0 112px 0 9px; gap: 5px; align-items: center; border-bottom: 1px solid var(--app-line, #d9d6d2); background: var(--app-surface, #f2f0ee); }
+.ubuntu-editor__toolbar button { height: 34px; padding: 0 8px; color: var(--app-ink, #3d3d3d); background: transparent; font: 13px var(--font-ubuntu); }
+.ubuntu-editor__toolbar button:hover:not(:disabled) { background: var(--app-hover, #0000000a); }
+.ubuntu-editor__toolbar .ubuntu-editor__open, .ubuntu-editor__toolbar .ubuntu-editor__save { border: 1px solid var(--app-line, #d3cec8); background: var(--app-surface, #faf9f8); }
 .ubuntu-editor__document-title { min-width: 0; flex: 1; text-align: center; }
 .ubuntu-editor__document-title strong { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 13px; font-weight: 600; }
-.ubuntu-editor__document-title span:not(.ubuntu-editor__unsaved) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #888079; font-size: 10px; }
+.ubuntu-editor__document-title span:not(.ubuntu-editor__unsaved) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--app-muted, #888079); font-size: 10px; }
 .ubuntu-editor__unsaved { width: 6px; height: 6px; border-radius: 50%; background: #e95420; }
-.ubuntu-window[data-app="editor"] .ubuntu-window__controls button { color: #3d3d3d; background: #ddd9d5; }
-.ubuntu-editor__page { min-height: 0; flex: 1; display: flex; background: white; }
-.ubuntu-editor textarea { width: 100%; padding: 22px 28px; background: white; color: #282828; font: 14px/1.65 'Ubuntu Mono', 'Cascadia Mono', Consolas, monospace; tab-size: 4; }
-.ubuntu-editor__status { display: flex; gap: 20px; padding: 6px 12px; border-top: 1px solid #e7e3de; background: #faf9f8; color: #827a72; font-size: 11px; }
+.ubuntu-window[data-app="editor"] .ubuntu-window__controls button { color: var(--app-ink, #3d3d3d); background: var(--app-panel, #ddd9d5); }
+.ubuntu-editor__page { min-height: 0; flex: 1; display: flex; background: var(--app-surface, white); }
+.ubuntu-editor textarea { width: 100%; padding: 22px 28px; background: var(--app-surface, white); color: var(--app-ink, #282828); font: 14px/1.65 'Ubuntu Mono', 'Cascadia Mono', Consolas, monospace; tab-size: 4; }
+.ubuntu-editor__status { display: flex; gap: 20px; padding: 6px 12px; border-top: 1px solid var(--app-line, #e7e3de); background: var(--app-surface, #faf9f8); color: var(--app-muted, #827a72); font-size: 11px; }
 .ubuntu-editor__status span:first-child { margin-right: auto; }
-.ubuntu-editor__search { display: flex; align-items: center; padding: 7px 12px; gap: 8px; border-bottom: 1px solid #e7e3de; background: #faf9f8; }
-.ubuntu-editor__search input { min-width: 0; flex: 1; padding: 7px; border: 1px solid #ccc7c1; border-radius: 6px; font: inherit; outline-color: #e95420; }
-.ubuntu-editor__search button { padding: 6px; border: 0; color: #444; background: transparent; cursor: pointer; }
+.ubuntu-editor__search { display: flex; align-items: center; padding: 7px 12px; gap: 8px; border-bottom: 1px solid var(--app-line, #e7e3de); background: var(--app-surface, #faf9f8); }
+.ubuntu-editor__search input { min-width: 0; flex: 1; padding: 7px; border: 1px solid var(--app-line, #ccc7c1); border-radius: 6px; font: inherit; outline-color: #e95420; }
+.ubuntu-editor__search button { padding: 6px; border: 0; color: var(--app-ink, #444); background: transparent; cursor: pointer; }
 .ubuntu-editor__picker { right: auto; left: 9px; width: 335px; }
 .ubuntu-editor__picker > strong { padding: 10px; font-size: 14px; }
 .ubuntu-editor__picker button { flex-direction: column; align-items: flex-start; gap: 3px; }
-.ubuntu-editor__picker small { color: #8a8179; font-size: 11px; }
+.ubuntu-editor__picker small { color: var(--app-muted, #8a8179); font-size: 11px; }
 .ubuntu-editor__menu label { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
-.ubuntu-window[data-app="help"], .ubuntu-window[data-app="store"], .ubuntu-window[data-app="trash"] { background: #faf9f8; color: #3d3d3d; border-color: #0003; }
-.ubuntu-window[data-app="help"] .ubuntu-window__header, .ubuntu-window[data-app="store"] .ubuntu-window__header { background: #f2f0ee; border-bottom: 1px solid #d9d6d2; height: 48px; }
+.ubuntu-window[data-app="help"], .ubuntu-window[data-app="store"], .ubuntu-window[data-app="trash"] { background: var(--app-surface, #faf9f8); color: var(--app-ink, #3d3d3d); border-color: #0003; }
+.ubuntu-window[data-app="help"] .ubuntu-window__header, .ubuntu-window[data-app="store"] .ubuntu-window__header { background: var(--app-surface, #f2f0ee); border-bottom: 1px solid var(--app-line, #d9d6d2); height: 48px; }
 .ubuntu-window[data-app="help"] .ubuntu-window__content, .ubuntu-window[data-app="store"] .ubuntu-window__content { height: calc(100% - 48px); }
-.ubuntu-window[data-app="help"] .ubuntu-window__controls button, .ubuntu-window[data-app="store"] .ubuntu-window__controls button, .ubuntu-window[data-app="trash"] .ubuntu-window__controls button { color: #3d3d3d; background: #ddd9d5; width: 27px; height: 27px; }
+.ubuntu-window[data-app="help"] .ubuntu-window__controls button, .ubuntu-window[data-app="store"] .ubuntu-window__controls button, .ubuntu-window[data-app="trash"] .ubuntu-window__controls button { color: var(--app-ink, #3d3d3d); background: var(--app-panel, #ddd9d5); width: 27px; height: 27px; }
 .ubuntu-window[data-app="help"] .ubuntu-window__controls button:last-child, .ubuntu-window[data-app="store"] .ubuntu-window__controls button:last-child, .ubuntu-window[data-app="trash"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
-.ubuntu-simple-app { padding: 30px; color: #3d3d3d; background: #faf9f8; }
-.ubuntu-simple-app p { color: #77716c; }
-.ubuntu-simple-app .desktop-action { border: 1px solid #d5cfc8; color: #3d3d3d; background: #fff; border-radius: 7px; padding: 9px 14px; cursor: pointer; }
-.ubuntu-store-card { flex-direction: row; align-items: center; width: 100%; padding: 16px; gap: 14px; background: white; border: 1px solid #e6e1db; border-radius: 12px; box-shadow: 0 2px 4px #00000004; }
+.ubuntu-simple-app { padding: 30px; color: var(--app-ink, #3d3d3d); background: var(--app-surface, #faf9f8); }
+.ubuntu-simple-app p { color: var(--app-muted, #77716c); }
+.ubuntu-simple-app .desktop-action { border: 1px solid var(--app-line, #d5cfc8); color: var(--app-ink, #3d3d3d); background: var(--app-surface, #fff); border-radius: 7px; padding: 9px 14px; cursor: pointer; }
+.ubuntu-store-card { flex-direction: row; align-items: center; width: 100%; padding: 16px; gap: 14px; background: var(--app-surface, white); border: 1px solid var(--app-line, #e6e1db); border-radius: 12px; box-shadow: 0 2px 4px #00000004; }
 .ubuntu-store-card img { width: 48px; height: 48px; object-fit: contain; }
 .ubuntu-store-card > div { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-.ubuntu-store-card span, .ubuntu-store-card small { color: #827970; }
-.ubuntu-store-card button { padding: 8px 14px; border: 1px solid #d4cec7; border-radius: 7px; color: #3d3d3d; background: #faf9f8; font: 13px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-store-card span, .ubuntu-store-card small { color: var(--app-muted, #827970); }
+.ubuntu-store-card button { padding: 8px 14px; border: 1px solid var(--app-line, #d4cec7); border-radius: 7px; color: var(--app-ink, #3d3d3d); background: var(--app-surface, #faf9f8); font: 13px var(--font-ubuntu); cursor: pointer; }
 .ubuntu-help-topics { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 25px; }
-.ubuntu-help-topics article { padding: 18px; border: 1px solid #e2ddd7; border-radius: 12px; background: #fff; }
+.ubuntu-help-topics article { padding: 18px; border: 1px solid var(--app-line, #e2ddd7); border-radius: 12px; background: var(--app-surface, #fff); }
 .ubuntu-help-topics h3 { font-size: 15px; font-weight: 600; }
 .ubuntu-help-topics p { font-size: 13px; }
 .ubuntu-help-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .ubuntu-help-actions .desktop-action { margin-top: 0; }
-.ubuntu-trash-list { background: white; border-color: #e2ddd7; }
-.ubuntu-trash-list div { color: #3d3d3d; border-color: #e2ddd7; }
-.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) { width: min(1040px, calc(100vw - 110px)); height: min(710px, calc(100vh - 100px)); background: #faf9f8; color: #3d3d3d; border-color: #0003; }
-.ubuntu-window[data-app="cv"] { width: min(800px, calc(100vw - 110px)); height: min(760px, calc(100vh - 100px)); background: #f2f0ee; color: #3d3d3d; border-color: #0003; }
-.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__header, .ubuntu-window[data-app="cv"] .ubuntu-window__header { background: #f2f0ee; border-bottom: 1px solid #d9d6d2; }
-.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__controls button, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button { color: #3d3d3d; background: #ddd9d5; width: 27px; height: 27px; }
+.ubuntu-trash-list { background: var(--app-surface, white); border-color: var(--app-line, #e2ddd7); }
+.ubuntu-trash-list div { color: var(--app-ink, #3d3d3d); border-color: var(--app-line, #e2ddd7); }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) { width: min(1040px, calc(100vw - 110px)); height: min(710px, calc(100vh - 100px)); background: var(--app-surface, #faf9f8); color: var(--app-ink, #3d3d3d); border-color: #0003; }
+.ubuntu-window[data-app="cv"] { width: min(800px, calc(100vw - 110px)); height: min(760px, calc(100vh - 100px)); background: var(--app-surface, #f2f0ee); color: var(--app-ink, #3d3d3d); border-color: #0003; }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__header, .ubuntu-window[data-app="cv"] .ubuntu-window__header { background: var(--app-surface, #f2f0ee); border-bottom: 1px solid var(--app-line, #d9d6d2); }
+.ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__controls button, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button { color: var(--app-ink, #3d3d3d); background: var(--app-panel, #ddd9d5); width: 27px; height: 27px; }
 .ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) .ubuntu-window__controls button:last-child, .ubuntu-window[data-app="cv"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
 .ubuntu-cv { height: 100%; display: flex; flex-direction: column; }
 .ubuntu-cv__toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; font-size: 12px; }
 .ubuntu-cv__toolbar > span { margin-right: auto; }
-.ubuntu-cv__toolbar a { color: #a43a12; background: #fff; padding: 7px 10px; border: 1px solid #d8d1c8; border-radius: 6px; text-decoration: none; }
-.ubuntu-cv iframe { min-height: 0; flex: 1; width: 100%; border: 0; background: #dedbd7; }
+.ubuntu-cv__toolbar a { color: var(--app-accent, #a43a12); background: var(--app-surface, #fff); padding: 7px 10px; border: 1px solid var(--app-line, #d8d1c8); border-radius: 6px; text-decoration: none; }
+.ubuntu-cv iframe { min-height: 0; flex: 1; width: 100%; border: 0; background: var(--app-panel, #dedbd7); }
 .ubuntu-window[data-app="trash"] .ubuntu-window__header { position: absolute; top: 0; right: 0; z-index: 5; width: 108px; height: 48px; padding: 0 8px 0 0; border: 0; background: transparent; }
 .ubuntu-window[data-app="trash"] .ubuntu-window__title { display: none; }
 .ubuntu-window[data-app="trash"] .ubuntu-window__content { height: 100%; }
-.ubuntu-window[data-app="trash"] .ubuntu-window__controls button { width: 27px; height: 27px; color: #3d3d3d; background: #ddd9d5; }
+.ubuntu-window[data-app="trash"] .ubuntu-window__controls button { width: 27px; height: 27px; color: var(--app-ink, #3d3d3d); background: var(--app-panel, #ddd9d5); }
 .ubuntu-window[data-app="trash"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
 html[data-desktop-theme="dark"] :is(.ubuntu-simple-app, .ubuntu-editor, .ubuntu-files, .document-viewer, .ubuntu-window[data-app="cv"]) { color: var(--theme-ink); background: var(--theme-surface); }
 html[data-desktop-theme="dark"] :is(.ubuntu-simple-app, .ubuntu-editor, .ubuntu-files) :is(.ubuntu-editor__toolbar, .ubuntu-files__toolbar, .ubuntu-files__sidebar, .ubuntu-editor__status, .ubuntu-files__status, .ubuntu-editor__search, .ubuntu-files__search-row) { color: var(--theme-ink); background: var(--theme-surface-muted); border-color: var(--theme-line); }
 html[data-desktop-theme="dark"] :is(.ubuntu-files__location, .ubuntu-files__search input, .ubuntu-editor input, .ubuntu-editor textarea, .ubuntu-files__context-menu, .ubuntu-app-popover) { color: var(--theme-ink); background: #252a2c; border-color: var(--theme-line); }
 html[data-desktop-theme="dark"] .ubuntu-file:hover { background: #ffffff12; }
 html[data-desktop-theme="dark"] .ubuntu-file.is-selected { color: #f3ffff; background: #26736d; }
-.ubuntu-editor-save-dialog { width: min(430px, calc(100vw - 32px)); margin: auto; padding: 28px 24px 20px; border: 1px solid #d4cfc9; border-radius: 15px; color: #3d3d3d; background: #faf9f8; box-shadow: 0 15px 60px #0006; font-family: var(--font-ubuntu); animation: ubuntu-snap-show 150ms ease-out; }
+.ubuntu-editor-save-dialog { width: min(430px, calc(100vw - 32px)); margin: auto; padding: 28px 24px 20px; border: 1px solid var(--app-line, #d4cfc9); border-radius: 15px; color: var(--app-ink, #3d3d3d); background: var(--app-surface, #faf9f8); box-shadow: 0 15px 60px #0006; font-family: var(--font-ubuntu); animation: ubuntu-snap-show 150ms ease-out; }
 .ubuntu-editor-save-dialog::backdrop { background: #0006; }
 .ubuntu-editor-save-dialog h2 { margin: 0 0 14px; text-align: center; font-size: 20px; font-weight: 600; }
-.ubuntu-editor-save-dialog p { margin: 0 0 24px; color: #6c655f; text-align: center; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+.ubuntu-editor-save-dialog p { margin: 0 0 24px; color: var(--app-muted, #6c655f); text-align: center; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
 .ubuntu-editor-save-dialog > div { display: flex; justify-content: center; gap: 8px; }
-.ubuntu-editor-save-dialog button { min-height: 40px; padding: 8px 12px; border: 1px solid #d4cec7; border-radius: 8px; color: inherit; background: white; font: 13px var(--font-ubuntu); cursor: pointer; }
-.ubuntu-editor-save-dialog button:hover { background: #f0ece8; }
+.ubuntu-editor-save-dialog button { min-height: 40px; padding: 8px 12px; border: 1px solid var(--app-line, #d4cec7); border-radius: 8px; color: inherit; background: var(--app-surface, white); font: 13px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-editor-save-dialog button:hover { background: var(--app-panel, #f0ece8); }
 .ubuntu-editor-save-dialog button:focus-visible { outline: 2px solid #e95420; outline-offset: 2px; }
 .ubuntu-editor-save-dialog button.is-destructive { color: #a51d2d; }
 .ubuntu-editor-save-dialog button.is-suggested { color: white; border-color: #e95420; background: #e95420; }
 .ubuntu-editor-save-dialog button.is-suggested:hover { background: #f76733; }
-.ubuntu-editor-save-dialog__notice { display: block; margin-bottom: 12px; color: #827970; font-size: 12px; text-align: center; }
+.ubuntu-editor-save-dialog__notice { display: block; margin-bottom: 12px; color: var(--app-muted, #827970); font-size: 12px; text-align: center; }
 @media (prefers-reduced-motion: reduce) { .ubuntu-editor-save-dialog { animation: none; } }
 .ubuntu-files__context-menu, .ubuntu-app-popover, .ubuntu-files__properties { animation: app-popover-in 120ms cubic-bezier(.25,.46,.45,.94); }
-.ubuntu-files__trash-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #dedbd7; color: #77716c; background: #faf9f8; font-size: 12px; }
-.ubuntu-files__trash-actions button { padding: 7px 12px; border: 1px solid #d4cec7; border-radius: 6px; color: #3d3d3d; background: white; font: 12px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-files__trash-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--app-line, #dedbd7); color: var(--app-muted, #77716c); background: var(--app-surface, #faf9f8); font-size: 12px; }
+.ubuntu-files__trash-actions button { padding: 7px 12px; border: 1px solid var(--app-line, #d4cec7); border-radius: 6px; color: var(--app-ink, #3d3d3d); background: var(--app-surface, white); font: 12px var(--font-ubuntu); cursor: pointer; }
 .ubuntu-files__trash-actions button:disabled { opacity: .45; cursor: default; }
 @keyframes app-popover-in { from { opacity: 0; transform: scale(.97); } }
 @media (prefers-reduced-motion: reduce) { .ubuntu-files__context-menu, .ubuntu-app-popover, .ubuntu-files__properties { animation: none; } }
@@ -128,3 +128,4 @@ html[data-desktop-theme="dark"] .ubuntu-file.is-selected { color: #f3ffff; backg
   .ubuntu-app-popover { right: 12px; }
   .ubuntu-help-topics { grid-template-columns: 1fr; }
 }
+html[data-desktop-theme="dark"] .ubuntu-editor-save-dialog button.is-destructive { color: var(--app-danger); }

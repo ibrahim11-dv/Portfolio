@@ -11,6 +11,21 @@ export function validWallpaper(value) {
 
 export function resolveTheme(theme, systemDark) { return theme === 'system' ? (systemDark ? 'dark' : 'light') : theme === 'dark' ? 'dark' : 'light'; }
 
+export function resolveWallpaper(appearance, theme, images) {
+  const color = COLOR_WALLPAPERS.find(([id]) => id === appearance.wallpaper)?.[2];
+  const adaptive = theme === 'dark' ? images.dark : images.light;
+  const source = appearance.wallpaper === 'ubuntu-light' ? images.light
+    : appearance.wallpaper === 'ubuntu-dark' ? images.dark
+      : appearance.wallpaper === 'custom' ? images.custom || adaptive : adaptive;
+  return {
+    image: color ? 'none' : `url(${JSON.stringify(source)})`,
+    color: color || '#24262a',
+    size: appearance.wallpaper === 'custom' && images.custom && appearance.fit === 'contain' ? 'contain' : 'cover',
+    solid: Boolean(color),
+    adaptiveImage: `url(${JSON.stringify(adaptive)})`,
+  };
+}
+
 export function readAppearance(storage) {
   try {
     const raw = JSON.parse(storage?.getItem(APPEARANCE_KEY));

@@ -13,7 +13,7 @@ body, html, #root {
 .desktop {
   width: 100%;
   height: 100%;
-  background: var(--desktop-wallpaper) center / var(--desktop-wallpaper-size) no-repeat, #24262a;
+  background: var(--desktop-wallpaper) center / var(--desktop-wallpaper-size) no-repeat var(--desktop-wallpaper-color, #24262a);
   position: relative;
   isolation: isolate;
 }
@@ -30,3 +30,5 @@ html[data-desktop-theme="light"] .desktop::after { background: linear-gradient(1
     linear-gradient(180deg, rgba(12, 8, 20, 0.2), transparent 24%),
     radial-gradient(ellipse at 50% 100%, rgba(18, 10, 30, 0.2), transparent 58%);
 }
+
+html[data-wallpaper-solid="true"] .desktop::after { background: none; }

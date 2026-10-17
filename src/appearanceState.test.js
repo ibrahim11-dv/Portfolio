@@ -1,6 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { APPEARANCE_KEY, DEFAULT_APPEARANCE, readAppearance, resolveTheme } from './appearanceState.js';
+import { APPEARANCE_KEY, COLOR_WALLPAPERS, DEFAULT_APPEARANCE, readAppearance, resolveTheme, resolveWallpaper } from './appearanceState.js';
+
+const images = { light: '/light.png', dark: '/dark.png', custom: 'blob:personal' };
+test('all six solid wallpapers use a background color and no image in either theme', () => {
+  for (const theme of ['light', 'dark']) for (const [wallpaper, , color] of COLOR_WALLPAPERS) {
+    const result = resolveWallpaper({ ...DEFAULT_APPEARANCE, wallpaper }, theme, images);
+    assert.equal(result.image, 'none');
+    assert.equal(result.color, color);
+    assert.equal(result.solid, true);
+  }
+});
+test('adaptive images follow theme while fixed and personal images stay independent', () => {
+  for (const theme of ['light', 'dark']) {
+    assert.equal(resolveWallpaper(DEFAULT_APPEARANCE, theme, images).image, `url("/${theme}.png")`);
+    assert.equal(resolveWallpaper({ wallpaper: 'ubuntu-light' }, theme, images).image, 'url("/light.png")');
+    assert.equal(resolveWallpaper({ wallpaper: 'ubuntu-dark' }, theme, images).image, 'url("/dark.png")');
+    assert.equal(resolveWallpaper({ wallpaper: 'custom', fit: 'contain' }, theme, images).size, 'contain');
+    assert.equal(resolveWallpaper({ wallpaper: 'custom' }, theme, images).image, 'url("blob:personal")');
+    assert.equal(resolveWallpaper({ wallpaper: 'custom' }, theme, { ...images, custom: null }).image, `url("/${theme}.png")`);
+  }
+});
 
 function storage(values = {}) { return { getItem: (key) => values[key] ?? null }; }
 

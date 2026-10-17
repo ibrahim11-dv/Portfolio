@@ -35,6 +35,15 @@
 }
 
 html[data-desktop-theme="dark"] {
+  color-scheme: dark;
+  --app-ink: #f4f6f5;
+  --app-muted: #bcc6c5;
+  --app-accent: #8fd8cf;
+  --app-danger: #ff9ba5;
+  --app-surface: #1f2325;
+  --app-panel: #2b3133;
+  --app-line: #515b5e;
+  --app-hover: #ffffff14;
   --theme-window: #303035;
   --theme-window-header: #252529;
   --theme-surface: #1f2224;

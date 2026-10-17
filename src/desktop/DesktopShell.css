@@ -112,3 +112,12 @@ html[data-desktop-theme="dark"] .ubuntu-window:not([data-app="terminal"]) .ubunt
 .ubuntu-shell-notice { position: fixed; z-index: 7200; top: 48px; right: 20px; max-width: calc(100vw - 40px); padding: 14px 18px; border: 1px solid #ffffff22; border-radius: 10px; color: #fff; background: #2e2933f5; font: 13px/1.5 var(--font-ubuntu); box-shadow: 0 6px 22px #0005; }
 @media (max-width: 620px) { .ubuntu-workspace-osd { bottom: 100px; } }
 @media (prefers-reduced-motion: reduce) { .ubuntu-workspace-osd { animation: none; } }
+/* Menus rendered outside application content share the same appearance tokens. */
+html[data-desktop-theme="dark"] .ubuntu-files__context-menu { color: var(--app-ink); background: var(--app-panel); border-color: var(--app-line); }
+html[data-desktop-theme="dark"] .ubuntu-files__context-menu button { color: var(--app-ink); }
+html[data-desktop-theme="dark"] .ubuntu-files__context-menu button:hover:not(:disabled) { background: var(--app-hover); }
+html[data-desktop-theme="dark"] :is(.ubuntu-files__sidebar button, .ubuntu-file, .ubuntu-files__properties) { color: var(--app-ink); }
+html[data-desktop-theme="dark"] :is(.ubuntu-files__sidebar-heading, .ubuntu-file small, .ubuntu-files__empty, .ubuntu-files__properties span) { color: var(--app-muted); }
+html[data-desktop-theme="dark"] :is(.ubuntu-file__rename, .ubuntu-files__search, .ubuntu-files__properties) { color: var(--app-ink); background: var(--app-surface); border-color: var(--app-line); }
+html[data-desktop-theme="dark"] .ubuntu-files__sidebar button:hover { background: var(--app-hover); }
+html[data-desktop-theme="dark"] .ubuntu-files__sidebar button.is-selected { color: var(--app-ink); background: #26736d; }

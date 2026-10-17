@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import backgroundLight from './assets/background.png';
 import backgroundDark from './assets/backgroundDark.png';
-import { APPEARANCE_KEY, COLOR_WALLPAPERS, DEFAULT_APPEARANCE, readAppearance, validWallpaper } from './appearanceState';
+import { APPEARANCE_KEY, COLOR_WALLPAPERS, DEFAULT_APPEARANCE, readAppearance, validWallpaper, resolveWallpaper, resolveTheme } from './appearanceState';
 
 const AppearanceContext = createContext(null);
 const IMAGE_KEY = 'wallpaper';
@@ -58,11 +58,13 @@ export async function normalizeWallpaper(file) {
 }
 
 export function AppearanceProvider({ children }) {
-  const [appearance, setAppearance] = useState(() => readAppearance(localStorage));
+  const [appearance, setAppearance] = useState(() => {
+    try { return readAppearance(window.localStorage); } catch { return { ...DEFAULT_APPEARANCE }; }
+  });
   const [systemDark, setSystemDark] = useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches || false);
   const [imageUrl, setImageUrl] = useState(null);
   const [storageWarning, setStorageWarning] = useState('');
-  const effectiveTheme = appearance.theme === 'system' ? (systemDark ? 'dark' : 'light') : appearance.theme;
+  const effectiveTheme = resolveTheme(appearance.theme, systemDark);
 
   useEffect(() => { const media = window.matchMedia?.('(prefers-color-scheme: dark)'); if (!media) return undefined; const update = () => setSystemDark(media.matches); media.addEventListener?.('change', update); return () => media.removeEventListener?.('change', update); }, []);
   useEffect(() => { let active = true; readImage().then((blob) => { if (blob && active) setImageUrl(URL.createObjectURL(blob)); }); return () => { active = false; }; }, []);
@@ -72,18 +74,20 @@ export function AppearanceProvider({ children }) {
     root.dataset.desktopTheme = effectiveTheme;
     root.dataset.desktopDark = String(effectiveTheme === 'dark');
     root.dataset.wallpaperKind = appearance.wallpaper;
-    const selected = appearance.wallpaper === 'adaptive' ? (effectiveTheme === 'dark' ? backgroundDark : backgroundLight) : appearance.wallpaper === 'ubuntu-light' ? backgroundLight : appearance.wallpaper === 'ubuntu-dark' ? backgroundDark : appearance.wallpaper === 'custom' && imageUrl ? imageUrl : COLOR_WALLPAPERS.find(([id]) => id === appearance.wallpaper)?.[2] || backgroundLight;
-    root.style.setProperty('--desktop-wallpaper', selected.startsWith?.('#') ? selected : `url("${selected}")`);
-    root.style.setProperty('--desktop-wallpaper-size', appearance.fit === 'contain' && appearance.wallpaper === 'custom' ? 'contain' : 'cover');
+    const wallpaper = resolveWallpaper(appearance, effectiveTheme, { light: backgroundLight, dark: backgroundDark, custom: imageUrl });
+    root.dataset.wallpaperSolid = String(wallpaper.solid);
+    root.style.setProperty('--desktop-wallpaper', wallpaper.image);
+    root.style.setProperty('--desktop-wallpaper-color', wallpaper.color);
+    root.style.setProperty('--desktop-wallpaper-size', wallpaper.size);
+    root.style.setProperty('--adaptive-wallpaper', wallpaper.adaptiveImage);
   }, [appearance, effectiveTheme, imageUrl]);
   useEffect(() => () => { if (imageUrl) URL.revokeObjectURL(imageUrl); }, [imageUrl]);
 
   async function importWallpaper(file) {
     const blob = await normalizeWallpaper(file);
     const url = URL.createObjectURL(blob);
-    if (imageUrl) URL.revokeObjectURL(imageUrl);
     setImageUrl(url); setAppearance((current) => ({ ...current, wallpaper: 'custom' }));
-    try { await storeImage(blob); } catch { setStorageWarning('L’image est active mais ne pourra pas être conservée après fermeture.'); }
+    try { await storeImage(blob); setStorageWarning(''); } catch { setStorageWarning('L’image est active mais ne pourra pas être conservée après fermeture.'); }
   }
   async function resetAppearance() { await deleteImage(); if (imageUrl) URL.revokeObjectURL(imageUrl); setImageUrl(null); setAppearance({ ...DEFAULT_APPEARANCE }); setStorageWarning(''); }
   const value = { appearance, effectiveTheme, imageUrl, storageWarning, setTheme: (theme) => setAppearance((current) => ({ ...current, theme })), setWallpaper: (wallpaper) => setAppearance((current) => ({ ...current, wallpaper: validWallpaper(wallpaper) })), setFit: (fit) => setAppearance((current) => ({ ...current, fit: fit === 'contain' ? 'contain' : 'cover' })), importWallpaper, resetAppearance };
