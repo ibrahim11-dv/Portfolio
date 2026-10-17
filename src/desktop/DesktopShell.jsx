@@ -22,7 +22,7 @@ import './DesktopShell.css';
 import './FileManager.css';
 import './Applications.css';
 import { findReusableWindow } from './recruiterJourney';
-import { completeIntroduction, guideStepAfter, initialIntroductionPhase } from './introJourney';
+import { completeIntroduction, initialIntroductionState, transitionIntroduction } from './introJourney';
 
 const DocumentViewer = lazy(() => import('./DocumentViewer'));
 
@@ -46,7 +46,7 @@ export default function DesktopShell() {
   const [showOverview, setShowOverview] = useState(false);
   const [workspaceNotice, setWorkspaceNotice] = useState(null);
   const [desktopNotice, setDesktopNotice] = useState('');
-  const [introduction, setIntroduction] = useState(() => ({ phase: initialIntroductionPhase(), step: 0 }));
+  const [introduction, setIntroduction] = useState(initialIntroductionState);
   const zIndex = useRef(10);
   const nextInstance = useRef(1);
   const pendingLaunches = useRef(new Map());
@@ -141,7 +141,7 @@ export default function DesktopShell() {
     completeIntroduction();
     const trigger = introductionTrigger.current;
     introductionTrigger.current = null;
-    setIntroduction({ phase: 'done', step: 0 });
+    setIntroduction((current) => transitionIntroduction(current, openPresentation ? 'open-presentation' : 'explore'));
     if (openPresentation) { openApp('presentation'); return; }
     requestAnimationFrame(() => (trigger?.isConnected ? trigger : document.querySelector('[data-intro-app="presentation"]'))?.focus({ preventScroll: true }));
   }
@@ -149,7 +149,7 @@ export default function DesktopShell() {
   function replayIntroduction(trigger) {
     introductionTrigger.current = trigger || document.activeElement;
     setShowApps(false); setShowOverview(false); setSwitcher(null);
-    setIntroduction({ phase: 'boot', step: 0 });
+    setIntroduction((current) => transitionIntroduction(current, 'replay'));
   }
 
   function closeApp(id) {
@@ -256,6 +256,7 @@ export default function DesktopShell() {
       if (event.key === 'Escape') { setShowApps(false); setShowOverview(false); setSwitcher(null); }
     }
     function releaseShortcut(event) {
+      if (introduction.phase !== 'done') return;
       if (switcher && event.key === switcher.modifier) { focusApp(switcher.ids[switcher.index]); setSwitcher(null); return; }
       if (event.key === 'Meta' && !metaChord.current && !document.querySelector('dialog[open]')) { setShowApps(false); setShowOverview((value) => !value); }
     }
@@ -298,11 +299,11 @@ export default function DesktopShell() {
     <WindowOverview open={showOverview} windows={windows} workspaceCount={workspaceCount} activeWorkspace={workspace} onWorkspace={switchWorkspace} onMoveWindow={moveWindowToWorkspace} onOpen={openApp} onFocus={focusApp} onCloseWindow={(id) => window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }))} onClose={() => setShowOverview(false)} onShowApps={() => { setShowOverview(false); setShowApps(true); }} revision={files} />
     <AppGrid open={showApps} onOpen={openApp} onClose={() => setShowApps(false)} />
     <DesktopIntroduction phase={introduction.phase} step={introduction.step}
-      onBootComplete={() => setIntroduction({ phase: 'presentation', step: 0 })}
+      onBootComplete={() => setIntroduction((current) => transitionIntroduction(current, 'boot-complete'))}
       onSkip={() => finishIntroduction()} onExplore={() => finishIntroduction()}
-      onStartGuide={() => setIntroduction({ phase: 'guide', step: 0 })}
-      onPrevious={() => setIntroduction((current) => ({ ...current, step: guideStepAfter(current.step, -1) }))}
-      onNext={() => setIntroduction((current) => ({ ...current, step: guideStepAfter(current.step, 1) }))}
+      onStartGuide={() => setIntroduction((current) => transitionIntroduction(current, 'start-guide'))}
+      onPrevious={() => setIntroduction((current) => transitionIntroduction(current, 'previous'))}
+      onNext={() => setIntroduction((current) => transitionIntroduction(current, 'next'))}
       onOpenPresentation={() => finishIntroduction({ openPresentation: true })} />
   </div>;
 }

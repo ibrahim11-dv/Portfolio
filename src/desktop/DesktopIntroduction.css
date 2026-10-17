@@ -1,4 +1,11 @@
-.ib-introduction { position: fixed; z-index: 12000; inset: 0; font-family: var(--font-ubuntu); }
+.ib-introduction { position: fixed; z-index: 12000; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; font-family: var(--font-ubuntu); }
+.ib-introduction::backdrop { background: transparent; }
+.ib-introduction--guide .ib-introduction__shade { backdrop-filter: none; background: #11121840; }
+.ib-introduction .ib-introduction__actions button { min-height: 44px; }
+.desktop-shell:has(.ib-introduction--guide) .desktop-shell__workspace { visibility: hidden; }
+@media (max-width: 620px) {
+  .desktop-shell:has(.ib-introduction--guide) .desktop-items::after { content: ''; position: absolute; top: 100%; width: 1px; height: 100dvh; pointer-events: none; }
+}
 .ib-introduction--boot { display: grid; place-items: center; grid-template-rows: auto auto auto; align-content: center; gap: 18px; color: #f8f8f8; background: #171419; }
 .ib-introduction__boot-mark { position: relative; width: 70px; height: 70px; border: 3px solid #f4f4f4; border-radius: 50%; }
 .ib-introduction__boot-mark::after { content: ''; position: absolute; inset: 17px; border: 3px solid var(--ib-accent); border-radius: 50%; }
@@ -20,3 +27,9 @@
 @media (max-width: 620px) { .ib-introduction__panel { top: auto; right: 10px; bottom: 86px; left: 10px; width: auto; max-height: min(64dvh, 430px); padding: 23px 20px; }.ib-introduction__panel h1, .ib-introduction__panel h2 { margin-top: 15px; font-size: 25px; }.ib-introduction__copy, .ib-introduction__guide-copy { font-size: 13px; }.ib-introduction__actions--guide { align-items: stretch; }.ib-introduction__actions--guide .ib-introduction__secondary { width: 100%; }.ib-introduction__nav { width: 100%; }.ib-introduction__nav .ib-introduction__primary { flex: 1; }.ib-introduction__skip { right: 10px; bottom: 11px; } }
 @media (max-height: 520px) { .ib-introduction__panel { top: 43px; bottom: 77px; max-height: none; }.ib-introduction__copy { gap: 7px; }.ib-introduction__actions { margin-top: 15px; } }
 @media (prefers-reduced-motion: reduce) { .ib-introduction__spinner, .ib-introduction__shade, .ib-introduction__panel { animation: none; }.ib-introduction__target { transition: none; } }
+@media (max-width: 620px) {
+  .ib-introduction--guide .ib-introduction__panel { padding: 16px; }
+  .ib-introduction--guide .ib-introduction__panel h2 { font-size: 22px; margin-block: 10px; }
+  .ib-introduction--guide .ib-introduction__progress { margin-top: 10px; }
+  .ib-introduction--guide .ib-introduction__actions { margin-top: 14px; }
+}

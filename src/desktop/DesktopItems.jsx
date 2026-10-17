@@ -79,6 +79,7 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onFo
   const dragRef = useRef(null);
   const bandRef = useRef(null);
   const touchPressRef = useRef(null);
+  const touchClickUntil = useRef(0);
   const entries = listDirectory(files, DESKTOP).filter(([name]) => showHidden || !name.startsWith('.'));
   const items = [...SHORTCUTS, ...entries.map(([name, type]) => {
     const path = `${DESKTOP}/${name}`;
@@ -178,13 +179,14 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onFo
   }
   function startTouchOpen(event, id) {
     if (event.pointerType !== 'touch') return;
-    touchPressRef.current = { id, x: event.clientX, y: event.clientY };
+    touchPressRef.current = { id, x: event.clientX, y: event.clientY, started: event.timeStamp };
   }
   function finishTouchOpen(event, id) {
     const touch = touchPressRef.current;
     touchPressRef.current = null;
-    if (event.pointerType !== 'touch' || !touch || touch.id !== id || Math.abs(touch.x - event.clientX) + Math.abs(touch.y - event.clientY) > 12) return;
+    if (event.pointerType !== 'touch' || !touch || touch.id !== id || event.timeStamp - touch.started > 600 || Math.abs(touch.x - event.clientX) + Math.abs(touch.y - event.clientY) > 12) return;
     event.preventDefault(); event.stopPropagation();
+    touchClickUntil.current = event.timeStamp + 700;
     selectItem(event, id); openItem(id);
   }
   function begin(kind, path) {
@@ -377,7 +379,8 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onFo
       {items.map((item) => <button key={item.id} type="button" data-desktop-id={item.id} data-intro-app={item.app || undefined} draggable className={`desktop-items__item ${selection.includes(item.id) ? 'is-selected' : ''} ${dragging.includes(item.id) ? 'is-dragging' : ''} ${dropTarget === item.path && item.type === 'dir' ? 'is-drop-target' : ''} ${clipboard.mode === 'cut' && clipboard.paths.includes(item.path) ? 'is-cut' : ''}`}
         style={{ left: layout.left + cells[item.id].col * CELL_WIDTH, top: layout.top + cells[item.id].row * CELL_HEIGHT }}
         title={`${item.name}${item.protected ? ' · élément du portfolio' : ''} (double-clic ou toucher pour ouvrir)`} aria-pressed={selection.includes(item.id)}
-        onClick={(event) => { event.stopPropagation(); selectItem(event, item.id); }} onDoubleClick={() => openItem(item.id)}
+        onClick={(event) => { event.stopPropagation(); if (event.detail && event.timeStamp < touchClickUntil.current) return; selectItem(event, item.id); }} onDoubleClick={(event) => { if (event.timeStamp >= touchClickUntil.current) openItem(item.id); }}
+        onPointerMove={(event) => { const touch = touchPressRef.current; if (touch && Math.abs(touch.x - event.clientX) + Math.abs(touch.y - event.clientY) > 12) touchPressRef.current = null; }}
         onPointerDown={(event) => startTouchOpen(event, item.id)} onPointerUp={(event) => finishTouchOpen(event, item.id)} onPointerCancel={() => { touchPressRef.current = null; }}
         onFocus={(event) => { if (event.currentTarget.matches(':focus-visible')) onFocusDesktop(); }}
         onContextMenu={(event) => { event.stopPropagation(); showMenu(event, selection.includes(item.id) ? selection : [item.id]); }}
