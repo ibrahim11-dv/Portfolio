@@ -12,6 +12,7 @@ import VirtualTerminal from './VirtualTerminal';
 import AppGrid from './AppGrid';
 import PortfolioApp from './PortfolioApp';
 import DesktopItems from './DesktopItems';
+import DesktopIntroduction from './DesktopIntroduction';
 import WindowOverview from './WindowOverview';
 import WorkspaceTransition from './WorkspaceTransition';
 import { CV_DOCUMENT, PROFILE } from './portfolioData';
@@ -21,11 +22,12 @@ import './DesktopShell.css';
 import './FileManager.css';
 import './Applications.css';
 import { findReusableWindow } from './recruiterJourney';
+import { completeIntroduction, guideStepAfter, initialIntroductionPhase } from './introJourney';
 
 const DocumentViewer = lazy(() => import('./DocumentViewer'));
 
-function SimpleApp({ kind, onOpen }) {
-  if (kind === 'help') return <div className="ubuntu-simple-app"><HelpCircle size={44} /><h2>Guide du bureau Ubuntu</h2><p>Tout ce dont vous avez besoin pour commencer.</p><div className="ubuntu-help-topics"><article><h3>Fichiers et dossiers</h3><p>Cliquez dans un espace vide du bureau pour créer un document ou un dossier. Ouvrez-le par double-clic, renommez-le avec F2 et supprimez-le avec Suppr. Les éléments du portfolio sont protégés.</p></article><article><h3>Terminal</h3><p>Ouvrez le terminal avec Ctrl+Alt+T. Tapez help pour afficher les commandes disponibles et Ctrl+Maj+T pour créer un onglet.</p></article><article><h3>Corbeille</h3><p>Vos créations supprimées vont dans la corbeille. Vous pouvez les restaurer à leur emplacement d’origine ou vider la corbeille.</p></article><article><h3>Fenêtres</h3><p>Utilisez le bouton d’agrandissement ou double-cliquez sur la barre supérieure. Déplacez la fenêtre vers un bord pour l’ancrer et tirez ses bords pour la redimensionner. Le dock permet de réduire et rouvrir les applications.</p></article></div><button className="desktop-action" onClick={() => window.open('https://help.ubuntu.com/', '_blank', 'noopener,noreferrer')}>Documentation Ubuntu</button></div>;
+function SimpleApp({ kind, onOpen, onReplayIntroduction }) {
+  if (kind === 'help') return <div className="ubuntu-simple-app"><HelpCircle size={44} /><h2>Guide du bureau IbrahimOS</h2><p>Tout ce dont vous avez besoin pour commencer.</p><div className="ubuntu-help-topics"><article><h3>Fichiers et dossiers</h3><p>Cliquez dans un espace vide du bureau pour créer un document ou un dossier. Ouvrez-le par double-clic, renommez-le avec F2 et supprimez-le avec Suppr. Les éléments du portfolio sont protégés.</p></article><article><h3>Terminal</h3><p>Ouvrez le terminal avec Ctrl+Alt+T. Tapez help pour afficher les commandes disponibles et Ctrl+Maj+T pour créer un onglet.</p></article><article><h3>Corbeille</h3><p>Vos créations supprimées vont dans la corbeille. Vous pouvez les restaurer à leur emplacement d’origine ou vider la corbeille.</p></article><article><h3>Fenêtres</h3><p>Utilisez le bouton d’agrandissement ou double-cliquez sur la barre supérieure. Déplacez la fenêtre vers un bord pour l’ancrer et tirez ses bords pour la redimensionner. Le dock permet de réduire et rouvrir les applications.</p></article></div><div className="ubuntu-help-actions"><button className="desktop-action" onClick={(event) => onReplayIntroduction?.(event.currentTarget)}>Revoir l’accueil et la visite</button><button className="desktop-action" onClick={() => window.open('https://help.ubuntu.com/', '_blank', 'noopener,noreferrer')}>Documentation Ubuntu</button></div></div>;
   if (kind === 'store') return <div className="ubuntu-simple-app"><PackageOpen size={44} /><h2>Applications installées</h2><p>Retrouvez les applications de votre bureau.</p>{DESKTOP_APPS.filter((app) => app.id !== 'store').map((app) => <div className="ubuntu-store-card" key={app.id}><img src={app.icon} alt="" /><div><strong>{app.name}</strong><small>Installé</small></div><button onClick={() => onOpen(app.id)}>Ouvrir</button></div>)}</div>;
   return null;
 }
@@ -44,6 +46,7 @@ export default function DesktopShell() {
   const [showOverview, setShowOverview] = useState(false);
   const [workspaceNotice, setWorkspaceNotice] = useState(null);
   const [desktopNotice, setDesktopNotice] = useState('');
+  const [introduction, setIntroduction] = useState(() => ({ phase: initialIntroductionPhase(), step: 0 }));
   const zIndex = useRef(10);
   const nextInstance = useRef(1);
   const pendingLaunches = useRef(new Map());
@@ -55,6 +58,7 @@ export default function DesktopShell() {
   const metaChord = useRef(false);
   const hiddenByDesktop = useRef({});
   const workspaceTransition = useRef(null);
+  const introductionTrigger = useRef(null);
   const workspaceCount = Math.max(2, workspace + 1, ...windows.map((item) => item.workspace + 2));
   if (activeApp && !windows.some((item) => item.id === activeApp)) setActiveApp(frontWindow(windows, null, workspace));
 
@@ -133,6 +137,21 @@ export default function DesktopShell() {
     setWindows((current) => [...current, { ...created, initialPosition: { x: 92 + current.length % 6 * 28, y: 44 + Math.min(current.length * 8, 16) } }]);
   }
 
+  function finishIntroduction({ openPresentation = false } = {}) {
+    completeIntroduction();
+    const trigger = introductionTrigger.current;
+    introductionTrigger.current = null;
+    setIntroduction({ phase: 'done', step: 0 });
+    if (openPresentation) { openApp('presentation'); return; }
+    requestAnimationFrame(() => (trigger?.isConnected ? trigger : document.querySelector('[data-intro-app="presentation"]'))?.focus({ preventScroll: true }));
+  }
+
+  function replayIntroduction(trigger) {
+    introductionTrigger.current = trigger || document.activeElement;
+    setShowApps(false); setShowOverview(false); setSwitcher(null);
+    setIntroduction({ phase: 'boot', step: 0 });
+  }
+
   function closeApp(id) {
     setWindows((current) => current.filter((window) => window.id !== id));
     setActiveApp((current) => current === id ? frontWindow(windows, id, workspace) : current);
@@ -189,6 +208,7 @@ export default function DesktopShell() {
 
   useEffect(() => {
     function handleShortcuts(event) {
+      if (introduction.phase !== 'done') return;
       if (document.querySelector('dialog[open]')) return;
       if (event.key === 'Meta') metaChord.current = false;
       else if (event.metaKey) metaChord.current = true;
@@ -248,7 +268,7 @@ export default function DesktopShell() {
     return () => { window.removeEventListener('keydown', handleShortcuts); window.removeEventListener('keyup', releaseShortcut); window.removeEventListener('blur', releaseOnBlur); window.removeEventListener('pointerdown', markPointerChord, true); };
   // Keyboard shortcuts intentionally use the current window action.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showApps, windows, activeApp, switcher, workspace, workspaceCount]);
+  }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase]);
 
   return <div className="desktop-shell">
     <TopBar appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
@@ -267,7 +287,7 @@ export default function DesktopShell() {
         else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} />;
         else if (kind === 'editor') content = <TextEditor key={window.id} windowId={window.id} files={files} filePath={window.filePath} navigationRequest={window.navigationRequest} openRequests={window.editorRequests} initialDocument={window.editorDocument} setFiles={setFiles} onNewWindow={(editorDocument) => openApp('editor', { newWindow: true, editorDocument: editorDocument || createDocument(files, uniquePath(files, `${ROOT}/Documents`, 'Sans titre.txt'), 0, true) })} onOpenDirectory={(directory) => openApp('files', { directory })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
         else if (kind === 'images') content = <ImageViewer key={`${window.id}-${window.navigationRequest || 0}`} files={files} setFiles={setFiles} filePath={window.filePath} onNavigate={(filePath) => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, filePath: filePath || undefined } : item))} onOpenDirectory={(directory) => openApp('files', { directory })} onNewWindow={() => openApp('images', { newWindow: true })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
-        else content = <SimpleApp kind={kind} onOpen={openApp} />;
+        else content = <SimpleApp kind={kind} onOpen={openApp} onReplayIntroduction={replayIntroduction} />;
         return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} minimized={window.minimized} workspaceHidden={window.workspace !== workspace} isActive={activeApp === window.id && window.workspace === workspace && !showOverview && !showApps} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
       })}
     </main>
@@ -277,5 +297,12 @@ export default function DesktopShell() {
     {desktopNotice && <div className="ubuntu-shell-notice" role="status">{desktopNotice}</div>}
     <WindowOverview open={showOverview} windows={windows} workspaceCount={workspaceCount} activeWorkspace={workspace} onWorkspace={switchWorkspace} onMoveWindow={moveWindowToWorkspace} onOpen={openApp} onFocus={focusApp} onCloseWindow={(id) => window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }))} onClose={() => setShowOverview(false)} onShowApps={() => { setShowOverview(false); setShowApps(true); }} revision={files} />
     <AppGrid open={showApps} onOpen={openApp} onClose={() => setShowApps(false)} />
+    <DesktopIntroduction phase={introduction.phase} step={introduction.step}
+      onBootComplete={() => setIntroduction({ phase: 'presentation', step: 0 })}
+      onSkip={() => finishIntroduction()} onExplore={() => finishIntroduction()}
+      onStartGuide={() => setIntroduction({ phase: 'guide', step: 0 })}
+      onPrevious={() => setIntroduction((current) => ({ ...current, step: guideStepAfter(current.step, -1) }))}
+      onNext={() => setIntroduction((current) => ({ ...current, step: guideStepAfter(current.step, 1) }))}
+      onOpenPresentation={() => finishIntroduction({ openPresentation: true })} />
   </div>;
 }

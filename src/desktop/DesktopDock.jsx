@@ -159,7 +159,7 @@ export default function DesktopDock({ openApps, activeApp, onOpen, onLaunch = on
   }
 
   return <>
-    <aside className={`ubuntu-dock ${dragging ? 'is-app-dragging' : ''}`} aria-label="Applications favorites et ouvertes" onContextMenu={(event) => event.preventDefault()}
+    <aside data-intro-target="dock" className={`ubuntu-dock ${dragging ? 'is-app-dragging' : ''}`} aria-label="Applications favorites et ouvertes" onContextMenu={(event) => event.preventDefault()}
       onDragEnter={(event) => { if (!event.target.closest('.ubuntu-dock__bottom')) acceptApp(event); }}
       onDragOver={(event) => { if (!event.target.closest('.ubuntu-dock__bottom')) acceptApp(event); }}
       onDrop={(event) => { if (!event.target.closest('.ubuntu-dock__bottom')) dropApp(event); }}
@@ -182,7 +182,7 @@ export default function DesktopDock({ openApps, activeApp, onOpen, onLaunch = on
         {!dockApps.length && <div className={`ubuntu-dock__empty ${dropIndex !== null ? 'is-drop-target' : ''}`} aria-label="Déposer une application pour l’ajouter aux favoris" />}
       </div>
       <div className="ubuntu-dock__bottom">
-        <button className="ubuntu-dock__item" data-app-launcher="applications" aria-label="Afficher les applications"
+        <button className="ubuntu-dock__item" data-intro-target="app-grid" data-app-launcher="applications" aria-label="Afficher les applications"
           {...tooltipEvents('applications', 'Afficher les applications')} onClick={() => { setTooltip(null); setMenu(null); onShowApps(); }}>
           <span className="ubuntu-dock__icon ubuntu-dock__icon--grid"><Grid2X2 size={22} strokeWidth={1.7} /></span>
         </button>

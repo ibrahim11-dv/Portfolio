@@ -74,6 +74,8 @@
 .ubuntu-help-topics article { padding: 18px; border: 1px solid #e2ddd7; border-radius: 12px; background: #fff; }
 .ubuntu-help-topics h3 { font-size: 15px; font-weight: 600; }
 .ubuntu-help-topics p { font-size: 13px; }
+.ubuntu-help-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.ubuntu-help-actions .desktop-action { margin-top: 0; }
 .ubuntu-trash-list { background: white; border-color: #e2ddd7; }
 .ubuntu-trash-list div { color: #3d3d3d; border-color: #e2ddd7; }
 .ubuntu-window:is([data-app="presentation"], [data-app="projects"], [data-app="skills"], [data-app="journey"], [data-app="contact"]) { width: min(1040px, calc(100vw - 110px)); height: min(710px, calc(100vh - 100px)); background: #faf9f8; color: #3d3d3d; border-color: #0003; }
