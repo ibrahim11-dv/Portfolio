@@ -93,6 +93,11 @@
 .ubuntu-window[data-app="trash"] .ubuntu-window__content { height: 100%; }
 .ubuntu-window[data-app="trash"] .ubuntu-window__controls button { width: 27px; height: 27px; color: #3d3d3d; background: #ddd9d5; }
 .ubuntu-window[data-app="trash"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
+html[data-desktop-theme="dark"] :is(.ubuntu-simple-app, .ubuntu-editor, .ubuntu-files, .document-viewer, .ubuntu-window[data-app="cv"]) { color: var(--theme-ink); background: var(--theme-surface); }
+html[data-desktop-theme="dark"] :is(.ubuntu-simple-app, .ubuntu-editor, .ubuntu-files) :is(.ubuntu-editor__toolbar, .ubuntu-files__toolbar, .ubuntu-files__sidebar, .ubuntu-editor__status, .ubuntu-files__status, .ubuntu-editor__search, .ubuntu-files__search-row) { color: var(--theme-ink); background: var(--theme-surface-muted); border-color: var(--theme-line); }
+html[data-desktop-theme="dark"] :is(.ubuntu-files__location, .ubuntu-files__search input, .ubuntu-editor input, .ubuntu-editor textarea, .ubuntu-files__context-menu, .ubuntu-app-popover) { color: var(--theme-ink); background: #252a2c; border-color: var(--theme-line); }
+html[data-desktop-theme="dark"] .ubuntu-file:hover { background: #ffffff12; }
+html[data-desktop-theme="dark"] .ubuntu-file.is-selected { color: #f3ffff; background: #26736d; }
 .ubuntu-editor-save-dialog { width: min(430px, calc(100vw - 32px)); margin: auto; padding: 28px 24px 20px; border: 1px solid #d4cfc9; border-radius: 15px; color: #3d3d3d; background: #faf9f8; box-shadow: 0 15px 60px #0006; font-family: var(--font-ubuntu); animation: ubuntu-snap-show 150ms ease-out; }
 .ubuntu-editor-save-dialog::backdrop { background: #0006; }
 .ubuntu-editor-save-dialog h2 { margin: 0 0 14px; text-align: center; font-size: 20px; font-weight: 600; }

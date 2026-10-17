@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { HelpCircle, PackageOpen } from 'lucide-react';
+import AppearanceApp from './AppearanceApp';
 import TopBar from '../components/TopBar/TopBar';
 import DesktopDock from './DesktopDock';
 import DesktopWindow from './DesktopWindow';
@@ -272,9 +273,9 @@ export default function DesktopShell() {
   }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase]);
 
   return <div className="desktop-shell">
-    <TopBar appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
+    <TopBar appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
     <DesktopDock openApps={[...new Set(windows.map((item) => item.appId))]} activeApp={windows.find((item) => item.id === activeApp)?.appId} onOpen={dockAction} onLaunch={openApp} onQuit={quitApp} onTrashPaths={trashDrop} isFileProtected={(path) => !canDeletePath(files, path)} onShowApps={() => { setShowOverview(false); setShowApps((value) => !value); }} />
-    <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onFocusDesktop={() => setActiveApp(null)} />
+    <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onOpenAppearance={() => openApp('appearance')} onFocusDesktop={() => setActiveApp(null)} />
     <main className="desktop-shell__workspace" aria-label="Espace de travail">
       {windows.map((window) => {
         const kind = window.appId;
@@ -283,6 +284,7 @@ export default function DesktopShell() {
         const icon = app?.icon || '/ubuntu-apps/trash.png';
         let content;
         if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
+        else if (kind === 'appearance') content = <AppearanceApp onNotify={setDesktopNotice} />;
         else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('contact')} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
         else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;
         else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} />;

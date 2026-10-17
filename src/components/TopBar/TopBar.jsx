@@ -26,7 +26,7 @@ function SymbolicIcon({ name }) {
   return <span aria-hidden="true" className="ubuntu-symbolic-icon" style={{ '--icon': `url("${import.meta.env.BASE_URL}ubuntu-icons/${name}-symbolic.svg")` }} />;
 }
 
-export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, overviewOpen = false }) {
+export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, overviewOpen = false }) {
   const [now, setNow] = useState(new Date());
   const [openMenu, setOpenMenu] = useState(null); // "clock" | "system" | null
   const [localWorkspace, setLocalWorkspace] = useState(0);
@@ -56,13 +56,11 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
     try { localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences)); }
     catch { /* Preferences still work for this session when storage is unavailable. */ }
     const root = document.documentElement;
-    root.dataset.desktopDark = String(preferences.dark);
     root.dataset.desktopSaver = String(preferences.saver);
     document.querySelectorAll('audio, video').forEach((media) => { media.volume = preferences.volume / 100; });
   }, [preferences]);
 
   useEffect(() => () => {
-    delete document.documentElement.dataset.desktopDark;
     delete document.documentElement.dataset.desktopSaver;
   }, []);
 
@@ -402,6 +400,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
                 <BatteryIndicator {...battery} showPercentage />
               </div>
               <div className="ubuntu-qs-footer__right">
+                <button className="ubuntu-qs-footer__btn ubuntu-qs-appearance" aria-label="Ouvrir les réglages d’apparence" onClick={() => { setOpenMenu(null); onOpenAppearance?.(); }}><Sun size={16} /></button>
                 <button className="ubuntu-qs-footer__btn" aria-label="Capture d'écran" disabled={capturing} onClick={() => openDialog('capture')}><Camera size={16} /></button>
                 <button className="ubuntu-qs-footer__btn" aria-label="Verrouiller" onClick={() => openSession('lock')}><Lock size={16} /></button>
                 <button className="ubuntu-qs-footer__btn" aria-label="Éteindre" aria-expanded={detail === 'power'} onClick={() => setDetail(detail === 'power' ? null : 'power')}><Power size={16} /></button>

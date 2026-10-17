@@ -269,3 +269,9 @@
 
 .portfolio-app--standalone .portfolio-app__toolbar { flex-wrap: wrap; padding-block: 5px; }
 .portfolio-app--standalone .portfolio-app__content { scroll-padding-top: 12px; }
+html[data-desktop-theme="dark"] .portfolio-app { --ib-ink: #edf1f0; --ib-graphite: #f3f5f4; --ib-slate: #adb6b5; --ib-line: #ffffff22; --ib-paper: #1f2325; --ib-panel: #292e30; }
+html[data-desktop-theme="dark"] .portfolio-app__toolbar { background: #252a2c; }
+html[data-desktop-theme="dark"] .portfolio-app__toolbar :is(.portfolio-app__toolbar-title, .portfolio-app__back, .portfolio-app__toolbar-caption) { color: #c8d0cf; }
+html[data-desktop-theme="dark"] .portfolio-app :is(.portfolio-app__toolbar-cv, .portfolio-app__utility-link, .portfolio-app__profile-actions :is(button,a), .portfolio-app__active-filters button) { color: #eef2f1; background: #2d3335; border-color: #ffffff2b; }
+html[data-desktop-theme="dark"] .portfolio-app :is(.portfolio-app__collections button, .portfolio-app__case-file, .portfolio-app__case-file.is-featured, .portfolio-app__contact-sheet, .portfolio-app__languages, .portfolio-app__profile-portrait-panel, .portfolio-app__profile-readouts) { color: #e9efed; background: #292e30; border-color: #ffffff22; }
+html[data-desktop-theme="dark"] .portfolio-app :is(.portfolio-app__search, .portfolio-app__search input, .portfolio-app__tags span) { color: #e9efed; background: #24292b; border-color: #ffffff2b; }

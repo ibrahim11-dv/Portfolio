@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, ClipboardPaste, Copy, FilePlus2, FolderOpen, FolderPlus, LockKeyhole, Pencil, Scissors, Terminal, Trash2, X } from 'lucide-react';
+import { Check, ClipboardPaste, Copy, FilePlus2, FolderOpen, FolderPlus, LockKeyhole, MonitorCog, Pencil, Scissors, Terminal, Trash2, X } from 'lucide-react';
 import { canDeletePath, DIRECTORY_MARKER, isDirectory, listDirectory, normalizePath, readTrash, renamePath, restoreFromTrash, ROOT, trashPaths, transferPaths, uniquePath, writeFiles } from './virtualFs';
 import { DESKTOP_APPS, PORTFOLIO_APP_IDS, endAppDrag, hasAppDrag, readAppDrag, readAppShortcut } from './apps';
 import { endFileDrag, FILE_CLIPBOARD_EVENT, FILE_DRAG_END_EVENT, fileDragCopies, readFileClipboard, readFileDrag, writeFileClipboard, writeFileDrag } from './dragDrop';
@@ -59,7 +59,7 @@ function arrangeItems(items, saved, layout) {
   return result;
 }
 
-export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onFocusDesktop }) {
+export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOpenAppearance, onFocusDesktop }) {
   const [selected, setSelected] = useState([]);
   const [positions, setPositions] = useState(readPositions);
   const [viewport, setViewport] = useState(() => ({ width: window.innerWidth, height: window.innerHeight }));
@@ -408,6 +408,7 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onFo
         <div role="separator" />
         <button role="menuitem" onClick={() => { setMenu(null); onOpen('files', { directory: DESKTOP }); }}><FolderOpen size={16} />Afficher le Bureau dans Fichiers</button>
         <button role="menuitem" onClick={() => { setMenu(null); onOpen('terminal', { directory: DESKTOP }); }}><Terminal size={16} />Ouvrir dans le terminal</button>
+        <button role="menuitem" onClick={() => { setMenu(null); onOpenAppearance?.(); }}><MonitorCog size={16} />Modifier l’apparence</button>
       </>}
     </div>, document.body)}
     {operation && <FileNameDialog directory={DESKTOP} directoryLabel="Bureau" key={`${operation.kind}-${operation.path || ''}`} operation={operation} files={files} onSave={saveName} onClose={closeOperation} />}

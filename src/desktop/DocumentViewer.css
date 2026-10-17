@@ -5,6 +5,8 @@
 .ubuntu-window[data-app="cv"] .ubuntu-window__controls button { width: 27px; height: 27px; color: #3d3d3d; background: #ddd9d5; }
 .ubuntu-window[data-app="cv"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
 .papers { position: relative; display: flex; flex-direction: column; height: 100%; min-width: 0; outline: 0; background: #fff; color: #3d3d3d; font: 13px var(--font-ubuntu); container-type: inline-size; container-name: papers; }
+html[data-desktop-theme="dark"] .papers { color: var(--theme-ink); background: var(--theme-surface); }
+html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-title, .papers__sidebar, .papers__search, .papers__status) { color: var(--theme-ink); background: var(--theme-surface-muted); border-color: var(--theme-line); }
 .papers button { font: inherit; cursor: pointer; }
 .papers button:disabled { opacity: .4; cursor: default; }
 .papers button:focus-visible, .papers a:focus-visible { outline: 2px solid #e95420; outline-offset: -2px; }

@@ -37,7 +37,6 @@ export default function WorkspaceTransition({ ref }) {
         const wallpaper = document.createElement('div');
         wallpaper.className = 'workspace-transition__wallpaper';
         wallpaper.style.background = desktopStyle.background;
-        wallpaper.style.backgroundSize = `${window.innerWidth}px ${window.innerHeight}px`;
         const shade = document.createElement('div');
         shade.className = 'workspace-transition__shade';
         shade.style.background = getComputedStyle(desktop, '::after').background;

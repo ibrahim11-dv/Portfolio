@@ -21,4 +21,27 @@
   --ubuntu-text-muted: rgba(255, 255, 255, 0.8);
   --ubuntu-text-subtle: rgba(255, 255, 255, 0.5);
   --font-ubuntu: "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --desktop-wallpaper: url('./assets/background.png');
+  --desktop-wallpaper-size: cover;
+  --theme-window: #303035;
+  --theme-window-header: #252529;
+  --theme-surface: #f7f8f8;
+  --theme-surface-muted: #eceeef;
+  --theme-ink: #171a1b;
+  --theme-muted: #596164;
+  --theme-line: #cbd0d2;
+  --theme-menu: #36363a;
+  --theme-menu-text: #fff;
+}
+
+html[data-desktop-theme="dark"] {
+  --theme-window: #303035;
+  --theme-window-header: #252529;
+  --theme-surface: #1f2224;
+  --theme-surface-muted: #292d30;
+  --theme-ink: #f4f6f5;
+  --theme-muted: #c1c8c8;
+  --theme-line: #ffffff24;
+  --theme-menu: #36363a;
+  --theme-menu-text: #fff;
 }

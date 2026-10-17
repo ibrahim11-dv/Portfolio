@@ -9,6 +9,7 @@ export const DESKTOP_APPS = [
   { id: 'terminal', name: 'Terminal', icon: '/ubuntu-apps/terminal.png', shortcut: 'Ctrl+Alt+T' },
   { id: 'editor', name: 'Éditeur de texte', icon: '/ubuntu-apps/editor.png' },
   { id: 'images', name: 'Visionneur d’images', icon: '/ubuntu-apps/loupe.svg' },
+  { id: 'appearance', name: 'Apparence', icon: '/ubuntu-apps/appearance.svg' },
   { id: 'help', name: 'Aide', icon: '/ubuntu-apps/help.png' },
   { id: 'store', name: 'App Center', icon: '/ubuntu-apps/store.png' },
 ];

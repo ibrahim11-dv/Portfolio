@@ -19,6 +19,11 @@
 .ubuntu-window__controls button:hover { background: #ffffff19; }
 .ubuntu-window__controls button:last-child:hover { background: #c7162b; }
 .ubuntu-window__content { height: calc(100% - 44px); overflow: hidden; }
+html[data-desktop-theme="light"] .ubuntu-window:not([data-app="terminal"]) { background: var(--theme-surface); color: var(--theme-ink); border-color: #0003; }
+html[data-desktop-theme="light"] .ubuntu-window:not([data-app="terminal"]) .ubuntu-window__header { background: var(--theme-surface-muted); border-bottom-color: var(--theme-line); }
+html[data-desktop-theme="light"] .ubuntu-window:not([data-app="terminal"]) .ubuntu-window__controls button { color: var(--theme-ink); }
+html[data-desktop-theme="dark"] .ubuntu-window:not([data-app="terminal"]) { background: var(--theme-window); color: var(--theme-ink); border-color: var(--theme-line); }
+html[data-desktop-theme="dark"] .ubuntu-window:not([data-app="terminal"]) .ubuntu-window__header { background: var(--theme-window-header); border-bottom-color: var(--theme-line); }
 .ubuntu-terminal { height: 100%; display: flex; flex-direction: column; background: #171719; color: #f7f7f7; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 13px; cursor: text; }
 .ubuntu-terminal__chrome { height: 42px; padding: 0 8px 0 13px; display: flex; align-items: center; gap: 3px; border-bottom: 1px solid #ffffff18; background: #202023; font-family: var(--font-ubuntu); }
 .ubuntu-terminal__chrome button { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 7px; color: #ffffffcf; background: transparent; cursor: pointer; }
