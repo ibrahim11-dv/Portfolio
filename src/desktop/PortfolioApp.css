@@ -282,3 +282,8 @@ html[data-desktop-theme="dark"] .portfolio-app :is(.portfolio-app__collections b
 }
 html[data-desktop-theme="dark"] .portfolio-app :is(button, a, input):focus-visible { outline-color: var(--ib-accent); }
 html[data-desktop-theme="dark"] .portfolio-app__collections button[aria-pressed="true"] :is(span, b, small) { color: inherit; }
+.ubuntu-window[data-app="projects"] .portfolio-app { font-family: var(--font-reading); font-size: 15px; }
+.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__section-heading p, .portfolio-app__case-body p) { font-size: 16px; line-height: 1.7; }
+.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__case-head, .portfolio-app__case-body dt, .portfolio-app__case-body dd, .portfolio-app__case-action, .portfolio-app__tags span, .portfolio-app__filters button, .portfolio-app__collections button, .portfolio-app__search, .portfolio-app__search input, .portfolio-app__eyebrow) { font-family: var(--font-reading); font-size: 13px; letter-spacing: normal; }
+.ubuntu-window[data-app="projects"] .portfolio-app__case-body h2 { font-size: 25px; line-height: 1.25; letter-spacing: -.02em; }
+.ubuntu-window[data-app="projects"] .portfolio-app__case-focus { font-size: 14px; line-height: 1.65; }

@@ -70,10 +70,14 @@ function ProjectTour({ project }) {
         <span className="project-report__eyebrow">PARCOURS ILLUSTRATIF / 02</span>
         <h2 id={`${id}-title`}>Le flux du projet.</h2>
       </div>
-      {!reducedMotion && <button className="project-tour__play" onClick={() => {
+      {!reducedMotion && <button type="button" className="project-tour__play" aria-controls={`${id}-detail`} onClick={() => {
         if (!playing && step === steps.length - 1) setStep(0);
         setPlaying(!playing);
-      }} aria-pressed={playing}>{playing ? <Pause size={14} /> : <Play size={14} />}{playing ? 'Pause' : 'Lire le parcours'}</button>}
+      }} aria-pressed={playing}>{playing ? <Pause size={14} /> : <Play size={14} />}{playing ? 'Mettre en pause' : step === steps.length - 1 ? 'Relire le parcours' : 'Lire le parcours'}</button>}
+    </div>
+    <div className="project-tour__playback">
+      <p role="status">{playing ? `Lecture automatique · étape ${step + 1} sur ${steps.length} · 5 secondes par étape` : reducedMotion ? 'Parcours manuel : choisissez une étape ou utilisez les flèches.' : step === steps.length - 1 ? 'Fin du parcours. Vous pouvez le relire ou choisir une étape.' : 'Choisissez une étape ou lancez la lecture automatique.'}</p>
+      {playing && <div className="project-tour__progress" aria-hidden="true"><span key={step} /></div>}
     </div>
     <ProjectArtwork project={project} step={step} />
     <p className="project-tour__disclaimer">Illustration de fonctionnement · données d’exemple · aucun service externe appelé</p>
@@ -152,7 +156,7 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
     element?.focus({ preventScroll: true });
   }
 
-  return <article className="project-report" ref={reportRef} style={{ '--project-accent': '#8fd8cf' }}>
+  return <article className="project-report" ref={reportRef}>
     <header className="project-report__hero">
       <div className="project-report__hero-top"><span>DOSSIER / {String(PROJECTS.findIndex((item) => item.id === project.id) + 1).padStart(2, '0')}</span><span>{project.group === 'main' ? 'PROJET PRINCIPAL' : 'AUTRE PROJET'}</span></div>
       <div className="project-report__hero-grid">
@@ -194,7 +198,7 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
         <div className="project-report__features">{project.highlights.map((item) => <span key={item}><Check size={14} />{item}</span>)}</div>
       </section>
       {PROJECT_MEDIA[project.id] && <div className="project-report__chapter" data-chapter="screens" tabIndex={-1}><ProjectGallery key={project.id} project={project} images={PROJECT_MEDIA[project.id]} /></div>}
-      <div className="project-report__chapter" data-chapter="tour" tabIndex={-1}><ProjectTour project={project} /></div>
+      <div className="project-report__chapter" data-chapter="tour" tabIndex={-1}><ProjectTour key={project.id} project={project} /></div>
       <section className="project-report__chapter" data-chapter="architecture" tabIndex={-1}>
         <span className="project-report__eyebrow">ARCHITECTURE / 03</span>
         <h2>Les composants du système.</h2>

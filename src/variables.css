@@ -1,4 +1,7 @@
 :root {
+  --app-muted: #596164;
+  --app-accent: #216b62;
+  --font-reading: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --motion-feedback: 120ms;
   --motion-content: 180ms;
   --motion-window: 240ms;

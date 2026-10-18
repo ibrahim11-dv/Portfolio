@@ -25,8 +25,8 @@
 .loupe__empty > svg { color: var(--app-muted, #aaa); }
 .loupe__empty h2 { font-size: 22px; margin: 18px 0 0; }
 .loupe__empty p { color: var(--app-muted, #777); margin: 10px 0 20px; }
-.loupe__empty button { padding: 11px 24px; border-radius: 99px; background: #e95420; color: white; font-weight: 600; }
-.loupe__empty button:hover { background: #d74a1b !important; }
+.loupe__empty button { padding: 11px 24px; border-radius: 99px; background: #b83a10; color: white; font-weight: 600; }
+.loupe__empty button:hover { background: #9c300c !important; }
 .loupe__osd { position: absolute; bottom: 18px; z-index: 2; display: flex; align-items: center; padding: 6px; border-radius: 12px; background: #f0f0f0bf; backdrop-filter: blur(8px); }
 .loupe__osd button { min-width: 34px; height: 34px; }
 .loupe__navigation { left: 18px; gap: 6px; }

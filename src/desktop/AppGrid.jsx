@@ -173,7 +173,7 @@ export default function AppGrid({ open = true, onOpen, onClose }) {
     if (next !== undefined) { event.preventDefault(); buttons[next]?.focus(); }
   }
 
-  if (!present) return null;
+  if (!open && !present) return null;
   return <div className={`ubuntu-overview ${open ? 'is-opening' : 'is-closing'} ${dragging ? 'is-app-dragging' : ''}`} role="dialog" aria-modal={open} aria-hidden={!open}
     aria-label="Applications" aria-describedby={instructionsId} onKeyDown={handleKeys}
     onClick={(event) => { if (open && event.target === event.currentTarget) closeOverview(); }} onContextMenu={(event) => event.preventDefault()}>

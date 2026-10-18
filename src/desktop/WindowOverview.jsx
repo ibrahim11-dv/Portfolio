@@ -120,7 +120,7 @@ export default function WindowOverview({ open, windows, activeWorkspace, workspa
     event.dataTransfer.dropEffect = hasAppDrag(event) ? 'copy' : 'move';
     setDropWorkspace(index);
   }
-  if (!present) return null;
+  if (!open && !present) return null;
   return <div ref={rootRef} className={`ubuntu-window-overview ${open ? 'is-opening' : 'is-closing'}`} role="dialog" aria-modal={open} aria-hidden={!open} aria-label="Activités" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }} onKeyDown={(event) => {
     if (event.key === 'Escape') { event.preventDefault(); onClose(); }
     if (event.key === 'Tab') {
