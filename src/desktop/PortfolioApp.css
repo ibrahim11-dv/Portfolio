@@ -269,6 +269,12 @@
 
 .portfolio-app--standalone .portfolio-app__toolbar { flex-wrap: wrap; padding-block: 5px; }
 .portfolio-app--standalone .portfolio-app__content { scroll-padding-top: 12px; }
+@container portfolio (max-width: 480px) {
+  .portfolio-app__profile-note { grid-template-columns: minmax(0, 1fr); }
+  .portfolio-app__profile-note > * { min-width: 0; overflow-wrap: anywhere; }
+  .portfolio-app__profile-note > p, .portfolio-app__profile-note > div { grid-column: auto; }
+  .portfolio-app__profile-note > div { grid-template-columns: minmax(0, 1fr); }
+}
 html[data-desktop-theme="dark"] .portfolio-app { --ib-ink: #edf1f0; --ib-graphite: #f3f5f4; --ib-slate: #adb6b5; --ib-line: #ffffff22; --ib-paper: #1f2325; --ib-panel: #292e30; }
 html[data-desktop-theme="dark"] .portfolio-app__toolbar { background: #252a2c; }
 html[data-desktop-theme="dark"] .portfolio-app__toolbar :is(.portfolio-app__toolbar-title, .portfolio-app__back, .portfolio-app__toolbar-caption) { color: #c8d0cf; }
