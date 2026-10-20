@@ -6,13 +6,15 @@
 @media (max-width: 620px) {
   .desktop-shell:has(.ib-introduction--guide) .desktop-items::after { content: ''; position: absolute; top: 100%; width: 1px; height: 100dvh; pointer-events: none; }
 }
-.ib-introduction--boot { display: grid; place-items: center; grid-template-rows: auto auto auto; align-content: center; gap: 18px; color: #f8f8f8; background: #171419; }
-.ib-introduction__boot-mark { position: relative; width: 70px; height: 70px; border: 3px solid #f4f4f4; border-radius: 50%; }
-.ib-introduction__boot-mark::after { content: ''; position: absolute; inset: 17px; border: 3px solid var(--ib-accent); border-radius: 50%; }
-.ib-introduction__boot-mark span { position: absolute; z-index: 1; width: 12px; height: 12px; border-radius: 50%; background: #f4f4f4; }
-.ib-introduction__boot-mark span:nth-child(1) { top: -6px; left: 25px; }.ib-introduction__boot-mark span:nth-child(2) { right: -6px; top: 25px; }.ib-introduction__boot-mark span:nth-child(3) { bottom: -6px; left: 25px; }.ib-introduction__boot-mark span:nth-child(4) { left: -6px; top: 25px; }
-.ib-introduction__boot-copy { display: grid; gap: 5px; text-align: center; }.ib-introduction__boot-copy strong { font-size: 20px; letter-spacing: .05em; }.ib-introduction__boot-copy span { color: #ffffffb8; font-size: 14px; }
-.ib-introduction__spinner { color: var(--ib-accent); animation: ib-introduction-spin .9s linear infinite; }
+.ib-introduction--boot { color: #f8f8f8; background: #080808; }
+.ib-introduction__boot-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 48px; padding: 24px 24px 12vh; }
+.ib-introduction__boot-copy { display: grid; gap: 12px; text-align: center; }
+.ib-introduction__boot-copy strong { font-size: clamp(32px, 5vw, 48px); font-weight: 400; letter-spacing: -.04em; }
+.ib-introduction__boot-copy span { color: #bcbcbc; font-size: 14px; }
+.ib-introduction__spinner { display: block; width: 23px; height: 23px; border: 2px solid #ffffff30; border-top-color: #fff; border-right-color: #fff; border-radius: 50%; animation: ib-introduction-spin .85s linear infinite; }
+.ib-introduction__ubuntu-signature { position: absolute; bottom: max(85px, 12vh); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 5px; color: #fff; }
+.ib-introduction__ubuntu-signature > span { font-size: 38px; font-weight: 400; letter-spacing: -.055em; }
+.ib-introduction__ubuntu-signature svg { width: 44px; height: 44px; }
 .ib-introduction__skip { position: fixed; right: 20px; bottom: 19px; min-height: 40px; padding: 9px 13px; border: 1px solid #ffffff42; border-radius: 7px; color: #fff; background: #ffffff12; font: 13px var(--font-ubuntu); cursor: pointer; }.ib-introduction__skip:hover, .ib-introduction__skip:focus-visible { border-color: var(--ib-accent); background: #ffffff20; outline: 0; }
 .ib-introduction__shade { position: absolute; inset: 0; background: #1112188c; backdrop-filter: blur(2px); animation: ib-introduction-fade var(--motion-content) var(--motion-ease); }
 .ib-introduction__target { position: fixed; z-index: 1; display: block; border: 2px solid var(--ib-accent); border-radius: 10px; box-shadow: 0 0 0 4px #8fd8cf2e, 0 8px 24px #0008; pointer-events: none; transition: inset var(--motion-feedback) var(--motion-ease), width var(--motion-feedback) var(--motion-ease), height var(--motion-feedback) var(--motion-ease); }
@@ -32,4 +34,34 @@
   .ib-introduction--guide .ib-introduction__panel h2 { font-size: 22px; margin-block: 10px; }
   .ib-introduction--guide .ib-introduction__progress { margin-top: 10px; }
   .ib-introduction--guide .ib-introduction__actions { margin-top: 14px; }
+}
+
+/* The welcome window follows the desktop's theme; the boot screen stays black. */
+.ib-introduction--presentation { display: grid; place-items: center; padding: 20px; box-sizing: border-box; }
+.ib-introduction--presentation .ib-introduction__shade { background: #0005; backdrop-filter: none; }
+.ib-introduction--presentation .ib-introduction__panel { position: relative; inset: auto; width: min(560px, 100%); max-height: calc(100dvh - 40px); box-sizing: border-box; padding: 36px; border: 1px solid var(--theme-line); border-radius: 12px; background: var(--theme-surface); color: var(--theme-ink); text-align: center; }
+.ib-introduction__welcome-mark { display: grid; place-items: center; width: 76px; height: 76px; margin: 0 auto 22px; border-radius: 18px; color: #fff; background: #e95420; }
+.ib-introduction__welcome-mark svg { width: 64px; height: 64px; }
+.ib-introduction--presentation .ib-introduction__eyebrow { justify-content: center; color: var(--theme-muted); font-size: 12px; letter-spacing: .02em; text-transform: none; }
+.ib-introduction--presentation .ib-introduction__panel h1 { max-width: none; margin: 16px 0; font-size: clamp(25px, 3vw, 32px); line-height: 1.15; }
+.ib-introduction--presentation .ib-introduction__copy { color: var(--theme-muted); }
+.ib-introduction--presentation .ib-introduction__actions { justify-content: center; }
+.ib-introduction--presentation .ib-introduction__primary { background: #b83a10; border-color: #b83a10; color: #fff; }
+.ib-introduction--presentation .ib-introduction__primary:hover { background: #9c300c; }
+.ib-introduction--presentation .ib-introduction__secondary { background: var(--theme-surface-muted); border-color: var(--theme-line); color: var(--theme-ink); }
+.ib-introduction--presentation .ib-introduction__close { color: var(--theme-ink); background: var(--theme-surface-muted); }
+.ib-introduction--presentation button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 3px; }
+@media (max-width: 620px) {
+  .ib-introduction--presentation { padding: 12px; }
+  .ib-introduction--presentation .ib-introduction__panel { padding: 28px 20px 20px; max-height: calc(100dvh - 24px); }
+  .ib-introduction--presentation .ib-introduction__actions { flex-direction: column; }
+  .ib-introduction__welcome-mark { width: 60px; height: 60px; margin-bottom: 16px; }
+  .ib-introduction__welcome-mark svg { width: 50px; height: 50px; }
+}
+@media (max-height: 520px) {
+  .ib-introduction__welcome-mark { display: none; }
+  .ib-introduction__boot-center { gap: 20px; padding-bottom: 70px; }
+  .ib-introduction__ubuntu-signature { bottom: 52px; }
+  .ib-introduction__ubuntu-signature > span { font-size: 26px; }
+  .ib-introduction__ubuntu-signature svg { width: 32px; height: 32px; }
 }

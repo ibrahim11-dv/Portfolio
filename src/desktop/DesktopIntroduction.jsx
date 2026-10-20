@@ -1,9 +1,16 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, CircleDotDashed, Grid2X2, MonitorDot, UserRound, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Grid2X2, MonitorDot, UserRound, X } from 'lucide-react';
 import { INTRODUCTION_STEPS } from './introJourney';
 import './DesktopIntroduction.css';
 
 const STEP_ICONS = [UserRound, Grid2X2, MonitorDot];
+
+function UbuntuMark() {
+  return <svg viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <circle cx="50" cy="50" r="29" stroke="currentColor" strokeWidth="9" strokeDasharray="48 12.74" transform="rotate(12 50 50)" />
+    {[0, 120, 240].map((angle) => <g key={angle} transform={`rotate(${angle} 50 50)`}><circle cx="88" cy="50" r="11" fill="currentColor" /></g>)}
+  </svg>;
+}
 
 function isReducedMotion() {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
@@ -38,7 +45,7 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
 
   useEffect(() => {
     if (phase !== 'boot') return undefined;
-    const timer = window.setTimeout(() => completeBoot(), isReducedMotion() ? 0 : 1050);
+    const timer = window.setTimeout(() => completeBoot(), isReducedMotion() ? 0 : 1500);
     return () => window.clearTimeout(timer);
   }, [phase]);
 
@@ -98,10 +105,12 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
   if (phase === 'done') return null;
 
   if (phase === 'boot') return <dialog ref={dialogRef} className="ib-introduction ib-introduction--boot" aria-label="Démarrage d’IbrahimOS" onCancel={(event) => { event.preventDefault(); onSkip(); }} onKeyUp={(event) => event.stopPropagation()} onKeyDown={(event) => { event.stopPropagation(); if (event.key === 'Tab') { event.preventDefault(); event.currentTarget.querySelector('button')?.focus(); } }}>
-    <div className="ib-introduction__boot-mark" aria-hidden="true"><span /><span /><span /><span /></div>
-    <div className="ib-introduction__boot-copy"><strong>IbrahimOS</strong><span>Bienvenue sur le bureau d’Ibrahim</span></div>
-    <CircleDotDashed className="ib-introduction__spinner" size={25} aria-hidden="true" />
-    <button className="ib-introduction__skip" type="button" onClick={onSkip} autoFocus>Passer l’introduction</button>
+    <div className="ib-introduction__boot-center">
+      <div className="ib-introduction__boot-copy"><strong>IbrahimOS</strong><span>Le portfolio d’Ibrahim Chehlafi</span></div>
+      <span className="ib-introduction__spinner" role="status" aria-label="Ouverture du bureau"><span aria-hidden="true" /></span>
+    </div>
+    <div className="ib-introduction__ubuntu-signature" aria-label="Bureau inspiré d’Ubuntu"><span>ubuntu</span><UbuntuMark /></div>
+    <button className="ib-introduction__skip" type="button" onClick={onSkip} autoFocus>Accéder au bureau</button>
   </dialog>;
 
   return <dialog ref={dialogRef} className={`ib-introduction ib-introduction--${phase}`} aria-labelledby="ib-introduction-title" onCancel={(event) => { event.preventDefault(); onExplore(); }} onKeyDown={keys} onKeyUp={(event) => event.stopPropagation()}>
@@ -111,16 +120,17 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
     <section ref={panelRef} className="ib-introduction__panel" aria-describedby="ib-introduction-description">
       <button className="ib-introduction__close" type="button" onClick={onExplore} aria-label={guide ? 'Passer la visite' : 'Explorer librement'}><X size={18} /></button>
       {phase === 'presentation' ? <>
-        <span className="ib-introduction__eyebrow"><span aria-hidden="true">●</span> IBRAHIMOS / ACCUEIL</span>
-        <h1 id="ib-introduction-title">Bienvenue dans mon espace de travail</h1>
+        <div className="ib-introduction__welcome-mark"><UbuntuMark /></div>
+        <span className="ib-introduction__eyebrow">Bienvenue dans IbrahimOS</span>
+        <h1 id="ib-introduction-title">Bonjour, bienvenue dans le portfolio d’Ibrahim.</h1>
         <div id="ib-introduction-description" className="ib-introduction__copy">
           <p>Je suis Ibrahim Chehlafi, développeur Full-Stack à Perpignan, à la recherche d’un stage en développement informatique.</p>
-          <p>J’ai imaginé ce portfolio comme un bureau : chaque application vous permet de découvrir une partie de mon univers, de mes compétences ou de mon parcours.</p>
-          <p>Vous pouvez explorer librement, ouvrir mon CV ou suivre une courte visite.</p>
+          <p>Ce bureau inspiré d’Ubuntu est mon portfolio. Ouvrez les applications pour découvrir mes projets, mes compétences, mon parcours et mon CV.</p>
+          <p>Une courte visite vous montre où les trouver. Vous pouvez aussi entrer directement et explorer à votre rythme.</p>
         </div>
         <div className="ib-introduction__actions">
-          <button data-introduction-primary className="ib-introduction__primary" type="button" onClick={onStartGuide}>Découvrir le bureau <ArrowRight size={17} /></button>
-          <button type="button" className="ib-introduction__secondary" onClick={onExplore}>Explorer librement</button>
+          <button data-introduction-primary className="ib-introduction__primary" type="button" onClick={onStartGuide}>Me guider <ArrowRight size={17} /></button>
+          <button type="button" className="ib-introduction__secondary" onClick={onExplore}>Entrer dans le bureau</button>
         </div>
       </> : <>
         <span className="ib-introduction__eyebrow"><StepIcon size={14} aria-hidden="true" /> VISITE DU BUREAU</span>
