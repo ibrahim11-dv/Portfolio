@@ -5,19 +5,20 @@ import { appById } from './apps';
 import { ProfileView, ProjectsView, SkillsView, JourneyView, ContactView } from './PortfolioViews';
 import ProjectReport from './ProjectReport';
 import { CVAction, PortfolioActions } from './PortfolioActions';
+import { applyProjectRequest } from './projectRoute';
 import './PortfolioApp.css';
 
 // Session state belongs to the shell and survives a window closing.
-export default function PortfolioApp({ appId, session, onSaveSession, projectRequest, navigationRequest, restoreContext, onOpenApp, onOpenCV, onNotify }) {
+export default function PortfolioApp({ appId, session, onSaveSession, projectRequest, navigationRequest, restoreContext, onOpenApp, onProjectRouteChange, onOpenCV, onNotify }) {
   const initial = restoreContext || session;
-  const [state, setState] = useState(() => ({ projectId: projectRequest ?? initial.projectId ?? null, filters: initial.filters || { group: 'main', query: '', category: 'all' }, scroll: projectRequest !== undefined ? 0 : initial.scroll || 0, returnTo: initial.returnTo || { scroll: 0, id: null }, collections: initial.collections || {} }));
+  const [state, setState] = useState(() => applyProjectRequest({ projectId: initial.projectId ?? null, filters: initial.filters || { group: 'main', query: '', category: 'all' }, scroll: initial.scroll || 0, returnTo: initial.returnTo || { scroll: 0, id: null }, collections: initial.collections || {} }, projectRequest));
   const [request, setRequest] = useState(navigationRequest);
   const contentRef = useRef(null);
   const restoredRequest = useRef(null);
   if (request !== navigationRequest) {
     setRequest(navigationRequest);
     if (restoreContext) setState(restoreContext);
-    else if (projectRequest !== undefined) setState({ ...state, projectId: projectRequest, scroll: 0, returnTo: state.projectId ? state.returnTo : { scroll: state.scroll, id: projectRequest } });
+    else if (projectRequest !== undefined) setState(applyProjectRequest(state, projectRequest));
   }
   const selectedProject = appId === 'projects' ? PROJECTS.find((project) => project.id === state.projectId) : null;
   const app = appById(appId);
@@ -36,10 +37,11 @@ export default function PortfolioApp({ appId, session, onSaveSession, projectReq
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.projectId, request]);
   function selectProject(id) {
-    if (appId !== 'projects') { onOpenApp('projects', { projectId: id }); return; }
+    if (appId !== 'projects') { onOpenApp('projects', { projectId: id }); onProjectRouteChange?.(id); return; }
     setState((current) => ({ ...current, projectId: id, scroll: 0, returnTo: current.projectId ? current.returnTo : { scroll: contentRef.current.scrollTop, id } }));
+    onProjectRouteChange?.(id);
   }
-  function returnToProjects() { setState((current) => ({ ...current, projectId: null, scroll: current.returnTo.scroll })); }
+  function returnToProjects() { setState((current) => ({ ...current, projectId: null, scroll: current.returnTo.scroll })); onProjectRouteChange?.(null); }
   function updateFilters(update) {
     const next = typeof update === 'function' ? update(state.filters) : update;
     if (next.group === state.filters.group) { setState({ ...state, filters: next }); return; }

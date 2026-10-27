@@ -6,6 +6,8 @@ import { DESKTOP_APPS, PORTFOLIO_APP_IDS, endAppDrag, hasAppDrag, readAppDrag, r
 import { endFileDrag, FILE_CLIPBOARD_EVENT, FILE_DRAG_END_EVENT, fileDragCopies, readFileClipboard, readFileDrag, writeFileClipboard, writeFileDrag } from './dragDrop';
 import FileNameDialog from './FileNameDialog';
 import { readImage } from './imageFiles';
+import { PROFILE } from './portfolioData';
+import { socialDesktopShortcuts } from './desktopLinks';
 import './DesktopItems.css';
 
 const DESKTOP = `${ROOT}/Desktop`;
@@ -17,6 +19,7 @@ const SHORTCUTS = DESKTOP_APPS.filter((app) => PORTFOLIO_APP_IDS.includes(app.id
   id: app.id === 'presentation' ? '@profile' : `@${app.id}`,
   name: app.id === 'cv' ? 'Mon CV' : app.name, icon: app.icon, app: app.id, protected: true,
 }));
+const SOCIAL_SHORTCUTS = socialDesktopShortcuts(PROFILE);
 
 function readPositions() {
   try {
@@ -59,7 +62,7 @@ function arrangeItems(items, saved, layout) {
   return result;
 }
 
-export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOpenAppearance, onFocusDesktop }) {
+export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOpenExternal, onOpenAppearance, onFocusDesktop }) {
   const [selected, setSelected] = useState([]);
   const [positions, setPositions] = useState(readPositions);
   const [viewport, setViewport] = useState(() => ({ width: window.innerWidth, height: window.innerHeight }));
@@ -81,7 +84,7 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOp
   const touchPressRef = useRef(null);
   const touchClickUntil = useRef(0);
   const entries = listDirectory(files, DESKTOP).filter(([name]) => showHidden || !name.startsWith('.'));
-  const items = [...SHORTCUTS, ...entries.map(([name, type]) => {
+  const items = [...SHORTCUTS, ...SOCIAL_SHORTCUTS, ...entries.map(([name, type]) => {
     const path = `${DESKTOP}/${name}`;
     const app = readAppShortcut(files[path]);
     return { id: path, path, name: app ? name.replace(/\.desktop$/, '') : name, type, app: app?.id, icon: app?.icon || readImage(files[path])?.src || `/ubuntu-apps/${type === 'dir' ? 'folder' : 'file'}.png`, protected: !canDeletePath(files, path) };
@@ -162,7 +165,8 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOp
     const item = items.find((entry) => entry.id === id);
     if (!item) return;
     setMenu(null);
-    if (item.app) onOpen(item.app, item.options);
+    if (item.external) onOpenExternal?.(item.external, item.name);
+    else if (item.app) onOpen(item.app, item.options);
     else if (item.type === 'dir') onOpen('files', { directory: item.path });
     else onOpenFile(item.path);
   }
@@ -378,7 +382,7 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOp
       onDragEnter={(event) => dragOver(event)} onDragOver={(event) => dragOver(event)} onDrop={(event) => receiveDrop(event)} onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDropTarget(null); }}>
       {items.map((item) => <button key={item.id} type="button" data-desktop-id={item.id} data-intro-app={item.app || undefined} draggable className={`desktop-items__item ${selection.includes(item.id) ? 'is-selected' : ''} ${dragging.includes(item.id) ? 'is-dragging' : ''} ${dropTarget === item.path && item.type === 'dir' ? 'is-drop-target' : ''} ${clipboard.mode === 'cut' && clipboard.paths.includes(item.path) ? 'is-cut' : ''}`}
         style={{ left: layout.left + cells[item.id].col * CELL_WIDTH, top: layout.top + cells[item.id].row * CELL_HEIGHT }}
-        title={`${item.name}${item.protected ? ' · élément du portfolio' : ''} (double-clic ou toucher pour ouvrir)`} aria-pressed={selection.includes(item.id)}
+        title={`${item.external ? `Ouvrir ${item.name} dans un nouvel onglet` : item.name}${item.protected ? ' · élément du portfolio' : ''} (double-clic ou toucher pour ouvrir)`} aria-label={item.external ? `Ouvrir ${item.name} dans un nouvel onglet` : undefined} aria-pressed={selection.includes(item.id)}
         onClick={(event) => { event.stopPropagation(); if (event.detail && event.timeStamp < touchClickUntil.current) return; selectItem(event, item.id); }} onDoubleClick={(event) => { if (event.timeStamp >= touchClickUntil.current) openItem(item.id); }}
         onPointerMove={(event) => { const touch = touchPressRef.current; if (touch && Math.abs(touch.x - event.clientX) + Math.abs(touch.y - event.clientY) > 12) touchPressRef.current = null; }}
         onPointerDown={(event) => startTouchOpen(event, item.id)} onPointerUp={(event) => finishTouchOpen(event, item.id)} onPointerCancel={() => { touchPressRef.current = null; }}
@@ -386,7 +390,7 @@ export default function DesktopItems({ files, setFiles, onOpen, onOpenFile, onOp
         onContextMenu={(event) => { event.stopPropagation(); showMenu(event, selection.includes(item.id) ? selection : [item.id]); }}
         onDragStart={(event) => startDrag(event, item)} onDragEnd={stopDrag}
         onDragEnter={item.type === 'dir' ? (event) => dragOver(event, item.path) : undefined} onDragOver={item.type === 'dir' ? (event) => dragOver(event, item.path) : undefined} onDrop={item.type === 'dir' ? (event) => receiveDrop(event, item.path) : undefined}>
-        <span className="desktop-items__icon"><img src={item.icon} alt="" draggable="false" />{item.app && item.path && <span className="desktop-items__shortcut-badge">↗</span>}</span><span>{item.name}</span>
+        <span className="desktop-items__icon"><img src={item.icon} alt="" draggable="false" />{(item.app && item.path || item.external) && <span className="desktop-items__shortcut-badge">↗</span>}</span><span>{item.name}</span>
       </button>)}
       {rubberband && <div className="desktop-items__selection" style={{ left: rubberband.x, top: rubberband.y, width: rubberband.width, height: rubberband.height }} />}
       {dropTarget && typeof dropTarget === 'object' && <div className="desktop-items__drop-cell" style={{ left: layout.left + dropTarget.cell.col * CELL_WIDTH, top: layout.top + dropTarget.cell.row * CELL_HEIGHT }} />}

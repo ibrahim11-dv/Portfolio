@@ -58,7 +58,7 @@ function clampRect(rect, area = workArea(), minimum = MINIMUM_WINDOW_SIZE) {
   };
 }
 
-function initialLayout(appId, position) {
+function initialLayout(appId, position, initialMaximized = false) {
   const area = workArea();
   const [preferredWidth, preferredHeight] = savedWindowSize(appId);
   const rect = clampRect({
@@ -67,7 +67,7 @@ function initialLayout(appId, position) {
     width: Math.min(preferredWidth, area.width - (area.mobile ? 16 : 28)),
     height: Math.min(preferredHeight, area.height - (area.mobile ? 20 : 56)),
   }, area, APP_MINIMUMS[appId]);
-  return { mode: 'normal', rect, normalRect: rect };
+  return initialMaximized ? { mode: 'maximized', rect: snappedRect('maximized', area), normalRect: rect } : { mode: 'normal', rect, normalRect: rect };
 }
 
 function snappedRect(mode, area = workArea()) {
@@ -115,8 +115,8 @@ function resizedRect(origin, direction, dx, dy, area, minimum = MINIMUM_WINDOW_S
   return { x, y, width, height };
 }
 
-export default function DesktopWindow({ title, icon, children, appId, windowId = appId, initialPosition, onClose, onFocus, zIndex, minimized = false, workspaceHidden = false, isActive = true, alwaysOnTop = false, onToggleAbove, workspace = 0, workspaceCount = 2, onMoveWorkspace }) {
-  const [layout, setLayout] = useState(() => initialLayout(appId, initialPosition));
+export default function DesktopWindow({ title, icon, children, appId, windowId = appId, initialPosition, initialMaximized = false, onClose, onFocus, zIndex, minimized = false, workspaceHidden = false, isActive = true, alwaysOnTop = false, onToggleAbove, workspace = 0, workspaceCount = 2, onMoveWorkspace }) {
+  const [layout, setLayout] = useState(() => initialLayout(appId, initialPosition, initialMaximized));
   const [animatedGeometry, setAnimatedGeometry] = useState(false);
   const [gestureKind, setGestureKind] = useState(null);
   const [snapTarget, setSnapTarget] = useState(null);

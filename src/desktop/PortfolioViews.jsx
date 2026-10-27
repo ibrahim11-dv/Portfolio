@@ -52,6 +52,7 @@ export function ProfileView({ navigate, onSelectProject }) {
             <button className="is-primary" onClick={() => navigate('projects')}><FolderGit2 size={16} />Voir les projets</button>
             <CVAction><FileText size={16} />Lire le CV</CVAction>
             {PROFILE.github && <a href={PROFILE.github} target="_blank" rel="noreferrer" title="Ouvrir dans un nouvel onglet"><GitBranch size={16} />GitHub</a>}
+            {PROFILE.linkedin && <a href={PROFILE.linkedin} target="_blank" rel="noreferrer" title="Ouvrir LinkedIn dans un nouvel onglet"><Globe2 size={16} />LinkedIn</a>}
             <button onClick={() => navigate('contact')}><Mail size={16} />Contact</button>
           </div>
           <p className="portfolio-app__profile-bio">{PROFILE.bio}</p>
@@ -96,7 +97,7 @@ export function ProjectsView({ onSelectProject, filters, setFilters }) {
     {(query || category !== 'all') && <div className="portfolio-app__active-filters"><span>{query && `Recherche : « ${query} »`}{category !== 'all' && ` · Catégorie : ${category}`}</span><button onClick={() => update({ query: '', category: 'all' })}>Effacer les filtres</button></div>}
     <div className="portfolio-app__project-tools"><label className="portfolio-app__search"><Search size={16} /><input type="search" placeholder="Rechercher un projet ou une technologie" value={query} onChange={(event) => update({ query: event.target.value })} aria-label="Rechercher dans cette collection" /></label><span className="portfolio-app__result-count" role="status">{String(filtered.length).padStart(2, '0')} RÉSULTATS</span></div>
     <div className="portfolio-app__filters" aria-label="Catégories de projets"><button className={category === 'all' ? 'is-active' : ''} onClick={() => update({ category: 'all' })} aria-pressed={category === 'all'}>TOUS</button>{categories.map((item) => <button key={item} className={category === item ? 'is-active' : ''} onClick={() => update({ category: item })} aria-pressed={category === item}>{item}</button>)}</div>
-    {filtered.length ? <div className="portfolio-app__case-list">{filtered.map((project) => <ProjectCard key={project.id} project={project} index={PROJECTS.indexOf(project)} onSelect={onSelectProject} featured={group === 'main' && ['parcvision', 'pfe-esto', 'intern-management'].includes(project.id)} />)}</div> : <div className="portfolio-app__empty"><Search size={31} /><h2>Aucun projet trouvé</h2><p>Aucun résultat pour « {query || category} » dans les {group === 'main' ? 'projets principaux' : 'autres projets'}{category !== 'all' ? `, catégorie ${category}` : ''}. Essayez une autre technologie ou effacez les filtres.</p><button onClick={() => update({ query: '', category: 'all' })}>Réinitialiser</button></div>}
+    {filtered.length ? <div className="portfolio-app__case-list">{filtered.map((project) => <ProjectCard key={project.id} project={project} index={PROJECTS.indexOf(project)} onSelect={onSelectProject} featured={group === 'main' && ['citadel', 'learnxcompile', 'parcvision'].includes(project.id)} />)}</div> : <div className="portfolio-app__empty"><Search size={31} /><h2>Aucun projet trouvé</h2><p>Aucun résultat pour « {query || category} » dans les {group === 'main' ? 'projets principaux' : 'autres projets'}{category !== 'all' ? `, catégorie ${category}` : ''}. Essayez une autre technologie ou effacez les filtres.</p><button onClick={() => update({ query: '', category: 'all' })}>Réinitialiser</button></div>}
   </>;
 }
 
@@ -125,6 +126,7 @@ export function ContactView() {
     <section className="portfolio-app__contact-sheet"><div className="portfolio-app__contact-signature"><ProfileAvatar /><div><h2>{PROFILE.name}</h2><p>{PROFILE.role}</p><span><MapPin size={14} />{PROFILE.location}</span></div></div><div className="portfolio-app__contact-actions">
       <a href={`mailto:${PROFILE.email}`}><span>EMAIL</span><strong>{PROFILE.email}</strong><ArrowUpRight size={17} /></a>
       {PROFILE.github && <a href={PROFILE.github} target="_blank" rel="noreferrer" title="Ouvrir dans un nouvel onglet"><span>GITHUB</span><strong>ibrahim11-dv</strong><ArrowUpRight size={17} /></a>}
+      {PROFILE.linkedin && <a href={PROFILE.linkedin} target="_blank" rel="noreferrer" title="Ouvrir LinkedIn dans un nouvel onglet"><span>LINKEDIN</span><strong>Ibrahim Chehlafi</strong><ArrowUpRight size={17} /></a>}
       <CVAction><span>CV</span><strong>Lire le CV</strong><FileText size={16} /></CVAction>
     </div><div className="portfolio-app__contact-copy"><button onClick={copyEmail}><Copy size={15} />Copier l’adresse</button><span role="status">{copyStatus}</span>{copyStatus.startsWith('Copie automatique') && <input readOnly aria-label="Adresse email à copier" value={PROFILE.email} onFocus={(event) => event.target.select()} />}</div></section>
   </>;

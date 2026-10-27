@@ -4,6 +4,10 @@ export function findReusableWindow(windows, appId, filePath, newWindow = false) 
   return candidates.find((item) => !filePath || item.filePath === filePath) || candidates[0] || null;
 }
 
+export function shouldStartMaximized(appId, windows, workspace, mainAppIds) {
+  return mainAppIds.includes(appId) && !windows.some((item) => item.workspace === workspace && !item.minimized);
+}
+
 export function normalizeReadingState(state = {}) {
   const finite = (value, fallback, min, max) => Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
   return {

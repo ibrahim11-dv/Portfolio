@@ -1,6 +1,68 @@
 // Editorial reports grounded in the supplied CV and the linked repository files.
 export const PROJECTS = [
   {
+    id: 'citadel', name: 'The Citadel', group: 'main', category: 'Application web', accent: '#84b9d9', visual: 'chess',
+    tagline: 'Un club d’échecs, du premier coup à la partie en ligne.', context: 'Projet personnel', period: '2026',
+    role: 'Conception et développement full-stack', status: 'Code source public', technicalFocus: 'Jeu d’échecs, moteur navigateur et API sécurisée', evidence: 'Client, serveur et vérifications du dépôt inspectés',
+    description: 'Une plateforme d’échecs qui réunit parties locales, bot Stockfish, puzzles et tables en ligne avec comptes et horloges.',
+    stack: ['React', 'Vite', 'Spring Boot', 'JPA', 'H2', 'JWT', 'chess.js', 'Stockfish'], github: 'https://github.com/ibrahim11-dv/The-Cidatel', branch: 'master',
+    highlights: ['Parties locales, contre Stockfish et en ligne', 'Puzzles, historique et scorebook', 'Invitations privées et matchmaking avec horloges', 'Comptes sécurisés avec JWT et mots de passe BCrypt'],
+    report: {
+      intro: 'The Citadel est un espace de jeu d’échecs conçu autour d’une même expérience : jouer, s’entraîner et conserver les parties importantes.',
+      problem: 'Une application d’échecs doit couvrir des usages très différents sans fragmenter le parcours : partie à deux, adversaire automatisé, études tactiques, comptes et jeu en ligne. Les règles, les horloges et l’historique doivent rester cohérents selon le mode choisi.',
+      solution: 'Le client React propose les modes de jeu dans une interface commune. chess.js gère les règles pour les parties locales, un Worker Stockfish prend en charge le bot et une API Spring Boot pilote les comptes, invitations, parties en ligne et préférences associées. Le serveur valide les coups en ligne et conserve les informations nécessaires à la reprise.',
+      architecture: [
+        ['Client React', 'React Router organise les pages ; un échiquier partagé sert aux parties, puzzles, aperçus et relectures. Les préférences et l’état de session sont portés par des contextes dédiés.'],
+        ['Règles & moteur', 'chess.js traite les coups légaux côté navigateur pour les parties locales. Stockfish 19 s’exécute dans un Worker pour le bot. Le serveur utilise chesslib pour valider les parties en ligne.'],
+        ['API Spring Boot', 'Les contrôleurs exposent authentification, compte, progression des puzzles et jeux. JPA/H2 conserve les comptes et les checkpoints ; les sessions reposent sur JWT et les mots de passe sont hachés avec BCrypt.'],
+      ],
+      decisions: [
+        ['Distinguer les modes de jeu', 'Les parties locales restent utilisables dans le navigateur. Les parties en ligne passent par le serveur afin que les coups et les horloges soient validés de façon autoritative.'],
+        ['Un échiquier partagé', 'Le composant ChessBoard sert aux différents parcours, avec clic, glisser-déposer, clavier, promotion, orientation et mouvement réduit.'],
+        ['Ne pas présenter les niveaux comme un classement', 'Les six réglages Stockfish utilisent des limites de recherche et de temps. Le dépôt précise qu’ils ne représentent pas des classements Elo calibrés.'],
+      ],
+      outcome: 'Le projet relie une interface React, des règles d’échecs, un moteur dans le navigateur et un backend Java pour proposer une expérience de jeu allant de l’entraînement individuel au jeu en ligne.',
+      boundaries: 'La fiche reflète le dépôt local inspecté. Le jeu en ligne demande les serveurs client et Spring Boot ; aucun déploiement public, volume de joueurs ou mesure de performance n’est revendiqué ici.',
+      steps: [
+        { title: 'Choisir une table', label: 'Local · bot · puzzle · en ligne', text: 'Le visiteur sélectionne le mode depuis le club : partie locale, Stockfish, puzzle ou table connectée.', output: 'Mode de jeu choisi' },
+        { title: 'Jouer selon le mode', label: 'Règles et moteur', text: 'chess.js, Stockfish ou le serveur appliquent les règles et font avancer la partie selon son contexte.', output: 'Position et horloge à jour' },
+        { title: 'Conserver le parcours', label: 'Navigateur ou API', text: 'Les parties locales restent disponibles dans le navigateur ; les éléments liés au compte et aux parties en ligne passent par l’API.', output: 'Historique ou checkpoint' },
+      ],
+      sources: [{ label: 'Routes et modes du client', path: 'client/src/App.jsx' }, { label: 'Échiquier et partie locale', path: 'client/src/pages/GamePage.jsx' }, { label: 'Invitations et parties en ligne', path: 'server/src/main/java/com/chess/server/game/GameController.java' }, { label: 'Dépendances du serveur', path: 'server/pom.xml' }],
+    },
+  },
+  {
+    id: 'learnxcompile', name: 'LearnXcompile', group: 'main', category: 'Application mobile', accent: '#83bafa', visual: 'code',
+    tagline: 'Apprendre un langage, une étape à la fois.', context: 'Projet Android', period: '2026',
+    role: 'Conception et développement Android', status: 'Code source public', technicalFocus: 'Parcours pédagogique, progression et données locales', evidence: 'Code Android, modèles SQLite et tests instrumentés inspectés',
+    description: 'Une application Android d’apprentissage de Java, Python et C++, structurée autour de leçons, exemples, QCM, exercices et progression locale.',
+    stack: ['Java', 'Android SDK', 'Material Components', 'SQLite', 'BCrypt', 'Espresso'], github: 'https://github.com/ibrahim11-dv/learnXcompile', branch: 'master',
+    highlights: ['Parcours Java, Python et C++ avec chapitres progressifs', 'Étapes : explication, exemple de code, QCM et exercice', 'Recherche, reprise de leçon, favoris et statistiques de progression', 'Comptes et progression stockés localement avec SQLite'],
+    report: {
+      intro: 'LearnXcompile transforme l’apprentissage de bases de programmation en un parcours Android progressif, de la découverte d’un concept à sa vérification dans un exercice.',
+      problem: 'Un débutant a besoin de trouver une leçon, de reprendre là où il s’est arrêté et de savoir ce qui est débloqué. Le projet rassemble ces besoins dans une application locale qui organise contenus, progression et navigation par langage.',
+      solution: 'L’application présente les cours Java, Python et C++. Chaque chapitre propose quatre étapes : explication, exemple de code, question à choix multiple et exercice. Les données pédagogiques, l’état de verrouillage, les favoris et la progression sont conservés dans SQLite ; l’accueil propose recherche et reprise.',
+      architecture: [
+        ['Écrans Android', 'Des activités Java et des layouts XML composent l’authentification, l’accueil, les chapitres, les étapes d’apprentissage, la progression, le profil et les options de cours.'],
+        ['Contrôleurs & modèles', 'ChapterController coordonne les écrans et ChapterModel organise les langues, chapitres, étapes, contenus et favoris dans SQLite.'],
+        ['Données locales', 'Deux bases SQLite séparent les comptes et les données de cours. Les mots de passe des comptes sont hachés avec BCrypt ; les préférences de session et d’abonnement utilisent SharedPreferences.'],
+      ],
+      decisions: [
+        ['Une progression en quatre étapes', 'Chaque leçon suit un ordre lisible : comprendre, voir un exemple, répondre à un QCM puis valider un exercice.'],
+        ['Débloquer progressivement', 'La fin d’un chapitre enregistre sa réussite puis déverrouille le suivant, sauf lorsqu’une limite d’abonnement simulée est atteinte.'],
+        ['Rester local', 'Le projet utilise SQLite et SharedPreferences sur l’appareil. Il ne montre pas de synchronisation distante entre appareils.'],
+      ],
+      outcome: 'Une application Android structurée autour de contenus pédagogiques, de la progression et de la reprise, qui met en pratique interfaces natives, persistance SQLite et navigation entre étapes.',
+      boundaries: 'Le contrôle de l’exercice vérifie la présence de la sortie attendue dans le texte saisi : ce n’est pas un compilateur ni un environnement d’exécution Java, Python ou C++. Le paiement et l’abonnement sont une simulation locale ; aucun prestataire de paiement n’est intégré.',
+      steps: [
+        { title: 'Créer un compte', label: 'Inscription & connexion', text: 'Un compte local est créé puis authentifié. Le profil actif est conservé dans les préférences de l’application.', output: 'Session locale active' },
+        { title: 'Choisir et apprendre', label: 'Java · Python · C++', text: 'Le visiteur ouvre un cours et suit une leçon : explication, exemple, QCM puis exercice.', output: 'Étape pédagogique enregistrée' },
+        { title: 'Suivre la progression', label: 'SQLite & favoris', text: 'La réussite, les favoris et la prochaine leçon sont conservés pour alimenter accueil, reprise et statistiques.', output: 'Chapitre terminé ou suivant déverrouillé' },
+      ],
+      sources: [{ label: 'Accueil, recherche et reprise', path: 'app/src/main/java/com/example/learnxcompile/HomeActivity.java' }, { label: 'Modèle SQLite et contenus pédagogiques', path: 'app/src/main/java/com/example/learnxcompile/Models/ChapterModel.java' }, { label: 'Validation de l’exercice et déblocage', path: 'app/src/main/java/com/example/learnxcompile/TestActivity.java' }, { label: 'Dépendances Android', path: 'app/build.gradle.kts' }],
+    },
+  },
+  {
     id: 'parcvision', name: 'ParcVision', group: 'main', category: 'Application métier', accent: '#e99756', visual: 'fleet',
     tagline: 'Une flotte. Tous ses mouvements.', context: 'Stage · ZAI-CONCEPT INFO', period: 'Avril – juin 2026',
     role: 'Développement full-stack · stage', status: 'Projet de stage', technicalFocus: 'Gestion métier, sécurité, OCR et cartographie', evidence: 'README et code source public inspectés',
@@ -121,13 +183,6 @@ export const PROJECTS = [
         { title: 'Transmettre', label: 'GET /download', text: 'Express prépare la réponse de téléchargement et y transmet le flux sélectionné.', output: 'Flux HTTP' },
       ], sources: [{ label: 'Serveur et routes', path: 'server.js' }, { label: 'Interface et parcours', path: 'public/index.html' }],
     },
-  },
-  {
-    id: 'learnxcompile', name: 'LearnXcompile', group: 'main', category: 'À découvrir', accent: '#83bafa', visual: 'code',
-    tagline: 'Une nouvelle réalisation à découvrir.', context: 'Projet principal', period: 'Présentation en préparation',
-    role: 'Projet principal', status: 'Documentation en cours', technicalFocus: 'Informations techniques à compléter', evidence: 'Aucune documentation source fournie à ce jour',
-    description: 'La présentation détaillée de LearnXcompile sera ajoutée avec la documentation du projet.',
-    stack: [], highlights: [], pending: true,
   },
   {
     id: 'minichat', name: 'MiniChat', group: 'other', category: 'Temps réel', accent: '#bea1ef', visual: 'chat',

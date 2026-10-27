@@ -141,7 +141,7 @@
 .portfolio-app__contact-signature h2 { font-size: 20px; font-weight: 500; }
 .portfolio-app__contact-signature p { margin-top: 4px; color: var(--app-muted, #58635f); font-size: 12px; }
 .portfolio-app__contact-signature span { display: flex; align-items: center; gap: 5px; margin-top: 8px; color: var(--app-muted, #68736f); font-size: 10px; }
-.portfolio-app__contact-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.portfolio-app__contact-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .portfolio-app__contact-actions a { min-height: 107px; display: grid; align-content: space-between; gap: 8px; padding: 16px; border-right: 1px solid var(--app-line, #c7cdca); }
 .portfolio-app__contact-actions a:last-child { border-right: 0; }
 .portfolio-app__contact-actions a:hover { background: var(--app-surface, #f0f3f0); }

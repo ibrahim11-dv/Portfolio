@@ -611,7 +611,7 @@ export default function FileManager({ files, setFiles, onOpenFile, initialLocati
               <span className="ubuntu-file__size">{metadata.sizeLabel}</span><small>{metadata.type}</small>
             </div>;
           })}
-          {visibleEntries.length === 0 && <div className="ubuntu-files__empty">{inTrash ? <Trash2 size={64} strokeWidth={1.2} /> : <Folder size={64} strokeWidth={1.2} />}<strong>{query ? 'Aucun résultat' : inTrash ? 'La corbeille est vide' : 'Le dossier est vide'}</strong><span>{query ? 'Essayez un autre terme de recherche.' : ''}</span></div>}
+          {visibleEntries.length === 0 && <div className="ubuntu-files__empty">{inTrash ? <Trash2 size={64} strokeWidth={1.2} /> : <Folder size={64} strokeWidth={1.2} />}<strong>{query ? 'Aucun résultat' : inTrash ? 'La corbeille est vide' : 'Le dossier est vide'}</strong>{query && <span>Essayez un autre terme de recherche.</span>}</div>}
           {rubberBand && <div aria-hidden="true" className="ubuntu-files__selection-box" style={rubberBand} />}
         </div>
       </div>

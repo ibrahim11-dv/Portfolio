@@ -1,3 +1,20 @@
+export async function captureDesktop() {
+  const desktop = document.querySelector('.desktop');
+  if (!desktop) throw new Error('Le bureau n’est pas encore prêt.');
+  // Capture the portfolio itself, without requesting access to another application.
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const { toBlob } = await import('html-to-image');
+  const blob = await toBlob(desktop, {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    preferredFontFormat: 'woff2',
+    filter: node => !(node instanceof Element && node.matches('.ubuntu-capture, .desktop-dialog, .desktop-notice, .ubuntu-shell-notice')),
+  });
+  if (!blob) throw new Error('Impossible de capturer le bureau. Réessayez.');
+  return URL.createObjectURL(blob);
+}
+
 export async function captureScreen() {
   if (!navigator.mediaDevices?.getDisplayMedia) {
     throw new Error('La capture n’est pas disponible dans ce navigateur. Utilisez la capture d’écran de votre appareil.');
@@ -8,6 +25,8 @@ export async function captureScreen() {
   video.muted = true;
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false, preferCurrentTab: true });
+    // Let the launch dialog disappear before sampling the chosen surface.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     video.srcObject = stream;
     await Promise.race([
       (async () => {

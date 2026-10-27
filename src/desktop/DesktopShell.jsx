@@ -16,14 +16,15 @@ import DesktopItems from './DesktopItems';
 import DesktopIntroduction from './DesktopIntroduction';
 import WindowOverview from './WindowOverview';
 import WorkspaceTransition from './WorkspaceTransition';
-import { CV_DOCUMENT, PROFILE } from './portfolioData';
+import { CV_DOCUMENT, PROFILE, PROJECTS } from './portfolioData';
 import { appById, DESKTOP_APPS, readAppShortcut, PORTFOLIO_APP_IDS, resolveAppId } from './apps';
 import { canDeletePath, readFiles, ROOT, trashPaths, uniquePath, writeFiles } from './virtualFs';
 import './DesktopShell.css';
 import './FileManager.css';
 import './Applications.css';
-import { findReusableWindow } from './recruiterJourney';
+import { findReusableWindow, shouldStartMaximized } from './recruiterJourney';
 import { completeIntroduction, initialIntroductionState, transitionIntroduction } from './introJourney';
+import { projectIdFromSearch, searchWithProject } from './projectRoute';
 
 const DocumentViewer = lazy(() => import('./DocumentViewer'));
 
@@ -38,17 +39,34 @@ function frontWindow(windows, excluding, workspace) {
 }
 
 export default function DesktopShell() {
+  const initialProjectRoute = projectIdFromSearch(window.location.search, PROJECTS.map((project) => project.id));
   const [files, setFiles] = useState(readFiles);
-  const [windows, setWindows] = useState([]);
-  const [activeApp, setActiveApp] = useState(null);
+  const [windows, setWindows] = useState(() => initialProjectRoute ? [{
+    id: 'projects',
+    appId: 'projects',
+    projectId: initialProjectRoute,
+    workspace: 0,
+    navigationRequest: 11,
+    initialMaximized: true,
+    initialPosition: { x: 92, y: 44 },
+    minimized: false,
+    zIndex: 11,
+  }] : []);
+  const [activeApp, setActiveApp] = useState(() => initialProjectRoute ? 'projects' : null);
   const [showApps, setShowApps] = useState(false);
   const [switcher, setSwitcher] = useState(null);
   const [workspace, setWorkspace] = useState(0);
   const [showOverview, setShowOverview] = useState(false);
   const [workspaceNotice, setWorkspaceNotice] = useState(null);
-  const [desktopNotice, setDesktopNotice] = useState('');
-  const [introduction, setIntroduction] = useState(initialIntroductionState);
-  const zIndex = useRef(10);
+  const [desktopNotice, updateDesktopNotice] = useState('');
+  const [notifications, setNotifications] = useState([]);
+  const [quiet, setQuiet] = useState(false);
+  const setDesktopNotice = useCallback((text) => {
+    updateDesktopNotice(text);
+    if (text) setNotifications(current => [{ id: Math.max(Date.now(), (current[0]?.id || 0) + 1), text }, ...current].slice(0, 30));
+  }, []);
+  const [introduction, setIntroduction] = useState(() => initialProjectRoute ? { phase: 'done', step: 0 } : initialIntroductionState());
+  const zIndex = useRef(initialProjectRoute ? 11 : 10);
   const nextInstance = useRef(1);
   const pendingLaunches = useRef(new Map());
   const cvOrigin = useRef(null);
@@ -72,7 +90,7 @@ export default function DesktopShell() {
     if (!desktopNotice) return undefined;
     const timer = setTimeout(() => setDesktopNotice(''), 4500);
     return () => clearTimeout(timer);
-  }, [desktopNotice]);
+  }, [desktopNotice, setDesktopNotice]);
 
   function switchWorkspace(index, movingWindow) {
     const target = Math.max(0, Math.min(workspaceCount - 1, index));
@@ -131,12 +149,29 @@ export default function DesktopShell() {
     const targetWorkspace = requestedWorkspace ?? workspace;
     if (targetWorkspace !== workspace) switchWorkspace(targetWorkspace);
     setActiveApp(id);
-    const created = { id, appId, ...options, workspace: targetWorkspace, navigationRequest: layer, ...(appId === 'editor' && options.filePath ? { editorRequests: [{ id: layer, path: options.filePath }] } : {}), minimized: false, zIndex: layer };
+    const created = { id, appId, ...options, workspace: targetWorkspace, navigationRequest: layer, initialMaximized: shouldStartMaximized(appId, windows, targetWorkspace, PORTFOLIO_APP_IDS), ...(appId === 'editor' && options.filePath ? { editorRequests: [{ id: layer, path: options.filePath }] } : {}), minimized: false, zIndex: layer };
     // Coordinate launches issued in one event before React has rendered the first window.
     pendingLaunches.current.set(appId, created);
     queueMicrotask(() => { if (pendingLaunches.current.get(appId)?.id === id) pendingLaunches.current.delete(appId); });
     setWindows((current) => [...current, { ...created, initialPosition: { x: 92 + current.length % 6 * 28, y: 44 + Math.min(current.length * 8, 16) } }]);
   }
+
+  function syncProjectRoute(projectId) {
+    const search = searchWithProject(window.location.search, projectId);
+    if (search === window.location.search) return;
+    window.history.pushState({ projectId: projectId || null }, '', `${window.location.pathname}${search}${window.location.hash}`);
+  }
+
+  useEffect(() => {
+    function restoreProjectRoute() {
+      const projectId = projectIdFromSearch(window.location.search, PROJECTS.map((project) => project.id));
+      openApp('projects', { projectId });
+    }
+    window.addEventListener('popstate', restoreProjectRoute);
+    return () => window.removeEventListener('popstate', restoreProjectRoute);
+  // The handler needs the latest window state to reuse the active Projets window.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [windows, workspace]);
 
   function finishIntroduction({ openPresentation = false } = {}) {
     completeIntroduction();
@@ -273,9 +308,9 @@ export default function DesktopShell() {
   }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase]);
 
   return <div className="desktop-shell">
-    <TopBar appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
+    <TopBar notifications={notifications} quiet={quiet} onQuiet={setQuiet} onClearNotifications={() => setNotifications([])} onDismissNotification={(id) => setNotifications(current => current.filter(item => item.id !== id))} appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
     <DesktopDock openApps={[...new Set(windows.map((item) => item.appId))]} activeApp={windows.find((item) => item.id === activeApp)?.appId} onOpen={dockAction} onLaunch={openApp} onQuit={quitApp} onTrashPaths={trashDrop} isFileProtected={(path) => !canDeletePath(files, path)} onShowApps={() => { setShowOverview(false); setShowApps((value) => !value); }} />
-    <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onOpenAppearance={() => openApp('appearance')} onFocusDesktop={() => setActiveApp(null)} />
+    <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onOpenExternal={(url, label) => { window.open(url, '_blank', 'noopener,noreferrer'); setDesktopNotice(`${label} ouvert dans un nouvel onglet.`); }} onOpenAppearance={() => openApp('appearance')} onFocusDesktop={() => setActiveApp(null)} />
     <main className="desktop-shell__workspace" aria-label="Espace de travail">
       {windows.map((window) => {
         const kind = window.appId;
@@ -283,7 +318,7 @@ export default function DesktopShell() {
         const title = kind === 'trash' ? 'Corbeille' : app?.name || 'Application';
         const icon = app?.icon || '/ubuntu-apps/trash.png';
         let content;
-        if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
+        if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} onProjectRouteChange={syncProjectRoute} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
         else if (kind === 'appearance') content = <AppearanceApp onNotify={setDesktopNotice} />;
         else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('contact')} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
         else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;
@@ -291,13 +326,13 @@ export default function DesktopShell() {
         else if (kind === 'editor') content = <TextEditor key={window.id} windowId={window.id} files={files} filePath={window.filePath} navigationRequest={window.navigationRequest} openRequests={window.editorRequests} initialDocument={window.editorDocument} setFiles={setFiles} onNewWindow={(editorDocument) => openApp('editor', { newWindow: true, editorDocument: editorDocument || createDocument(files, uniquePath(files, `${ROOT}/Documents`, 'Sans titre.txt'), 0, true) })} onOpenDirectory={(directory) => openApp('files', { directory })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
         else if (kind === 'images') content = <ImageViewer key={`${window.id}-${window.navigationRequest || 0}`} files={files} setFiles={setFiles} filePath={window.filePath} onNavigate={(filePath) => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, filePath: filePath || undefined } : item))} onOpenDirectory={(directory) => openApp('files', { directory })} onNewWindow={() => openApp('images', { newWindow: true })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
         else content = <SimpleApp kind={kind} onOpen={openApp} onReplayIntroduction={replayIntroduction} />;
-        return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} minimized={window.minimized} workspaceHidden={window.workspace !== workspace} isActive={activeApp === window.id && window.workspace === workspace && !showOverview && !showApps} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
+        return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} initialMaximized={window.initialMaximized} minimized={window.minimized} workspaceHidden={window.workspace !== workspace} isActive={activeApp === window.id && window.workspace === workspace && !showOverview && !showApps} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
       })}
     </main>
     <WorkspaceTransition ref={workspaceTransition} />
     {switcher && <div className="ubuntu-app-switcher" role="dialog" aria-label="Changer d’application"><div className="ubuntu-app-switcher__apps">{switcher.ids.map((id, index) => { const item = windows.find((candidate) => candidate.id === id); const app = appById(item?.appId); return <button key={id} className={switcher.index === index ? 'is-selected' : ''} aria-pressed={switcher.index === index} onClick={() => { focusApp(id); setSwitcher(null); }}><img src={app?.icon || '/ubuntu-apps/trash.png'} alt="" /><span>{app?.name || 'Corbeille'}</span></button>; })}</div></div>}
     {workspaceNotice !== null && !showOverview && <div className="ubuntu-workspace-osd" role="status">{Array.from({ length: workspaceCount }, (_, index) => <span key={index} className={workspaceNotice === index ? 'is-current' : ''}>{index + 1}</span>)}</div>}
-    {desktopNotice && <div className="ubuntu-shell-notice" role="status">{desktopNotice}</div>}
+    {desktopNotice && !quiet && <div className="ubuntu-shell-notice" role="status">{desktopNotice}</div>}
     <WindowOverview open={showOverview} windows={windows} workspaceCount={workspaceCount} activeWorkspace={workspace} onWorkspace={switchWorkspace} onMoveWindow={moveWindowToWorkspace} onOpen={openApp} onFocus={focusApp} onCloseWindow={(id) => window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }))} onClose={() => setShowOverview(false)} onShowApps={() => { setShowOverview(false); setShowApps(true); }} revision={files} />
     <AppGrid open={showApps} onOpen={openApp} onClose={() => setShowApps(false)} />
     <DesktopIntroduction phase={introduction.phase} step={introduction.step}

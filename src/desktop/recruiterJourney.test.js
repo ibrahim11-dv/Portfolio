@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { findReusableWindow, normalizeReadingState, rememberCollection } from './recruiterJourney.js';
+import { findReusableWindow, normalizeReadingState, rememberCollection, shouldStartMaximized } from './recruiterJourney.js';
 
 test('reopening CV reuses its minimized window across workspaces', () => {
   const cv = { id: 'cv', appId: 'cv', minimized: true, workspace: 2, zIndex: 10 };
@@ -28,4 +28,12 @@ test('collection snapshots preserve independent search, filters and return posit
   assert.deepEqual(second.main, { ...main, scroll: 412 });
   assert.equal(second.other.scroll, 95);
   assert.equal(first.other, undefined);
+});
+test('a principal application starts maximized only when its workspace has no visible window', () => {
+  const main = ['presentation', 'projects', 'skills', 'journey', 'contact'];
+  assert.equal(shouldStartMaximized('projects', [], 0, main), true);
+  assert.equal(shouldStartMaximized('projects', [{ workspace: 0, minimized: true }], 0, main), true);
+  assert.equal(shouldStartMaximized('projects', [{ workspace: 1, minimized: false }], 0, main), true);
+  assert.equal(shouldStartMaximized('projects', [{ workspace: 0, minimized: false }], 0, main), false);
+  assert.equal(shouldStartMaximized('cv', [], 0, main), false);
 });

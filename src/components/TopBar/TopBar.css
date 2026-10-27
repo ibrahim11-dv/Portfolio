@@ -554,3 +554,65 @@ html[data-desktop-saver="true"] .desktop *, html[data-desktop-saver="true"] .des
   .ubuntu-qs-footer__battery { gap: 4px; font-size: 10px; }
 }
  
+
+/* GNOME date menu: notifications alongside the calendar. */
+.ubuntu-topbar__dropdown--clock {
+  width: min(740px, calc(100vw - 24px));
+  margin-left: calc(max(-740px, 24px - 100vw) / 2);
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  border-radius: 20px;
+}
+.ubuntu-calendar { padding: 20px; min-width: 0; }
+.ubuntu-calendar__today { display: grid; gap: 5px; width: 100%; padding: 4px 0 20px; border: 0; text-align: left; color: inherit; background: transparent; cursor: pointer; text-transform: capitalize; }
+.ubuntu-calendar__today span { color: var(--ubuntu-text-muted); }
+.ubuntu-calendar__today strong { font-size: 20px; font-weight: 600; }
+.ubuntu-calendar__day { min-height: 32px; padding: 4px 0; }
+.ubuntu-calendar__day.is-other-month { color: var(--ubuntu-text-subtle); }
+.ubuntu-calendar__agenda { border-radius: 12px; padding: 14px; margin-top: 20px; background: var(--ubuntu-surface); font-size: 13px; }
+.ubuntu-calendar__agenda strong { display: block; text-transform: capitalize; }
+.ubuntu-calendar__agenda p { margin: 10px 0 0; color: var(--ubuntu-text-muted); }
+.ubuntu-notifications { display: flex; flex-direction: column; min-width: 0; padding: 20px; border-right: 1px solid var(--ubuntu-border); }
+.ubuntu-notifications__list { flex: 1; min-height: 220px; max-height: 380px; overflow-y: auto; }
+.ubuntu-notifications__empty { display: flex; height: 100%; min-height: 260px; align-items: center; justify-content: center; flex-direction: column; gap: 14px; color: var(--ubuntu-text-muted); }
+.ubuntu-notifications footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.ubuntu-notifications label { display: flex; align-items: center; gap: 10px; font-size: 12px; cursor: pointer; }
+.ubuntu-notifications input { appearance: none; width: 36px; height: 22px; border-radius: 20px; background: var(--ubuntu-slider-track); border: 1px solid var(--ubuntu-border); flex-shrink: 0; cursor: pointer; }
+.ubuntu-notifications input::after { content: ''; display: block; width: 16px; height: 16px; border-radius: 50%; background: #fff; margin: 2px; transition: transform var(--motion-feedback); }
+.ubuntu-notifications input:checked { background: var(--ubuntu-orange); }
+.ubuntu-notifications input:checked::after { transform: translateX(14px); }
+.ubuntu-notifications input:focus-visible { outline: 2px solid var(--ubuntu-orange); outline-offset: 3px; }
+.ubuntu-notification { margin-bottom: 10px; padding: 12px; border-radius: 12px; background: var(--ubuntu-surface); }
+.ubuntu-notification header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ubuntu-notification header button { display: grid; place-items: center; border: 0; border-radius: 50%; width: 28px; height: 28px; color: inherit; background: transparent; cursor: pointer; }
+.ubuntu-notification header button:hover { background: var(--ubuntu-surface-hover); }
+.ubuntu-notification p { margin: 8px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.ubuntu-notification time { font-size: 11px; color: var(--ubuntu-text-muted); }
+.ubuntu-topbar__notification-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.ubuntu-topbar__dropdown--system { border-radius: 24px; padding: 20px; }
+.ubuntu-quick-settings__footer, .ubuntu-quick-settings__sliders, .ubuntu-quick-settings__grid, .ubuntu-qs-detail, .ubuntu-qs-power-menu { order: initial; }
+.ubuntu-qs-card, .ubuntu-qs-tile { border-radius: 28px; min-height: 58px; }
+.ubuntu-qs-tile:has(.ubuntu-qs-detail-btn) .ubuntu-qs-card { border-radius: 28px 0 0 28px; }
+.ubuntu-qs-detail-btn { border-radius: 0 28px 28px 0; width: 34px; }
+.ubuntu-qs-tile .ubuntu-qs-card { padding: 12px; }
+.ubuntu-qs-card.active, .ubuntu-qs-tile:has(.active) { color: #fff; }
+.ubuntu-qs-footer__btn { width: 40px; height: 40px; color: var(--ubuntu-text); }
+.ubuntu-qs-power-menu { background: var(--ubuntu-surface); margin: 12px 0 0; }
+.ubuntu-qs-power-menu button:hover { background: var(--ubuntu-surface-hover); }
+@media (max-width: 620px) {
+  .ubuntu-topbar__dropdown--clock { grid-template-columns: minmax(0, 1fr); width: min(360px, calc(100vw - 12px)); margin-left: calc(max(-360px, 12px - 100vw) / 2); }
+  .ubuntu-calendar { grid-row: 1; padding: 16px; }
+  .ubuntu-notifications { border-right: 0; border-top: 1px solid var(--ubuntu-border); padding: 16px; }
+  .ubuntu-notifications__list { min-height: 60px; max-height: 180px; }
+  .ubuntu-notifications__empty { min-height: 60px; flex-direction: row; }
+  .ubuntu-notifications__empty svg { width: 22px; }
+  .ubuntu-calendar__today { padding-bottom: 12px; }
+  .ubuntu-calendar__agenda { margin-top: 12px; }
+}
+@media (max-width: 380px) {
+  .ubuntu-topbar__dropdown--system { padding: 12px; }
+  .ubuntu-qs-tile .ubuntu-qs-card { padding: 9px; gap: 6px; }
+  .ubuntu-qs-card__title { font-size: 12px; }
+  .ubuntu-qs-detail-btn { width: 28px; }
+}

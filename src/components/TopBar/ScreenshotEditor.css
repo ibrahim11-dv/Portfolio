@@ -1,0 +1,61 @@
+.ubuntu-capture { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 20px; border: 0; background: #18181cf5; color: #fff; font-family: var(--font-ubuntu); box-sizing: border-box; overflow: auto; }
+.ubuntu-capture[open] { display: flex; flex-direction: column; gap: 14px; }
+.ubuntu-capture::backdrop { background: #000b; }
+.ubuntu-capture header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-shrink: 0; }
+.ubuntu-capture h2 { font-size: 20px; margin: 0 0 5px; }
+.ubuntu-capture header p, .ubuntu-capture__hint { font-size: 13px; color: #d3d3d8; margin: 0; line-height: 1.5; }
+.ubuntu-capture button, .ubuntu-capture a { display: inline-flex; gap: 8px; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid #ffffff26; border-radius: 24px; background: #3b3b40; color: #fff; font: inherit; font-size: 14px; cursor: pointer; text-decoration: none; }
+.ubuntu-capture button:hover, .ubuntu-capture a:hover { background: #505057; }
+.ubuntu-capture button:focus-visible, .ubuntu-capture a:focus-visible, .ubuntu-capture__selection:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.ubuntu-capture button:disabled { opacity: .5; cursor: wait; }
+.ubuntu-capture .ubuntu-capture__close { width: 44px; padding: 0; flex-shrink: 0; }
+.ubuntu-capture__stage, .ubuntu-capture__preview { flex: 1; min-height: 100px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.ubuntu-capture__image { position: relative; line-height: 0; touch-action: none; user-select: none; cursor: crosshair; flex-shrink: 1; max-width: 100%; }
+.ubuntu-capture__image > img { display: block; max-width: 100%; max-height: calc(100dvh - 230px); width: auto; height: auto; user-select: none; }
+.ubuntu-capture__selection { position: absolute; border: 2px solid #fff; box-sizing: border-box; box-shadow: 0 0 0 9999px #0008; cursor: move; touch-action: none; }
+.ubuntu-capture__dimensions { position: absolute; top: 8px; left: 8px; font-size: 12px; line-height: 1.4; background: #18181ce8; padding: 3px 7px; border-radius: 4px; pointer-events: none; white-space: nowrap; }
+.ubuntu-capture__handle { position: absolute; width: 24px; height: 24px; transform: translate(-50%, -50%); }
+.ubuntu-capture__handle::after { content: ''; position: absolute; inset: 7px; background: white; border: 1px solid #333; border-radius: 50%; }
+.ubuntu-capture__handle.is-nw { left: 0; top: 0; cursor: nwse-resize; }
+.ubuntu-capture__handle.is-n { left: 50%; top: 0; cursor: ns-resize; }
+.ubuntu-capture__handle.is-ne { left: 100%; top: 0; cursor: nesw-resize; }
+.ubuntu-capture__handle.is-e { left: 100%; top: 50%; cursor: ew-resize; }
+.ubuntu-capture__handle.is-se { left: 100%; top: 100%; cursor: nwse-resize; }
+.ubuntu-capture__handle.is-s { left: 50%; top: 100%; cursor: ns-resize; }
+.ubuntu-capture__handle.is-sw { left: 0; top: 100%; cursor: nesw-resize; }
+.ubuntu-capture__handle.is-w { left: 0; top: 50%; cursor: ew-resize; }
+.ubuntu-capture__image.is-full { outline: 2px solid white; cursor: default; }
+.ubuntu-capture__preview img { max-width: 100%; max-height: calc(100dvh - 210px); object-fit: contain; }
+.ubuntu-capture footer { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: center; flex-shrink: 0; }
+.ubuntu-capture__modes { display: flex; gap: 6px; padding: 6px; border-radius: 28px; background: #29292e; }
+.ubuntu-capture__modes button { border-color: transparent; background: transparent; }
+.ubuntu-capture__modes button[aria-pressed="true"] { background: #55555d; box-shadow: inset 0 -2px #fff; }
+.ubuntu-capture .ubuntu-capture__shutter, .ubuntu-capture .ubuntu-capture__download { background: var(--ubuntu-orange); }
+.ubuntu-capture__hint, .ubuntu-capture__error { text-align: center; flex-shrink: 0; }
+.ubuntu-capture__error { color: #ffb5ad; font-size: 13px; margin: 0; }
+.ubuntu-capture__error:empty { display: none; }
+@media (max-width: 480px) {
+  .ubuntu-capture { padding: 12px; }
+  .ubuntu-capture button, .ubuntu-capture a { padding: 10px 12px; font-size: 12px; }
+  .ubuntu-capture footer { gap: 8px; }
+  .ubuntu-capture__image > img { max-height: calc(100dvh - 290px); }
+  .ubuntu-capture__hint { font-size: 11px; }
+}
+
+/* Snipping overlay: the frozen desktop fills the viewport, tools float above it. */
+.ubuntu-capture.is-selecting { padding: 0; overflow: hidden; background: #171719; }
+.ubuntu-capture.is-selecting > header { position: absolute; top: 12px; right: 12px; z-index: 3; }
+.ubuntu-capture.is-selecting > header > div { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ubuntu-capture.is-selecting .ubuntu-capture__stage { position: absolute; inset: 0; }
+.ubuntu-capture.is-selecting .ubuntu-capture__image > img { max-height: 100dvh; max-width: 100vw; }
+.ubuntu-capture.is-selecting .ubuntu-capture__image.awaiting-selection > img { filter: brightness(.55); }
+.ubuntu-capture.is-selecting footer { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 2; width: max-content; max-width: calc(100% - 130px); padding: 6px; gap: 8px; background: #252529; border: 1px solid #ffffff35; border-radius: 16px; box-shadow: 0 8px 32px #0006; }
+.ubuntu-capture.is-selecting .ubuntu-capture__modes { padding: 0; background: transparent; }
+.ubuntu-capture.is-selecting .ubuntu-capture__hint { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2; max-width: calc(100% - 24px); width: max-content; padding: 8px 14px; border-radius: 10px; background: #252529eb; pointer-events: none; }
+.ubuntu-capture.is-selecting .ubuntu-capture__error:not(:empty) { position: absolute; bottom: 65px; left: 10%; width: 80%; background: #252529; padding: 12px; }
+@media (max-width: 600px) {
+  .ubuntu-capture.is-selecting footer { left: 8px; transform: none; max-width: calc(100% - 68px); gap: 4px; }
+  .ubuntu-capture.is-selecting footer button { padding: 7px 8px; font-size: 11px; }
+  .ubuntu-capture.is-selecting .ubuntu-capture__modes { gap: 2px; }
+  .ubuntu-capture.is-selecting footer svg { width: 17px; }
+}

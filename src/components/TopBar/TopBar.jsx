@@ -9,36 +9,36 @@ import {
   Power,
   Lock,
   Camera,
-  ChevronDown,
   ChevronRight,
 } from "lucide-react";
 import "./TopBar.css";
 import DesktopDialog from './DesktopDialog';
 import { PREFERENCES_KEY, readPreferences } from './preferences';
-import { captureScreen } from './captureScreen';
+import { captureDesktop, captureScreen } from './captureScreen';
 import { observeBattery } from './battery';
 import BatteryIndicator from './BatteryIndicator';
 import UbuntuSession from './UbuntuSession';
 
-const DAY_LABELS = ["L", "M", "M", "J", "V", "S", "D"];
+import ClockMenu from './ClockMenu';
+import ScreenshotEditor from './ScreenshotEditor';
+import { useAppearance } from '../../AppearanceContext';
 
 function SymbolicIcon({ name }) {
   return <span aria-hidden="true" className="ubuntu-symbolic-icon" style={{ '--icon': `url("${import.meta.env.BASE_URL}ubuntu-icons/${name}-symbolic.svg")` }} />;
 }
 
-export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, overviewOpen = false }) {
+export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
+  const { effectiveTheme, setTheme } = useAppearance();
   const [now, setNow] = useState(new Date());
   const [openMenu, setOpenMenu] = useState(null); // "clock" | "system" | null
   const [localWorkspace, setLocalWorkspace] = useState(0);
   const activeWorkspace = workspace ?? localWorkspace;
-  const [viewDate, setViewDate] = useState(new Date()); // month shown in calendar
   const [preferences, setPreferences] = useState(readPreferences);
   const { volume, brightness, ...toggles } = preferences;
   const [detail, setDetail] = useState(null);
   const [dialog, setDialog] = useState(null);
   const [session, setSession] = useState(null);
   const [battery, setBattery] = useState({ percentage: 0, charging: false });
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [notice, setNotice] = useState('');
   const [captureUrl, setCaptureUrl] = useState(null);
   const [capturing, setCapturing] = useState(false);
@@ -72,12 +72,6 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
     return () => clearTimeout(timer);
   }, [notice]);
 
-  function openDialog(name) {
-    setOpenMenu(null);
-    setDetail(null);
-    setDialog(name);
-  }
-
   function mute() {
     if (volume) previousVolume.current = volume;
     setVolume(volume ? 0 : previousVolume.current);
@@ -90,15 +84,18 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
     setSession(mode);
   }
 
-  async function takeScreenshot() {
+  async function takeScreenshot(external = false) {
+    setOpenMenu(null);
+    setDetail(null);
     setDialog(null);
     setCapturing(true);
     try {
-      const url = await captureScreen();
+      const url = await (external ? captureScreen() : captureDesktop());
       setCaptureUrl(url);
-      setDialog('capture-result');
+      setDialog('capture-edit');
     } catch (error) {
       setNotice(error.name === 'NotAllowedError' ? 'Capture annulée ou non autorisée.' : error.message);
+      if (!external) setDialog('capture');
     } finally { setCapturing(false); }
   }
 
@@ -122,8 +119,6 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
       const key = event.key.toLowerCase();
       if (event.metaKey && key === 'v') {
         event.preventDefault();
-        setViewDate(new Date());
-        setSelectedDate(new Date());
         setDetail(null);
         setOpenMenu((current) => current === 'clock' ? null : 'clock');
         clockRef.current?.focus();
@@ -143,13 +138,19 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
   useEffect(() => {
     function handleEscape(event) {
       if (event.key === "Escape" && openMenu) {
-        (openMenu === "clock" ? clockRef : systemRef).current?.focus();
-        setOpenMenu(null);
+        event.preventDefault();
+        if (detail) {
+          containerRef.current?.querySelector('[aria-expanded="true"].ubuntu-qs-detail-btn, [aria-expanded="true"].ubuntu-qs-footer__btn')?.focus();
+          setDetail(null);
+        } else {
+          (openMenu === "clock" ? clockRef : systemRef).current?.focus();
+          setOpenMenu(null);
+        }
       }
     }
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [openMenu]);
+  }, [openMenu, detail]);
 
   // close menus on outside click
   useEffect(() => {
@@ -187,34 +188,17 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
   }, [workspaceCount, onWorkspaceChange]);
 
   function toggle(key) {
+    if (key === 'dark') { setTheme(effectiveTheme === 'dark' ? 'light' : 'dark'); return; }
     updatePreference(key, !preferences[key]);
   }
 
   // --- formatting ---
   const barDate = now.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
   const timeStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  const longDate = now.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  // --- calendar grid (weeks start on Monday) ---
-  const year = viewDate.getFullYear();
-  const month = viewDate.getMonth();
-  const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const isThisMonth = now.getFullYear() === year && now.getMonth() === month;
-  const monthLabel = viewDate.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
-
-  function shiftMonth(delta) {
-    setViewDate(new Date(year, month + delta, 1));
-  }
-
   const cards = [
     { key: "wifi", Icon: Wifi, title: "Wi-Fi", subtitle: "Indisponible", disabled: true },
     { key: "bluetooth", Icon: Bluetooth, title: "Bluetooth", subtitle: "Indisponible", disabled: true },
+    { key: 'dark', Icon: Moon, title: 'Style sombre', subtitle: effectiveTheme === 'dark' ? 'Activé' : 'Désactivé' },
     { key: "night", Icon: Moon, title: "Éclairage nocturne", subtitle: toggles.night ? "Activé" : "Désactivé" },
     { key: "plane", Icon: Plane, title: "Mode avion", subtitle: "Indisponible", disabled: true },
     { key: "saver", Icon: Leaf, title: "Économie d'énergie", subtitle: toggles.saver ? "Activé" : "Désactivé", arrow: true },
@@ -222,7 +206,14 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
 
   return (
     <>
-    <div ref={containerRef} className="ubuntu-topbar">
+    <div ref={containerRef} className="ubuntu-topbar" onBlur={(event) => {
+      if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) { setOpenMenu(null); setDetail(null); }
+    }} onKeyDown={(event) => {
+      if (event.key === 'ArrowDown' && [clockRef.current, systemRef.current].includes(event.target)) {
+        event.preventDefault();
+        containerRef.current.querySelector('.ubuntu-topbar__dropdown button:not(:disabled)')?.focus();
+      }
+    }}>
       {/* --- Left: workspace dots + app name --- */}
       <div className="ubuntu-topbar__left">
         <button
@@ -259,64 +250,13 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
             (openMenu === "clock" ? " ubuntu-topbar__clock-btn--open" : "")
           }
           onClick={() => {
-            setViewDate(new Date());
-            setSelectedDate(new Date());
             setOpenMenu(openMenu === "clock" ? null : "clock");
           }}
         >
-          <span>{barDate}</span><span>{timeStr}</span>
+          <span>{barDate}</span><span>{timeStr}</span>{quiet && <Moon size={12} aria-label="Ne pas déranger" />}{notifications.length > 0 && <span className="ubuntu-topbar__notification-dot" aria-label={`${notifications.length} notifications`} />}
         </button>
 
-        {openMenu === "clock" && (
-          <div id="ubuntu-calendar" className="ubuntu-topbar__dropdown ubuntu-topbar__dropdown--clock">
-            <div className="ubuntu-calendar__header">
-              <div className="ubuntu-calendar__date">{longDate}</div>
-              <div className="ubuntu-calendar__time">{timeStr}</div>
-            </div>
-
-            <div className="ubuntu-calendar__month-nav">
-              <button className="ubuntu-calendar__nav-btn" onClick={() => shiftMonth(-1)} aria-label="Mois précédent">
-                <ChevronDown size={16} className="ubuntu-calendar__nav-icon left" />
-              </button>
-              <span>{monthLabel}</span>
-              <button className="ubuntu-calendar__nav-btn" onClick={() => shiftMonth(1)} aria-label="Mois suivant">
-                <ChevronDown size={16} className="ubuntu-calendar__nav-icon right" />
-              </button>
-            </div>
-
-            <div className="ubuntu-calendar__grid">
-              {DAY_LABELS.map((d, i) => (
-                <div key={i} className="ubuntu-calendar__day-label">{d}</div>
-              ))}
-              {Array.from({ length: firstWeekday }).map((_, i) => (
-                <div key={"e" + i} className="ubuntu-calendar__day ubuntu-calendar__day--empty" />
-              ))}
-              {Array.from({ length: daysInMonth }).map((_, i) => {
-                const day = i + 1;
-                const isToday = isThisMonth && day === now.getDate();
-                return (
-                  <button
-                    key={day}
-                    aria-label={new Date(year, month, day).toLocaleDateString('fr-FR', { dateStyle: 'full' })}
-                    aria-pressed={selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === day}
-                    aria-current={isToday ? 'date' : undefined}
-                    onClick={() => setSelectedDate(new Date(year, month, day))}
-                    className={
-                      "ubuntu-calendar__day" +
-                      (isToday ? " ubuntu-calendar__day--today" : "")
-                    }
-                  >
-                    {day}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="ubuntu-calendar__selection" aria-live="polite">
-              {selectedDate.toLocaleDateString('fr-FR', { dateStyle: 'full' })}
-            </div>
-            <button className="desktop-action" onClick={() => { const today = new Date(); setViewDate(today); setSelectedDate(today); }}>Aujourd’hui</button>
-          </div>
-        )}
+        {openMenu === "clock" && <ClockMenu now={now} notifications={notifications} onClear={onClearNotifications} onDismiss={onDismissNotification} quiet={quiet} onQuiet={onQuiet} />}
       </div>
 
       {/* --- Right: system menu --- */}
@@ -340,30 +280,18 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
         </button>
 
         {openMenu === "system" && (
-          <div id="ubuntu-quick-settings" className="ubuntu-topbar__dropdown ubuntu-topbar__dropdown--system">
-            <div className="ubuntu-quick-settings__grid">
-              {cards.map(({ key, Icon, title, subtitle, arrow, disabled }) => (
-                <div key={key} className="ubuntu-qs-tile">
-                <button
-                  className={"ubuntu-qs-card" + (!disabled && toggles[key] ? " active" : "")}
-                  onClick={disabled ? undefined : () => toggle(key)}
-                  disabled={disabled}
-                  aria-pressed={!disabled && !!toggles[key]}
-                  title={disabled ? `${title} : indisponible dans le navigateur` : title}
-                >
-                  <span className="ubuntu-qs-card__icon">
-                    <Icon size={18} />
-                  </span>
-                  <span className="ubuntu-qs-card__content">
-                    <span className="ubuntu-qs-card__title">{title}</span>
-                    <span className="ubuntu-qs-card__subtitle">{subtitle}</span>
-                  </span>
-                </button>
-                {arrow && <button className="ubuntu-qs-detail-btn" aria-label={`Détails : ${title}`} aria-expanded={detail === key} onClick={() => setDetail(detail === key ? null : key)}><ChevronRight size={16} /></button>}
-                </div>
-              ))}
+          <div id="ubuntu-quick-settings" role="dialog" aria-label="Réglages rapides" className="ubuntu-topbar__dropdown ubuntu-topbar__dropdown--system">
+            <div className="ubuntu-quick-settings__footer">
+              <div className="ubuntu-qs-footer__battery">
+                <BatteryIndicator {...battery} showPercentage />
+              </div>
+              <div className="ubuntu-qs-footer__right">
+                <button className="ubuntu-qs-footer__btn ubuntu-qs-appearance" aria-label="Ouvrir les réglages d’apparence" onClick={() => { setOpenMenu(null); onOpenAppearance?.(); }}><Sun size={16} /></button>
+                <button className="ubuntu-qs-footer__btn" aria-label={capturing ? 'Préparation de la capture' : "Capture d'écran"} disabled={capturing} onClick={() => takeScreenshot()}><Camera size={16} /></button>
+                <button className="ubuntu-qs-footer__btn" aria-label="Verrouiller" onClick={() => openSession('lock')}><Lock size={16} /></button>
+                <button className="ubuntu-qs-footer__btn" aria-label="Éteindre ou se déconnecter" aria-expanded={detail === 'power'} onClick={() => setDetail(detail === 'power' ? null : 'power')}><Power size={16} /></button>
+              </div>
             </div>
-
             <div className="ubuntu-quick-settings__sliders">
               <div className="ubuntu-qs-slider">
                 <button className="ubuntu-calendar__nav-btn" aria-label={volume ? 'Couper le son' : 'Rétablir le son'} aria-pressed={volume === 0} onClick={mute}><SymbolicIcon name={volume ? 'audio-volume-high' : 'audio-volume-muted'} /></button>
@@ -395,17 +323,29 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
               </div>
             </div>
 
-            <div className="ubuntu-quick-settings__footer">
-              <div className="ubuntu-qs-footer__battery">
-                <BatteryIndicator {...battery} showPercentage />
-              </div>
-              <div className="ubuntu-qs-footer__right">
-                <button className="ubuntu-qs-footer__btn ubuntu-qs-appearance" aria-label="Ouvrir les réglages d’apparence" onClick={() => { setOpenMenu(null); onOpenAppearance?.(); }}><Sun size={16} /></button>
-                <button className="ubuntu-qs-footer__btn" aria-label="Capture d'écran" disabled={capturing} onClick={() => openDialog('capture')}><Camera size={16} /></button>
-                <button className="ubuntu-qs-footer__btn" aria-label="Verrouiller" onClick={() => openSession('lock')}><Lock size={16} /></button>
-                <button className="ubuntu-qs-footer__btn" aria-label="Éteindre" aria-expanded={detail === 'power'} onClick={() => setDetail(detail === 'power' ? null : 'power')}><Power size={16} /></button>
-              </div>
+            <div className="ubuntu-quick-settings__grid">
+              {cards.map(({ key, Icon, title, subtitle, arrow, disabled }) => (
+                <div key={key} className="ubuntu-qs-tile">
+                <button
+                  className={"ubuntu-qs-card" + (!disabled && (key === 'dark' ? effectiveTheme === 'dark' : toggles[key]) ? " active" : "")}
+                  onClick={disabled ? undefined : () => toggle(key)}
+                  disabled={disabled}
+                  aria-pressed={!disabled && (key === 'dark' ? effectiveTheme === 'dark' : !!toggles[key])}
+                  title={disabled ? `${title} : indisponible dans le navigateur` : title}
+                >
+                  <span className="ubuntu-qs-card__icon">
+                    <Icon size={18} />
+                  </span>
+                  <span className="ubuntu-qs-card__content">
+                    <span className="ubuntu-qs-card__title">{title}</span>
+                    <span className="ubuntu-qs-card__subtitle">{subtitle}</span>
+                  </span>
+                </button>
+                {arrow && <button className="ubuntu-qs-detail-btn" aria-label={`Détails : ${title}`} aria-expanded={detail === key} onClick={() => setDetail(detail === key ? null : key)}><ChevronRight size={16} /></button>}
+                </div>
+              ))}
             </div>
+
             {detail === 'saver' && <section className="ubuntu-qs-detail" aria-label="Économie d’énergie">
               <h3>Mode d’alimentation</h3>
               <button className="ubuntu-power-option" aria-pressed={toggles.saver} onClick={() => updatePreference('saver', true)}>Économie d’énergie {toggles.saver && <span aria-hidden="true">✓</span>}</button>
@@ -424,13 +364,15 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
     {toggles.night && <div className="desktop-display-overlay desktop-display-overlay--night" aria-hidden="true" />}
     <div className="desktop-notice" role="status">{notice}</div>
     {session && <UbuntuSession key={session} initialMode={session} now={now} battery={battery} onClose={(restart) => { if (restart) window.location.reload(); else setSession(null); }} />}
-    {dialog && <DesktopDialog key={dialog} variant={dialog} title={{ capture: 'Capture d’écran', 'capture-result': 'Votre capture' }[dialog]}
+    {dialog === 'capture-edit' && captureUrl && <ScreenshotEditor source={captureUrl} onNotify={setNotice} onClose={() => { setDialog(null); setCaptureUrl(null); systemRef.current?.focus(); }} />}
+    {dialog === 'capture' && <DesktopDialog key={dialog} variant={dialog} title="Capture d’écran"
       onClose={() => { setDialog(null); systemRef.current?.focus(); }}>
       {dialog === 'capture' && <>
-        <p>Choisissez l’onglet ou la fenêtre à capturer dans la boîte de dialogue du navigateur. L’image reste sur votre appareil.</p>
-        <button className="desktop-action desktop-action--primary" onClick={takeScreenshot}>Choisir et capturer</button>
+        <p>La capture directe du bureau n’a pas pu être préparée. Réessayez, ou choisissez une surface avec l’autorisation du navigateur.</p>
+        <p>L’image reste sur votre appareil. Le partage s’arrête dès que l’image est reçue.</p>
+        <button className="desktop-action desktop-action--primary" onClick={() => takeScreenshot()}>Réessayer</button>
+        <button className="desktop-action" onClick={() => takeScreenshot(true)}>Partager une surface</button>
       </>}
-      {dialog === 'capture-result' && <><img className="desktop-capture" src={captureUrl} alt="Capture de la surface choisie" /><a className="desktop-action desktop-action--primary" href={captureUrl} download="capture-portfolio.png">Télécharger l’image PNG</a></>}
     </DesktopDialog>}
     </>
   );
