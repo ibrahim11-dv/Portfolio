@@ -27,7 +27,7 @@ export default function ProjectGallery({ project, images }) {
     if (event.key === 'End') { event.preventDefault(); select(images.length - 1); }
   }
   const caption = <><strong>{current.title}</strong><p>{current.caption}</p></>;
-  return <section className="project-gallery" aria-label={`Captures de ${project.name}`} onKeyDown={keys}>
+  return <section className={`project-gallery ${current.orientation === 'portrait' ? 'project-gallery--portrait' : ''}`} aria-label={`Captures de ${project.name}`} onKeyDown={keys}>
     <header><div><span className="project-report__eyebrow">CAPTURES DU PROJET</span><h2>L’application à l’écran.</h2></div><span>{images.length} vues</span></header>
     <figure>
       <button ref={triggerRef} className="project-gallery__preview" onClick={() => dialogRef.current.showModal()} aria-label={`Agrandir : ${current.title}`}>
@@ -37,7 +37,7 @@ export default function ProjectGallery({ project, images }) {
       <figcaption aria-live="polite">{caption}</figcaption>
     </figure>
     <div className="project-gallery__thumbnails" aria-label="Choisir une capture">{images.map((item, position) => <button key={item.src} onClick={() => select(position)} aria-pressed={position === index} aria-label={`Capture ${position + 1} : ${item.title}`}><img src={item.src} alt="" loading="lazy" /><span>{String(position + 1).padStart(2, '0')} / {item.title}</span></button>)}</div>
-    <p className="project-gallery__note">Captures fournies par Ibrahim · les données visibles appartiennent aux écrans capturés.</p>
+    <p className="project-gallery__note">{current.credit || 'Captures fournies par Ibrahim · les données visibles appartiennent aux écrans capturés.'}</p>
     <dialog ref={dialogRef} className="project-gallery__dialog" aria-labelledby={titleId} onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
       <header><h2 id={titleId}>{project.name} / {current.title}</h2><button aria-label="Fermer la capture" onClick={close} autoFocus><X size={20} /></button></header>
       <div className={`project-gallery__canvas ${zoomed ? 'is-zoomed' : ''}`}><img src={current.src} alt={`${project.name} — ${current.title}`} /></div>

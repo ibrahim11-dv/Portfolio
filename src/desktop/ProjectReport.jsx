@@ -20,7 +20,7 @@ import { PROJECT_PRESENTATION } from './projectPresentation';
 
 export function ProjectArtwork({ project, step = 0, compact = false }) {
   const cover = PROJECT_MEDIA[project.id]?.[0];
-  if (compact && cover) return <div className="project-art project-art--capture is-compact" aria-hidden="true"><img src={cover.src} alt="" loading="lazy" decoding="async" /><span>CAPTURE DU PROJET</span></div>;
+  if (compact && cover) return <div className={`project-art project-art--capture is-compact ${cover.orientation === 'portrait' ? 'project-art--portrait' : ''}`} aria-hidden="true"><img src={cover.src} alt="" loading="lazy" decoding="async" /><span>CAPTURE DU PROJET</span></div>;
   const flow = PROJECT_PRESENTATION[project.id]?.flow;
   if (flow) return <div className={`project-art project-flow ${compact ? 'is-compact' : ''}`} aria-label={`Schéma explicatif : ${project.name}`}><span>SCHÉMA EXPLICATIF</span><ol>{flow.map((label, index) => <li key={label} className={index === step ? 'is-current' : ''}><small>0{index + 1}{index === step ? ' · ÉTAPE ACTIVE' : ''}</small><strong>{label}</strong>{index < flow.length - 1 && <ArrowRight size={18} aria-hidden="true" />}</li>)}</ol></div>;
   return <div className={`project-art project-art--pending ${compact ? 'is-compact' : ''}`}><div className="project-art__code"><Code2 size={52} strokeWidth={1} /><span>LearnXcompile</span><small>DOCUMENTATION EN COURS</small></div></div>;
