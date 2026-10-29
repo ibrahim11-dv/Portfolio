@@ -114,7 +114,7 @@ function ReportSummary({ project }) {
 
 export default function ProjectReport({ project, onBack, onSelectProject }) {
   const reportRef = useRef(null);
-  const [chapter, setChapter] = useState('context');
+  const [chapter, setChapter] = useState(PROJECT_MEDIA[project.id] ? 'screens' : 'tour');
   const report = project.report;
 
   useEffect(() => {
@@ -123,7 +123,7 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
       const top = root.getBoundingClientRect().top + 110;
       const sections = [...reportRef.current.querySelectorAll('[data-chapter]')];
       const current = sections.filter((item) => item.getBoundingClientRect().top <= top).at(-1);
-      setChapter(current?.dataset.chapter || 'context');
+      setChapter(current?.dataset.chapter || (PROJECT_MEDIA[project.id] ? 'screens' : 'tour'));
     }
     root.addEventListener('scroll', track, { passive: true });
     return () => root.removeEventListener('scroll', track);
@@ -152,6 +152,8 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
 
   function jump(section) {
     const element = reportRef.current.querySelector(`[data-chapter="${section}"]`);
+    const details = element?.querySelector('.project-report__technical');
+    if (details) details.open = true;
     element?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
     element?.focus({ preventScroll: true });
   }
@@ -164,17 +166,9 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
           <span className="project-report__eyebrow">{project.category} · {project.context}</span>
           <h1>{project.name}</h1>
           <p className="project-report__tagline">{project.tagline}</p>
-          <p className="project-report__intro">{project.description}</p>
+
         </div>
       </div>
-      <dl className="project-report__metadata">
-        <div><dt>CONTEXTE</dt><dd>{project.context}</dd></div>
-        <div><dt>PÉRIODE</dt><dd>{project.period}</dd></div>
-        <div><dt>RÔLE</dt><dd>{project.role}</dd></div>
-        <div><dt>STATUT</dt><dd>{project.status}</dd></div>
-        <div><dt>PREUVE</dt><dd>{project.evidence}</dd></div>
-      </dl>
-      {project.stack.length > 0 && <div className="project-report__stack project-report__stack--hero" aria-label="Stack technique">{project.stack.map((item) => <span key={item}>{item}</span>)}</div>}
       <div className="project-report__hero-links">
         {links.map(({ label, href, icon: Icon }) => <a key={label} href={href} target="_blank" rel="noreferrer" title="Ouvrir le code source dans un nouvel onglet"><Icon size={15} />{label}<ArrowUpRight size={14} /></a>)}
         {project.group === 'main' && <CVAction><FileText size={15} />Lire le CV</CVAction>}
@@ -184,33 +178,45 @@ export default function ProjectReport({ project, onBack, onSelectProject }) {
     {!report ? <section className="project-report__pending">
       <span className="project-report__eyebrow">ARCHIVE PARTIEL</span>
       <h2>Documentation en cours.</h2>
-      <p>Aucun dépôt ou document source de LearnXcompile n’a été fourni pour l’instant. Cette fiche reste volontairement limitée aux informations disponibles ; elle sera complétée lorsque les éléments du projet seront documentés.</p>
+      <p>Cette fiche présente uniquement les éléments actuellement documentés. Les détails techniques seront ajoutés à partir des sources du projet.</p>
       <button onClick={onBack}>Retour aux projets <ArrowRight size={16} /></button>
     </section> : <>
       <nav className="project-report__chapters" aria-label="Chapitres du rapport">
-        {[['context', '01', 'Synthèse'], ...(PROJECT_MEDIA[project.id] ? [['screens', '↗', 'Captures']] : []), ['tour', '02', 'Flux'], ['architecture', '03', 'Architecture'], ['decisions', '04', 'Décisions'], ['outcome', '05', 'Bilan']].map(([id, number, label]) => <button key={id} aria-current={chapter === id ? 'location' : undefined} onClick={() => { setChapter(id); jump(id); }}><small>{number}</small>{label}</button>)}
+        {[...(PROJECT_MEDIA[project.id] ? [['screens', '01', 'Le produit']] : []), ['tour', '02', 'Fonctionnement'], ['context', '03', 'Ma contribution'], ['architecture', '04', 'Technique'], ['decisions', '05', 'Choix'], ['outcome', '06', 'Bilan']].map(([id, number, label]) => <button key={id} aria-current={chapter === id ? 'location' : undefined} onClick={() => { setChapter(id); jump(id); }}><small>{number}</small>{label}</button>)}
       </nav>
+      {PROJECT_MEDIA[project.id] && <div className="project-report__chapter" data-chapter="screens" tabIndex={-1}><ProjectGallery key={project.id} project={project} images={PROJECT_MEDIA[project.id]} /></div>}
+      <div className="project-report__chapter" data-chapter="tour" tabIndex={-1}><ProjectTour key={project.id} project={project} /></div>
       <section className="project-report__chapter project-report__chapter--summary" data-chapter="context" tabIndex={-1}>
-        <span className="project-report__eyebrow">SYNTHÈSE D’INGÉNIERIE / 01</span>
+        <span className="project-report__eyebrow">MA CONTRIBUTION</span>
         <h2>Ce qui a été construit.</h2>
         <ReportSummary project={project} />
+        <details className="project-report__context-detail"><summary>Mon rôle, les technologies et le contexte</summary>
+      <dl className="project-report__metadata">
+        <div><dt>CONTEXTE</dt><dd>{project.context}</dd></div>
+        <div><dt>PÉRIODE</dt><dd>{project.period}</dd></div>
+        <div><dt>RÔLE</dt><dd>{project.role}</dd></div>
+        <div><dt>STATUT</dt><dd>{project.status}</dd></div>
+        <div><dt>PREUVE</dt><dd>{project.evidence}</dd></div>
+      </dl>
+      {project.stack.length > 0 && <div className="project-report__stack project-report__stack--hero" aria-label="Stack technique">{project.stack.map((item) => <span key={item}>{item}</span>)}</div>}
+<p>{project.description}</p></details>
         <details className="project-report__context-detail"><summary>Comprendre le contexte et la solution</summary><p>{report.problem}</p><p>{report.solution}</p></details>
         <div className="project-report__features">{project.highlights.map((item) => <span key={item}><Check size={14} />{item}</span>)}</div>
       </section>
-      {PROJECT_MEDIA[project.id] && <div className="project-report__chapter" data-chapter="screens" tabIndex={-1}><ProjectGallery key={project.id} project={project} images={PROJECT_MEDIA[project.id]} /></div>}
-      <div className="project-report__chapter" data-chapter="tour" tabIndex={-1}><ProjectTour key={project.id} project={project} /></div>
+
+
       <section className="project-report__chapter" data-chapter="architecture" tabIndex={-1}>
-        <span className="project-report__eyebrow">ARCHITECTURE / 03</span>
-        <h2>Les composants du système.</h2>
-        <ol className="project-report__architecture">{report.architecture.map(([title, text], index) => <li key={title}><span>0{index + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol>
+        <span className="project-report__eyebrow">ARCHITECTURE</span>
+        <details className="project-report__technical"><summary>Explorer les composants du système</summary>
+        <ol className="project-report__architecture">{report.architecture.map(([title, text], index) => <li key={title}><span>0{index + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol></details>
       </section>
       <section className="project-report__chapter" data-chapter="decisions" tabIndex={-1}>
-        <span className="project-report__eyebrow">DÉCISIONS / 04</span>
-        <h2>Choix et compromis.</h2>
-        <div className="project-report__decisions">{report.decisions.map(([title, text], index) => <div key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{text}</p></div>)}</div>
+        <span className="project-report__eyebrow">DÉCISIONS</span>
+        <details className="project-report__technical"><summary>Comprendre les choix et compromis</summary>
+        <div className="project-report__decisions">{report.decisions.map(([title, text], index) => <div key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{text}</p></div>)}</div></details>
       </section>
       <section className="project-report__chapter project-report__outcome" data-chapter="outcome" tabIndex={-1}>
-        <span className="project-report__eyebrow">BILAN / 05</span>
+        <span className="project-report__eyebrow">BILAN</span>
         <h2>Résultat et périmètre.</h2>
         <p>{report.outcome}</p>
         <details><summary>Sources, limites et niveau de preuve</summary><p>{report.boundaries}</p></details>

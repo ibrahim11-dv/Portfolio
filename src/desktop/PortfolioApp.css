@@ -288,8 +288,29 @@ html[data-desktop-theme="dark"] .portfolio-app :is(.portfolio-app__collections b
 }
 html[data-desktop-theme="dark"] .portfolio-app :is(button, a, input):focus-visible { outline-color: var(--ib-accent); }
 html[data-desktop-theme="dark"] .portfolio-app__collections button[aria-pressed="true"] :is(span, b, small) { color: inherit; }
-.ubuntu-window[data-app="projects"] .portfolio-app { font-family: var(--font-reading); font-size: 15px; }
-.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__section-heading p, .portfolio-app__case-body p) { font-size: 16px; line-height: 1.7; }
-.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__case-head, .portfolio-app__case-body dt, .portfolio-app__case-body dd, .portfolio-app__case-action, .portfolio-app__tags span, .portfolio-app__filters button, .portfolio-app__collections button, .portfolio-app__search, .portfolio-app__search input, .portfolio-app__eyebrow) { font-family: var(--font-reading); font-size: 13px; letter-spacing: normal; }
-.ubuntu-window[data-app="projects"] .portfolio-app__case-body h2 { font-size: 25px; line-height: 1.25; letter-spacing: -.02em; }
-.ubuntu-window[data-app="projects"] .portfolio-app__case-focus { font-size: 14px; line-height: 1.65; }
+.ubuntu-window[data-app="projects"] .portfolio-app { font-family: var(--font-reading); font-size: 17px; }
+.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__section-heading p, .portfolio-app__case-body p) { font-size: 18px; line-height: 1.65; }
+.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__case-head, .portfolio-app__case-body dt, .portfolio-app__case-body dd, .portfolio-app__case-action, .portfolio-app__tags span, .portfolio-app__filters button, .portfolio-app__collections button, .portfolio-app__search, .portfolio-app__search input, .portfolio-app__eyebrow) { font-family: var(--font-reading); font-size: 15px; letter-spacing: normal; }
+.ubuntu-window[data-app="projects"] .portfolio-app__case-body h2 { font-size: 28px; line-height: 1.25; letter-spacing: -.02em; }
+.ubuntu-window[data-app="projects"] .portfolio-app__case-focus { font-size: 16px; line-height: 1.65; }
+
+/* Visual project index, with supporting copy kept short. */
+.portfolio-app__case-file, .portfolio-app__case-file.is-featured:nth-child(1) { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; }
+.portfolio-app__case-file > .project-art { height: 310px; max-height: none; padding: 48px 20px 20px; }
+.portfolio-app__case-file .project-art--capture img { height: 100%; min-height: 0; object-fit: contain; }
+.portfolio-app__case-file .project-art--capture { grid-template-rows: minmax(0, 1fr) auto; }
+.portfolio-app__case-body { padding: 28px; }
+@container portfolio (max-width: 700px) {
+  .portfolio-app__case-file, .portfolio-app__case-file.is-featured:nth-child(1) { grid-template-columns: minmax(0, 1fr); }
+  .portfolio-app__case-file > .project-art { height: 240px; max-height: none; }
+  .portfolio-app__case-body { padding: 20px; }
+}
+.portfolio-app__case-file.is-featured:nth-child(1) > .project-art { height: 310px; }
+@container portfolio (max-width: 700px) {
+  .portfolio-app__case-file.is-featured:nth-child(1) > .project-art { height: 240px; }
+}
+.portfolio-app__case-file > .project-art--capture { padding: 16px; }
+
+.ubuntu-window[data-app="projects"] .portfolio-app :is(.portfolio-app__collection-intro, .portfolio-app__result-count, .portfolio-app__active-filters, .portfolio-app__toolbar-caption, .portfolio-app__toolbar-contact, .portfolio-app__back) { font-size: 15px; line-height: 1.5; }
+.ubuntu-window[data-app="projects"] .portfolio-app__search input { font-size: 16px; min-width: 0; }
+.ubuntu-window[data-app="projects"] .portfolio-app__collections button { white-space: normal; overflow-wrap: anywhere; }

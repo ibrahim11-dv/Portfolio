@@ -703,12 +703,64 @@
 .project-report__hero::after { display: none; }
 .project-report :is(p, .project-report__features, .project-report__architecture) { max-width: 72ch; }
 .project-report__hero h1 { font-size: clamp(30px, 5cqw, 46px); line-height: 1.15; letter-spacing: -.025em; }
-.project-report__chapter p, .project-report__intro, .project-report__outcome > p { font-size: 16px; line-height: 1.75; }
+.project-report__chapter p, .project-report__intro, .project-report__outcome > p { font-size: 18px; line-height: 1.7; }
 .project-report h3 { font-size: 18px; font-weight: 600; }
-.project-report__hero-links :is(a, button), .project-report__chapters button { min-height: 44px; font: 600 14px/1.4 var(--font-reading); }
+.project-report__hero-links :is(a, button), .project-report__chapters button { min-height: 44px; font: 600 16px/1.4 var(--font-reading); }
 .project-report__hero-links button { padding: 9px 12px; border: 1px solid var(--report-line); background: var(--report-panel); color: var(--report-ink); }
 .project-report__chapters { background: var(--theme-surface); backdrop-filter: none; }
 .project-report__chapters button[aria-current] { color: var(--project-accent); border-bottom-color: var(--project-accent); }
 .project-tour__controls button { min-width: 44px; min-height: 44px; }
 .project-gallery__note, .project-tour__disclaimer { font: 13px/1.6 var(--font-reading) !important; color: var(--report-muted) !important; }
 .project-gallery__thumbnails button[aria-pressed="true"] { color: var(--project-accent); border-color: var(--project-accent); }
+
+/* Product walkthrough: the real interface is the primary content. */
+.project-report__hero { padding-block: 20px; }
+.project-report__hero-top { margin-bottom: 10px; }
+.project-report__hero-grid { grid-template-columns: minmax(0, 1fr); }
+.project-report__hero-links { margin-top: 16px; }
+.project-gallery__walkthrough { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 22px; align-items: start; }
+.project-gallery__walkthrough figure { min-width: 0; }
+.project-gallery__preview { aspect-ratio: 16 / 10; max-height: none; }
+.project-gallery--portrait .project-gallery__preview { height: min(68dvh, 680px); }
+.project-gallery__thumbnails { grid-template-columns: minmax(0, 1fr); max-height: 65dvh; overflow-y: auto; padding: 3px; }
+.project-gallery__thumbnails button { display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 10px; align-items: center; min-height: 64px; padding: 8px; }
+.project-gallery__thumbnails span { margin: 0; overflow-wrap: anywhere; }
+.project-gallery__thumbnails img, .project-gallery--portrait .project-gallery__thumbnails img { height: 48px; aspect-ratio: auto; }
+.project-gallery figcaption { min-height: 0; }
+.project-gallery figcaption strong { font-size: 20px; }
+.project-gallery figcaption p { font-size: 17px; line-height: 1.6; }
+.project-report__technical summary { padding: 12px 0; font-size: 20px; font-weight: 600; cursor: pointer; }
+@container project-report (max-width: 700px) {
+  .project-gallery__walkthrough { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .project-gallery__thumbnails { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
+  .project-gallery__thumbnails button { grid-template-columns: minmax(0, 1fr); }
+  .project-gallery__thumbnails img { height: 72px; }
+  .project-gallery > header { align-items: start; }
+  .project-gallery > header h2 { font-size: 23px; }
+}
+.project-report__hero { padding: 16px 36px; }
+.project-report__hero-top { display: none; }
+.project-report__hero h1 { margin-top: 6px; }
+.project-report__hero .project-report__tagline { margin-top: 8px !important; }
+.project-report__chapter[data-chapter="screens"] { padding-top: 20px; }
+.project-gallery > header { margin-bottom: 12px; }
+@container project-report (max-width: 700px) {
+  .project-report__hero { padding: 16px; }
+}
+.project-gallery__navigation { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 16px; }
+.project-gallery__navigation button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px; border: 1px solid var(--report-line); color: var(--report-ink); background: var(--report-panel); font-size: 14px; }
+.project-gallery__navigation > span { white-space: nowrap; font-size: 13px; color: var(--report-muted); }
+
+/* Readable supporting labels across every project, with or without captures. */
+.project-report :is(.project-report__eyebrow, .project-gallery__thumbnails span, .project-report__metadata dt, .project-report__metadata dd, .project-report__stack span, .project-report__sources a, .project-tour__steps button, .project-tour__play, .project-report__features, .project-report__summary > div > span) { font-size: 15px; line-height: 1.55; }
+.project-report .project-report__context-detail { font-size: 17px; }
+.project-flow strong { font-size: 18px; }
+.project-flow small { font-size: 14px; }
+.project-gallery__navigation { flex-wrap: wrap; }
+.project-gallery__navigation button { font-size: 16px; }
+.project-gallery__dialog h2 { font-size: 17px; overflow-wrap: anywhere; }
+.project-gallery__caption { font-size: 17px; }
+.project-gallery__thumbnails button { grid-template-columns: 54px minmax(0, 1fr); }
+@container project-report (max-width: 700px) {
+  .project-gallery__thumbnails button { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,6 +1,38 @@
 // Editorial reports grounded in the supplied CV and the linked repository files.
 export const PROJECTS = [
   {
+    id: 'parcvision', name: 'ParcVision', group: 'main', category: 'Application métier', accent: '#e99756', visual: 'fleet',
+    tagline: 'Une flotte. Tous ses mouvements.', context: 'Stage · ZAI-CONCEPT INFO', period: 'Avril – juin 2026',
+    role: 'Développement full-stack · stage', status: 'Projet de stage', technicalFocus: 'Gestion métier, sécurité, OCR et cartographie', evidence: 'README et code source public inspectés',
+    description: 'Gestion de flotte automobile et archivage intelligent, réunis dans une application web.',
+    stack: ['Java', 'Spring Boot', 'Spring Security', 'PostgreSQL', 'Tesseract OCR', 'Leaflet'],
+    github: 'https://github.com/ibrahim11-dv/ParcVision-StageTech',
+    highlights: ['Véhicules, conducteurs, missions et maintenance', 'Archivage documentaire et recherche dans le texte extrait', 'Authentification JWT avec cookies HttpOnly', 'Cartographie Leaflet et simulation GPS'],
+    report: {
+      intro: 'Un véhicule est aussi un ensemble de missions, de dépenses, de documents et d’interventions. ParcVision rassemble ces informations pour donner une vue cohérente de l’activité d’une flotte.',
+      problem: 'La gestion quotidienne demande de relier des informations très différentes : disponibilité des conducteurs, état des véhicules, assurance, maintenance et documents justificatifs. Le projet répond à ce besoin de centralisation dans le cadre de mon stage chez ZAI-CONCEPT INFO à Errachidia.',
+      solution: 'L’application organise le travail autour d’un espace d’administration. Les véhicules et conducteurs alimentent la préparation des missions ; les interventions et incidents enrichissent leur historique. Les dépenses et indicateurs apportent une lecture transversale de l’activité. La GED complète cette gestion avec une arborescence documentaire et une recherche par nom ou contenu.',
+      architecture: [
+        ['Interface web', 'HTML, CSS, JavaScript et Bootstrap composent les écrans métier ; Leaflet affiche les parcours sur une carte.'],
+        ['Services métier', 'Les contrôleurs Spring exposent les opérations. Les services portent les traitements de flotte, de mission et d’archivage.'],
+        ['Données & documents', 'Spring Data JPA relie les entités à PostgreSQL. Tess4J s’appuie sur Tesseract pour extraire le texte des documents numérisés.'],
+      ],
+      decisions: [
+        ['Séparer les responsabilités', 'Une architecture N-tier répartit interface, logique métier et persistance afin de garder les opérations du domaine distinctes des écrans.'],
+        ['Rendre les archives consultables', 'L’extraction OCR asynchrone permet une recherche dans le contenu des images et PDF numérisés, avec des extraits de contexte.'],
+        ['Distinguer simulation et télémétrie', 'Le dépôt présente un suivi GPS simulé. La carte illustre les trajets et les positions ; elle ne prouve pas un raccordement à des boîtiers GPS réels.'],
+      ],
+      outcome: 'Le projet réunit deux domaines complémentaires : les opérations d’une flotte et leurs pièces documentaires. Il illustre mon travail sur une application métier structurée, de l’authentification à la visualisation cartographique et au traitement de documents.',
+      boundaries: 'Le dépôt fournit des données de démonstration et une simulation GPS. Aucun chiffre de performance ou de fréquentation n’est revendiqué ici.',
+      steps: [
+        { title: 'Préparer une mission', label: 'Véhicule + conducteur', text: 'Associer un véhicule et un conducteur à un trajet, puis préciser les instructions et la cargaison.', output: 'Mission préparée' },
+        { title: 'Suivre le parcours', label: 'Carte interactive', text: 'Visualiser le trajet, les points de passage et la position simulée sur une carte Leaflet.', output: 'Parcours visualisé' },
+        { title: 'Relier les documents', label: 'GED + OCR', text: 'Classer une pièce numérisée et rendre son texte consultable grâce à Tesseract.', output: 'Archive consultable' },
+      ],
+      sources: [{ label: 'Présentation et architecture', path: 'README.md' }],
+    },
+  },
+  {
     id: 'citadel', name: 'The Citadel', group: 'main', category: 'Application web', accent: '#84b9d9', visual: 'chess',
     tagline: 'Un club d’échecs, du premier coup à la partie en ligne.', context: 'Projet personnel', period: '2026',
     role: 'Conception et développement full-stack', status: 'Code source public', technicalFocus: 'Jeu d’échecs, moteur navigateur et API sécurisée', evidence: 'Client, serveur et vérifications du dépôt inspectés',
@@ -60,38 +92,6 @@ export const PROJECTS = [
         { title: 'Suivre la progression', label: 'SQLite & favoris', text: 'La réussite, les favoris et la prochaine leçon sont conservés pour alimenter accueil, reprise et statistiques.', output: 'Chapitre terminé ou suivant déverrouillé' },
       ],
       sources: [{ label: 'Accueil, recherche et reprise', path: 'app/src/main/java/com/example/learnxcompile/HomeActivity.java' }, { label: 'Modèle SQLite et contenus pédagogiques', path: 'app/src/main/java/com/example/learnxcompile/Models/ChapterModel.java' }, { label: 'Validation de l’exercice et déblocage', path: 'app/src/main/java/com/example/learnxcompile/TestActivity.java' }, { label: 'Dépendances Android', path: 'app/build.gradle.kts' }],
-    },
-  },
-  {
-    id: 'parcvision', name: 'ParcVision', group: 'main', category: 'Application métier', accent: '#e99756', visual: 'fleet',
-    tagline: 'Une flotte. Tous ses mouvements.', context: 'Stage · ZAI-CONCEPT INFO', period: 'Avril – juin 2026',
-    role: 'Développement full-stack · stage', status: 'Projet de stage', technicalFocus: 'Gestion métier, sécurité, OCR et cartographie', evidence: 'README et code source public inspectés',
-    description: 'Gestion de flotte automobile et archivage intelligent, réunis dans une application web.',
-    stack: ['Java', 'Spring Boot', 'Spring Security', 'PostgreSQL', 'Tesseract OCR', 'Leaflet'],
-    github: 'https://github.com/ibrahim11-dv/ParcVision-StageTech',
-    highlights: ['Véhicules, conducteurs, missions et maintenance', 'Archivage documentaire et recherche dans le texte extrait', 'Authentification JWT avec cookies HttpOnly', 'Cartographie Leaflet et simulation GPS'],
-    report: {
-      intro: 'Un véhicule est aussi un ensemble de missions, de dépenses, de documents et d’interventions. ParcVision rassemble ces informations pour donner une vue cohérente de l’activité d’une flotte.',
-      problem: 'La gestion quotidienne demande de relier des informations très différentes : disponibilité des conducteurs, état des véhicules, assurance, maintenance et documents justificatifs. Le projet répond à ce besoin de centralisation dans le cadre de mon stage chez ZAI-CONCEPT INFO à Errachidia.',
-      solution: 'L’application organise le travail autour d’un espace d’administration. Les véhicules et conducteurs alimentent la préparation des missions ; les interventions et incidents enrichissent leur historique. Les dépenses et indicateurs apportent une lecture transversale de l’activité. La GED complète cette gestion avec une arborescence documentaire et une recherche par nom ou contenu.',
-      architecture: [
-        ['Interface web', 'HTML, CSS, JavaScript et Bootstrap composent les écrans métier ; Leaflet affiche les parcours sur une carte.'],
-        ['Services métier', 'Les contrôleurs Spring exposent les opérations. Les services portent les traitements de flotte, de mission et d’archivage.'],
-        ['Données & documents', 'Spring Data JPA relie les entités à PostgreSQL. Tess4J s’appuie sur Tesseract pour extraire le texte des documents numérisés.'],
-      ],
-      decisions: [
-        ['Séparer les responsabilités', 'Une architecture N-tier répartit interface, logique métier et persistance afin de garder les opérations du domaine distinctes des écrans.'],
-        ['Rendre les archives consultables', 'L’extraction OCR asynchrone permet une recherche dans le contenu des images et PDF numérisés, avec des extraits de contexte.'],
-        ['Distinguer simulation et télémétrie', 'Le dépôt présente un suivi GPS simulé. La carte illustre les trajets et les positions ; elle ne prouve pas un raccordement à des boîtiers GPS réels.'],
-      ],
-      outcome: 'Le projet réunit deux domaines complémentaires : les opérations d’une flotte et leurs pièces documentaires. Il illustre mon travail sur une application métier structurée, de l’authentification à la visualisation cartographique et au traitement de documents.',
-      boundaries: 'Le dépôt fournit des données de démonstration et une simulation GPS. Aucun chiffre de performance ou de fréquentation n’est revendiqué ici.',
-      steps: [
-        { title: 'Préparer une mission', label: 'Véhicule + conducteur', text: 'Associer un véhicule et un conducteur à un trajet, puis préciser les instructions et la cargaison.', output: 'Mission préparée' },
-        { title: 'Suivre le parcours', label: 'Carte interactive', text: 'Visualiser le trajet, les points de passage et la position simulée sur une carte Leaflet.', output: 'Parcours visualisé' },
-        { title: 'Relier les documents', label: 'GED + OCR', text: 'Classer une pièce numérisée et rendre son texte consultable grâce à Tesseract.', output: 'Archive consultable' },
-      ],
-      sources: [{ label: 'Présentation et architecture', path: 'README.md' }],
     },
   },
   {

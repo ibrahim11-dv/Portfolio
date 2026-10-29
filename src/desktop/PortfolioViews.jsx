@@ -26,10 +26,9 @@ function ProjectCard({ project, index, onSelect, featured = false }) {
     <ProjectArtwork project={project} compact />
     <div className="portfolio-app__case-body">
       <div className="portfolio-app__case-title"><h2>{project.name}</h2><ArrowUpRight size={18} /></div>
-      <p>{project.description}</p>
-      <dl><div><dt>Contexte</dt><dd>{project.context}</dd></div><div><dt>Période</dt><dd>{project.period}</dd></div><div><dt>Rôle</dt><dd>{project.role}</dd></div></dl>
-      <span className="portfolio-app__case-focus">{project.technicalFocus}</span>
-      <Tags items={project.stack} />
+      <p>{project.tagline}</p>
+      <span className="portfolio-app__case-focus">{project.context} · {project.period}</span>
+      <Tags items={project.stack.slice(0, 4)} />
       <span className="portfolio-app__case-action">{project.pending ? 'Documentation en cours' : 'Voir le projet'} <ArrowRight size={15} /></span>
     </div>
   </button>;
@@ -89,7 +88,7 @@ export function ProjectsView({ onSelectProject, filters, setFilters }) {
   const filtered = collection.filter((project) => (category === 'all' || category === project.category)
     && normalize(`${project.name} ${project.description} ${project.stack.join(' ')} ${project.technicalFocus}`).includes(normalize(query.trim())));
   return <>
-    <SectionHeading eyebrow="PROJETS / 02" title="Travaux sélectionnés" description="Découvrez les besoins, les choix techniques et les réalisations derrière chaque projet." />
+    <SectionHeading eyebrow="PROJETS / 02" title="Ce que j’ai construit" description="Explorez les interfaces et les fonctionnalités. Les détails techniques restent à portée de clic." />
     <div className="portfolio-app__collections" aria-label="Collections de projets">
       {[['main', 'Projets principaux'], ['other', 'Autres projets']].map(([id, label]) => <button key={id} aria-pressed={group === id} onClick={() => update({ group: id, category: 'all', query: '' })}><span>{id === 'main' ? 'A' : 'B'}</span>{label}<b>{PROJECTS.filter((project) => project.group === id).length}</b></button>)}
     </div>
