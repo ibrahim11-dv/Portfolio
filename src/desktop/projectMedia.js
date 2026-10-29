@@ -1,26 +1,30 @@
-import fleetDashboard from '../assets/parcVision_Dashboard.png';
-import fleetMap from '../assets/parcVision_map.png';
-import fleetArchive from '../assets/parcVision_archivage.png';
-import fleetSearch from '../assets/parcVisionbarRechercheOCR.png';
-import fleetHome from '../assets/parcVision1.png';
-import campusAdmin from '../assets/PFE_admin.png';
-import campusTeacher from '../assets/PFE_teacher.png';
-import campusStudent from '../assets/PFE_student.png';
-import campusDepartment from '../assets/PFE_chef.png';
-import citadelHome from '../assets/projects/citadel-accueil.jpg';
-import citadelLocal from '../assets/projects/citadel-partie-locale.jpg';
-import learnHome from '../assets/projects/learnxcompile-accueil.png';
-import learnChapters from '../assets/projects/learnxcompile-parcours-java.png';
-import learnCode from '../assets/projects/learnxcompile-exemple-java.png';
-import learnQuiz from '../assets/projects/learnxcompile-quiz-java.png';
-import learnLesson from '../assets/projects/learnxcompile-lecon-types-de-donnees.png';
-import learnExercise from '../assets/projects/learnxcompile-exercice-java.png';
-import learnProgress from '../assets/projects/learnxcompile-profil-progression.png';
-import citadelStockfish from '../assets/projects/citadel-stockfish.jpg';
-import citadelPuzzles from '../assets/projects/citadel-tactique-sacrifice.jpg';
-import citadelInvitation from '../assets/projects/citadel-invitation-en-ligne.png';
-import citadelRematch from '../assets/projects/citadel-revanche-en-ligne.png';
-import citadelAppearance from '../assets/projects/citadel-personnalisation.jpg';
+import fleetDashboard from '../assets/parcVision_Dashboard.webp';
+import fleetMap from '../assets/parcVision_map.webp';
+import fleetArchive from '../assets/parcVision_archivage.webp';
+import fleetSearch from '../assets/parcVisionbarRechercheOCR.webp';
+import fleetHome from '../assets/parcVision1.webp';
+import fleetDrivers from '../assets/projects/parcvision-conducteurs.webp';
+import fleetVehicles from '../assets/projects/parcvision-vehicules.webp';
+import fleetExpenses from '../assets/projects/parcvision-depenses.webp';
+import fleetMission from '../assets/projects/parcvision-preparation-mission.webp';
+import campusAdmin from '../assets/PFE_admin.webp';
+import campusTeacher from '../assets/PFE_teacher.webp';
+import campusStudent from '../assets/PFE_student.webp';
+import campusDepartment from '../assets/PFE_chef.webp';
+import citadelHome from '../assets/projects/citadel-accueil.webp';
+import citadelLocal from '../assets/projects/citadel-partie-locale.webp';
+import learnHome from '../assets/projects/learnxcompile-accueil.webp';
+import learnChapters from '../assets/projects/learnxcompile-parcours-java.webp';
+import learnCode from '../assets/projects/learnxcompile-exemple-java.webp';
+import learnQuiz from '../assets/projects/learnxcompile-quiz-java.webp';
+import learnLesson from '../assets/projects/learnxcompile-lecon-types-de-donnees.webp';
+import learnExercise from '../assets/projects/learnxcompile-exercice-java.webp';
+import learnProgress from '../assets/projects/learnxcompile-profil-progression.webp';
+import citadelStockfish from '../assets/projects/citadel-stockfish.webp';
+import citadelPuzzles from '../assets/projects/citadel-tactique-sacrifice.webp';
+import citadelInvitation from '../assets/projects/citadel-invitation-en-ligne.webp';
+import citadelRematch from '../assets/projects/citadel-revanche-en-ligne.webp';
+import citadelAppearance from '../assets/projects/citadel-personnalisation.webp';
 
 // Original screenshots supplied by Ibrahim. Captured values are not outcome metrics.
 export const PROJECT_MEDIA = {
@@ -44,7 +48,11 @@ export const PROJECT_MEDIA = {
   ],
   parcvision: [
     { src: fleetDashboard, title: 'Tableau de bord', caption: 'Vue opérationnelle de la flotte, des missions et des interventions. Les chiffres sont ceux de la capture.' },
+    { src: fleetDrivers, title: 'Gestion des conducteurs', caption: 'Liste des conducteurs, disponibilités, recherche et filtre par statut.', credit: 'Capture fournie par Ibrahim · données de démonstration.' },
+    { src: fleetVehicles, title: 'Gestion des véhicules', caption: 'Inventaire de la flotte avec immatriculation, modèle, type et état de disponibilité.', credit: 'Capture fournie par Ibrahim · données de démonstration.' },
+    { src: fleetMission, title: 'Préparation d’une mission', caption: 'Formulaire associant conducteur, véhicule, trajet, horaires et caractéristiques du colis.', credit: 'Capture fournie par Ibrahim · aperçu du formulaire.' },
     { src: fleetMap, title: 'Carte des missions', caption: 'Carte Leaflet et liste des missions. Le suivi GPS du projet est une simulation.' },
+    { src: fleetExpenses, title: 'Suivi des dépenses', caption: 'Consultation des dépenses par date, source, mode de paiement et statut, avec recherche et pagination.', credit: 'Capture fournie par Ibrahim · montants de démonstration.' },
     { src: fleetArchive, title: 'Archives documentaires', caption: 'Arborescence des dossiers et consultation des pièces de la flotte.' },
     { src: fleetSearch, title: 'Recherche dans le contenu', caption: 'Résultats de recherche avec extraits et termes surlignés dans les documents.' },
     { src: fleetHome, title: 'Page d’accueil', caption: 'Écran de présentation et accès à la connexion de ParcVision.' },

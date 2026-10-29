@@ -106,6 +106,7 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
 
   if (phase === 'boot') return <dialog ref={dialogRef} className="ib-introduction ib-introduction--boot" aria-label="Démarrage d’IbrahimOS" onCancel={(event) => { event.preventDefault(); onSkip(); }} onKeyUp={(event) => event.stopPropagation()} onKeyDown={(event) => { event.stopPropagation(); if (event.key === 'Tab') { event.preventDefault(); event.currentTarget.querySelector('button')?.focus(); } }}>
     <div className="ib-introduction__boot-center">
+      <img className="ib-introduction__brand-logo" src="/brand/ibrahimos-logo.webp" alt="Logo IbrahimOS" width="128" height="128" />
       <div className="ib-introduction__boot-copy"><strong>IbrahimOS</strong><span>Le portfolio d’Ibrahim Chehlafi</span></div>
       <span className="ib-introduction__spinner" role="status" aria-label="Ouverture du bureau"><span aria-hidden="true" /></span>
     </div>
@@ -120,7 +121,7 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
     <section ref={panelRef} className="ib-introduction__panel" aria-describedby="ib-introduction-description">
       <button className="ib-introduction__close" type="button" onClick={onExplore} aria-label={guide ? 'Passer la visite' : 'Explorer librement'}><X size={18} /></button>
       {phase === 'presentation' ? <>
-        <div className="ib-introduction__welcome-mark"><UbuntuMark /></div>
+        <img className="ib-introduction__brand-logo" src="/brand/ibrahimos-logo.webp" alt="Logo IbrahimOS" width="96" height="96" />
         <span className="ib-introduction__eyebrow">Bienvenue dans IbrahimOS</span>
         <h1 id="ib-introduction-title">Bonjour, bienvenue dans le portfolio d’Ibrahim.</h1>
         <div id="ib-introduction-description" className="ib-introduction__copy">

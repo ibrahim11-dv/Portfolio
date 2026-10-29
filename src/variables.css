@@ -24,7 +24,7 @@
   --ubuntu-text-muted: rgba(255, 255, 255, 0.8);
   --ubuntu-text-subtle: rgba(255, 255, 255, 0.5);
   --font-ubuntu: "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --desktop-wallpaper: url('./assets/background.png');
+  --desktop-wallpaper: url('./assets/background.webp');
   --desktop-wallpaper-size: cover;
   --theme-window: #303035;
   --theme-window-header: #252529;

@@ -4,7 +4,7 @@ export { PROJECTS };
 // Profile: supplied CV. Projects: public GitHub source inspected on 4 October 2026.
 export const PROFILE = {
   name: 'Ibrahim Chehlafi',
-  portrait: '/portrait.jpg',
+  portrait: '/portrait.webp',
   role: 'Développeur Full-Stack',
   location: 'Perpignan, France',
   bio: 'Étudiant en Licence Informatique à l’Université de Perpignan Via Domitia, je conçois des applications web avec Spring Boot, Laravel et React. J’aime construire des solutions utiles, de l’architecture aux interfaces, avec un intérêt particulier pour l’intelligence artificielle.',

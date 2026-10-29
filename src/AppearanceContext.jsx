@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
-import backgroundLight from './assets/background.png';
-import backgroundDark from './assets/backgroundDark.png';
+import backgroundLight from './assets/background.webp';
+import backgroundDark from './assets/backgroundDark.webp';
 import { APPEARANCE_KEY, COLOR_WALLPAPERS, DEFAULT_APPEARANCE, readAppearance, validWallpaper, resolveWallpaper, resolveTheme } from './appearanceState';
 
 const AppearanceContext = createContext(null);
