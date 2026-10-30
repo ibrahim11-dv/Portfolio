@@ -5,6 +5,6 @@
 .ubuntu-confirmation-dialog > div { display: flex; gap: 10px; }
 .ubuntu-confirmation-dialog button { flex: 1; min-height: 42px; padding: 8px 12px; border: 1px solid var(--app-line, #d4cec7); border-radius: 8px; color: inherit; background: var(--app-surface, white); font: 13px var(--font-ubuntu); cursor: pointer; }
 .ubuntu-confirmation-dialog button:hover { filter: brightness(.96); }
-.ubuntu-confirmation-dialog button:focus-visible { outline: 2px solid #e95420; outline-offset: 2px; }
+.ubuntu-confirmation-dialog button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
 .ubuntu-confirmation-dialog button.is-destructive { color: white; border-color: #c01c28; background: #c01c28; }
 @media (prefers-reduced-motion: reduce) { .ubuntu-confirmation-dialog { animation: none; } }

@@ -23,6 +23,6 @@
 .nautilus-properties__explanation, .nautilus-properties__unavailable { color: var(--app-muted, #777); font-size: 13px; line-height: 1.5; margin: 20px 0; }
 .nautilus-properties__permission-item { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #0001; overflow-wrap: anywhere; }
 .nautilus-properties__permission-item small { flex-shrink: 0; color: var(--app-muted, #777); }
-.nautilus-properties button:focus-visible { outline: 2px solid #e95420; outline-offset: -3px; }
+.nautilus-properties button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: -3px; }
 @keyframes nautilus-properties-in { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .nautilus-properties { animation: none; } }

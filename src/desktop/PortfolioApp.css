@@ -1,4 +1,4 @@
-.portfolio-app { --ib-ink: #101112; --ib-graphite: #202225; --ib-slate: #696e73; --ib-line: #d7d9da; --ib-paper: #f5f6f4; --ib-panel: #eceeec; --ib-accent: #8fd8cf; container: portfolio / inline-size; height: 100%; display: flex; overflow: hidden; color: var(--ib-ink); background: var(--ib-paper); font: 13px/1.5 var(--font-ubuntu, Ubuntu, sans-serif); }
+.portfolio-app { --ib-ink: var(--app-ink); --ib-graphite: var(--app-ink); --ib-slate: var(--app-muted); --ib-line: var(--app-line); --ib-paper: var(--app-surface); --ib-panel: var(--app-panel); --ib-accent: var(--brand-highlight); container: portfolio / inline-size; height: 100%; display: flex; overflow: hidden; color: var(--ib-ink); background: var(--ib-paper); font: 13px/1.5 var(--font-ubuntu, Ubuntu, sans-serif); }
 .portfolio-app *, .portfolio-app *::before, .portfolio-app *::after { box-sizing: border-box; }
 .portfolio-app :is(h1, h2, h3, p, dl, dd) { margin: 0; }
 .portfolio-app :is(button, input, a) { font: inherit; }
@@ -275,7 +275,7 @@
   .portfolio-app__profile-note > p, .portfolio-app__profile-note > div { grid-column: auto; }
   .portfolio-app__profile-note > div { grid-template-columns: minmax(0, 1fr); }
 }
-html[data-desktop-theme="dark"] .portfolio-app { --ib-ink: #edf1f0; --ib-graphite: #f3f5f4; --ib-slate: #adb6b5; --ib-line: #ffffff22; --ib-paper: #1f2325; --ib-panel: #292e30; }
+
 html[data-desktop-theme="dark"] .portfolio-app__toolbar { background: #252a2c; }
 html[data-desktop-theme="dark"] .portfolio-app__toolbar :is(.portfolio-app__toolbar-title, .portfolio-app__back, .portfolio-app__toolbar-caption) { color: #c8d0cf; }
 html[data-desktop-theme="dark"] .portfolio-app :is(.portfolio-app__toolbar-cv, .portfolio-app__utility-link, .portfolio-app__profile-actions :is(button,a), .portfolio-app__active-filters button) { color: #eef2f1; background: #2d3335; border-color: #ffffff2b; }

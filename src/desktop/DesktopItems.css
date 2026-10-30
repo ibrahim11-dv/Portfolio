@@ -5,26 +5,26 @@
 .desktop-items__item.is-selected { background: #ffffff24; border-color: #ffffff42; }
 .desktop-items__item.is-dragging { opacity: .38; }
 .desktop-items__item.is-cut { opacity: .5; }
-.desktop-items__item.is-drop-target { background: #e9542044; border: 2px solid #fca98a; box-shadow: 0 0 0 3px #e954201c; }
+.desktop-items__item.is-drop-target { background: color-mix(in srgb, var(--brand-action) 26.7%, transparent); border: 2px solid var(--brand-highlight); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-action) 11.0%, transparent); }
 .desktop-items__item.is-drop-target .desktop-items__icon { transform: scale(1.06); }
 .desktop-items__item:focus-visible { outline: 2px solid white; outline-offset: -2px; }
 .desktop-items__icon { position: relative; width: 58px; height: 58px; flex-shrink: 0; transition: transform 120ms ease; }
 .desktop-items__icon img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 3px #0004); }
-.desktop-items__icon svg { position: absolute; right: 0; bottom: 2px; color: #fff; border-radius: 50%; background: #34243f; width: 19px; height: 19px; padding: 3px; }
+.desktop-items__icon svg { position: absolute; right: 0; bottom: 2px; color: #fff; border-radius: 50%; background: var(--brand-shell-panel); width: 19px; height: 19px; padding: 3px; }
 .desktop-items__shortcut-badge { position: absolute; bottom: 2px; left: -1px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; background: #fafafa; color: #333; box-shadow: 0 1px 4px #0005; text-shadow: none; font: bold 14px sans-serif; }
-.desktop-items__selection { position: absolute; z-index: 3; border: 1px solid #f0916c; background: #e954202b; pointer-events: none; }
+.desktop-items__selection { position: absolute; z-index: 3; border: 1px solid var(--brand-highlight); background: color-mix(in srgb, var(--brand-action) 16.9%, transparent); pointer-events: none; }
 .desktop-items__drop-cell { position: absolute; z-index: 1; width: 104px; height: 108px; border: 1px dashed #fff9; border-radius: 7px; background: #ffffff15; pointer-events: none; transition: left 80ms ease, top 80ms ease; }
 .desktop-drag-ghost { position: fixed; left: -9999px; top: -9999px; width: 70px; height: 72px; padding: 5px; border-radius: 8px; background: #ffffff20; filter: drop-shadow(0 4px 5px #0005); }
 .desktop-drag-ghost img { width: 58px; height: 58px; object-fit: contain; }
-.desktop-drag-ghost span { position: absolute; right: -5px; bottom: 2px; min-width: 24px; height: 24px; padding: 0 6px; display: grid; place-items: center; border-radius: 12px; background: #e95420; color: white; border: 2px solid white; font: bold 12px var(--font-ubuntu); }
-.desktop-context-menu { position: fixed; z-index: 7500; width: 240px; max-height: calc(100dvh - 48px); overflow: auto; padding: 6px; border: 1px solid #d0cbc6; border-radius: 9px; color: #3d3d3d; background: #faf9f8; box-shadow: 0 4px 14px #0004; font: 13px var(--font-ubuntu); animation: desktop-menu-in 120ms cubic-bezier(.25,.46,.45,.94); }
+.desktop-drag-ghost span { position: absolute; right: -5px; bottom: 2px; min-width: 24px; height: 24px; padding: 0 6px; display: grid; place-items: center; border-radius: 12px; background: var(--brand-action); color: white; border: 2px solid white; font: bold 12px var(--font-ubuntu); }
+.desktop-context-menu { position: fixed; z-index: 7500; width: 240px; max-height: calc(100dvh - 48px); overflow: auto; padding: 6px; border: 1px solid var(--app-line); border-radius: 9px; color: var(--app-ink); background: var(--app-surface); box-shadow: 0 4px 14px #0004; font: 13px var(--font-ubuntu); animation: desktop-menu-in 120ms cubic-bezier(.25,.46,.45,.94); }
 .desktop-context-menu button { display: flex; width: 100%; min-height: 36px; align-items: center; gap: 9px; padding: 8px; border: 0; border-radius: 5px; color: inherit; background: transparent; text-align: left; font: inherit; cursor: pointer; }
 .desktop-context-menu button svg { flex-shrink: 0; }
-.desktop-context-menu button:hover:not(:disabled), .desktop-context-menu button:focus-visible { background: #e9e5e1; outline: none; }
+.desktop-context-menu button:hover:not(:disabled), .desktop-context-menu button:focus-visible { background: var(--app-hover); outline: none; }
 .desktop-context-menu button:disabled { opacity: .4; cursor: default; }
-.desktop-context-menu kbd { margin-left: auto; color: #827970; font: 10px var(--font-ubuntu); white-space: nowrap; }
-.desktop-context-menu [role="separator"] { height: 1px; margin: 5px 3px; background: #dedbd7; }
-.desktop-context-menu__hint { display: flex; align-items: center; gap: 6px; padding: 7px 9px; color: #827970; font-size: 11px; }
+.desktop-context-menu kbd { margin-left: auto; color: var(--app-muted); font: 10px var(--font-ubuntu); white-space: nowrap; }
+.desktop-context-menu [role="separator"] { height: 1px; margin: 5px 3px; background: var(--app-line); }
+.desktop-context-menu__hint { display: flex; align-items: center; gap: 6px; padding: 7px 9px; color: var(--app-muted); font-size: 11px; }
 .desktop-items__notice { position: fixed; z-index: 7200; right: 20px; top: 48px; max-width: min(460px, calc(100vw - 40px)); display: flex; gap: 12px; align-items: center; padding: 13px 14px; border: 1px solid #ffffff25; border-radius: 10px; background: #2e2933f5; box-shadow: 0 6px 22px #0005; color: #fff; font: 13px/1.4 var(--font-ubuntu); animation: desktop-menu-in 150ms ease-out; }
 .desktop-items__notice button { flex-shrink: 0; border: 0; border-radius: 5px; padding: 5px; color: #ffcbb7; background: transparent; font: inherit; cursor: pointer; }
 .desktop-items__notice button:hover { background: #ffffff15; }

@@ -1,0 +1,77 @@
+/* Shared reading scale for the five portfolio applications. */
+.portfolio-app { font-family: var(--font-reading); font-size: 16px; line-height: 1.65; }
+.portfolio-app .portfolio-app__section-heading p { font-size: 17px; line-height: 1.65; }
+.portfolio-app .portfolio-app__eyebrow { font: 13px/1.5 var(--font-reading); letter-spacing: .08em; }
+.portfolio-app .portfolio-app__toolbar { min-height: 54px; gap: 8px; }
+.portfolio-app :is(.portfolio-app__toolbar-title, .portfolio-app__back, .portfolio-app__toolbar-cv, .portfolio-app__toolbar-contact, .portfolio-app__utility-link) { font: 15px/1.4 var(--font-reading); }
+.portfolio-app :is(.portfolio-app__toolbar-cv, .portfolio-app__toolbar-contact, .portfolio-app__back, .portfolio-app__utility-link) { min-height: 44px; }
+.portfolio-app .portfolio-app__toolbar-caption { font-size: 13px; }
+.portfolio-app :is(.portfolio-app__tags span, .portfolio-app__tags.is-large span) { font: 14px/1.5 var(--font-reading); padding: 5px 9px; }
+.portfolio-app :is(.portfolio-app__profile-bio, .portfolio-app__profile-note > p) { font-size: 17px; line-height: 1.75; }
+.portfolio-app .portfolio-app__profile-role { font-size: 22px; }
+.portfolio-app :is(.portfolio-app__profile-availability, .portfolio-app__profile-location, .portfolio-app__profile-actions :is(button,a), .portfolio-app__profile-project strong, .portfolio-app__profile-readouts dd) { font-size: 15px; line-height: 1.5; }
+.portfolio-app .portfolio-app__profile-actions :is(button,a) { min-height: 44px; }
+.portfolio-app :is(.portfolio-app__profile-project small, .portfolio-app__profile-project span, .portfolio-app__profile-readouts dt, .portfolio-app__profile-note > div span) { font-size: 13px; }
+.portfolio-app .portfolio-app__chronicle > h2 { font-size: 24px; }
+.portfolio-app .portfolio-app__chronicle h3 { font-size: 21px; line-height: 1.4; }
+.portfolio-app .portfolio-app__chronicle :is(p,strong) { font-size: 17px; line-height: 1.7; }
+.portfolio-app .portfolio-app__chronicle article > span { font: 15px/1.5 var(--font-reading); }
+.portfolio-app .portfolio-app__contact-signature h2 { font-size: 26px; line-height: 1.3; }
+.portfolio-app .portfolio-app__contact-signature p { font-size: 17px; }
+.portfolio-app .portfolio-app__contact-signature span { font-size: 15px; }
+.portfolio-app .portfolio-app__contact-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.portfolio-app .portfolio-app__contact-actions strong { font-size: 17px; line-height: 1.5; }
+.portfolio-app .portfolio-app__contact-actions span { font: 13px/1.5 var(--font-reading); }
+.portfolio-app .portfolio-app__contact-copy :is(button,span) { font-size: 15px; line-height: 1.5; }
+.portfolio-app .portfolio-app__contact-copy button { min-height: 44px; }
+.portfolio-app .portfolio-app__skill-group h2 { font-size: 20px; }
+.portfolio-app .portfolio-app__languages > div { font-size: 14px; }
+
+.skill-capabilities { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; margin: 30px 0; }
+.skill-capability { min-width: 0; border-top: 2px solid var(--app-accent); background: var(--app-panel); }
+.skill-capability__body { padding: 24px; }
+.skill-capability__body h2 { margin: 12px 0 20px; font-size: clamp(24px,3cqw,30px); line-height: 1.25; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.skill-capability__practice { padding-left: 20px; margin: 22px 0; color: var(--app-ink); font-size: 17px; line-height: 1.7; }
+.skill-capability__practice li + li { margin-top: 8px; }
+.skill-capability__practice li::marker { color: var(--app-accent); }
+.skill-capability__links { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; border-top: 1px solid var(--app-line); padding-top: 12px; }
+.skill-capability__links > span { width: 100%; font-size: 14px; color: var(--app-muted); }
+.skill-capability__links button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 0; text-align: left; border: 0; color: var(--app-accent); background: transparent; font-size: 15px; line-height: 1.5; text-decoration: underline; text-underline-offset: 4px; overflow-wrap: anywhere; }
+.skill-capability__links button svg { flex-shrink: 0; }
+.skill-capability__links button:hover { text-decoration-thickness: 2px; }
+.skills-inventory { border-block: 1px solid var(--app-line); padding: 16px 0; }
+.skills-inventory summary { cursor: pointer; font-size: 18px; padding: 8px 0; }
+.skills-inventory summary:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 3px; }
+.portfolio-certificates { margin-top: 40px; }
+.portfolio-certificates h2 { font-size: 27px; line-height: 1.3; margin: 8px 0; }
+.portfolio-certificates header > p { font-size: 17px; color: var(--app-muted); }
+.portfolio-certificates__grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin-top: 22px; }
+.portfolio-certificates__grid > button { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 14px; text-align: left; border: 1px solid var(--app-line); background: var(--app-panel); color: var(--app-ink); }
+.portfolio-certificates__grid > button:hover { border-color: var(--app-accent); }
+.portfolio-certificates__grid img { display: block; width: 100%; height: auto; aspect-ratio: 1.5; object-fit: contain; background: #fff; }
+.portfolio-certificates__grid span { color: var(--app-muted); font-size: 14px; }
+.portfolio-certificates__grid h3 { font-size: 18px; line-height: 1.4; }
+.portfolio-certificates__grid strong { display: flex; gap: 8px; align-items: center; margin-top: auto; font-size: 15px; color: var(--app-accent); }
+.certificate-dialog { width: min(1100px,calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; margin: auto; border: 1px solid var(--app-line); color: var(--app-ink); background: var(--app-surface); overflow: auto; }
+.certificate-dialog::backdrop { background: #000b; }
+.certificate-dialog header { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--app-panel); }
+.certificate-dialog header h2 { font-size: 20px; margin: 0; }
+.certificate-dialog header button { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border: 1px solid var(--app-line); color: inherit; background: var(--app-surface); }
+.certificate-dialog__page { padding: 12px; }
+.certificate-dialog__page img { display: block; width: 100%; height: auto; }
+.certificate-dialog footer { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+.certificate-dialog footer a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--app-line); font-size: 16px; }
+@container portfolio (max-width: 720px) {
+  .skill-capabilities { grid-template-columns: minmax(0,1fr); }
+  .skill-capability__body { padding: 20px; }
+  .portfolio-certificates__grid { grid-template-columns: minmax(0,1fr); }
+  .portfolio-certificates__grid img { max-height: 240px; }
+  .portfolio-app .portfolio-app__contact-actions { grid-template-columns: minmax(0,1fr); }
+}
+@container portfolio (max-width: 420px) {
+  .portfolio-app .portfolio-app__toolbar { padding-inline: 8px; flex-wrap: wrap; }
+  .portfolio-app .portfolio-app__toolbar-caption { display: none; }
+  .portfolio-app .portfolio-app__content:not(.is-report) { padding: 20px 14px; }
+  .portfolio-app .portfolio-app__skill-group { grid-template-columns: 28px minmax(0,1fr); gap: 8px; }
+  .portfolio-app .portfolio-app__contact-signature { padding: 16px; flex-wrap: wrap; }
+}

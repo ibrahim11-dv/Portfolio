@@ -7,6 +7,7 @@ import ProjectReport from './ProjectReport';
 import { CVAction, PortfolioActions } from './PortfolioActions';
 import { applyProjectRequest } from './projectRoute';
 import './PortfolioApp.css';
+import './PortfolioReadability.css';
 
 // Session state belongs to the shell and survives a window closing.
 export default function PortfolioApp({ appId, session, onSaveSession, projectRequest, navigationRequest, restoreContext, onOpenApp, onProjectRouteChange, onOpenCV, onNotify }) {
@@ -63,7 +64,7 @@ export default function PortfolioApp({ appId, session, onSaveSession, projectReq
         {appId !== 'contact' && <button className="portfolio-app__toolbar-contact" onClick={() => onOpenApp('contact')}>Contact</button>}
       </header>
       <main key={state.projectId || appId} ref={contentRef} tabIndex={-1} aria-label={selectedProject?.name || app.name} className={`portfolio-app__content ${selectedProject ? 'is-report' : ''}`} onScroll={(event) => { const scroll = event.currentTarget.scrollTop; setState((current) => current.scroll === scroll ? current : { ...current, scroll }); }}>
-        {selectedProject ? <ProjectReport project={selectedProject} onBack={returnToProjects} onSelectProject={selectProject} /> : appId === 'presentation' ? <ProfileView navigate={onOpenApp} onSelectProject={selectProject} /> : appId === 'projects' ? <ProjectsView onSelectProject={selectProject} filters={state.filters} setFilters={updateFilters} /> : appId === 'skills' ? <SkillsView /> : appId === 'journey' ? <JourneyView /> : <ContactView />}
+        {selectedProject ? <ProjectReport project={selectedProject} onBack={returnToProjects} onSelectProject={selectProject} /> : appId === 'presentation' ? <ProfileView navigate={onOpenApp} onSelectProject={selectProject} /> : appId === 'projects' ? <ProjectsView onSelectProject={selectProject} filters={state.filters} setFilters={updateFilters} /> : appId === 'skills' ? <SkillsView onSelectProject={selectProject} /> : appId === 'journey' ? <JourneyView /> : <ContactView />}
       </main>
     </div>
   </div></PortfolioActions>;

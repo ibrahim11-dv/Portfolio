@@ -3,13 +3,13 @@
 .ubuntu-window[data-app="cv"] .ubuntu-window__title { display: none; }
 .ubuntu-window[data-app="cv"] .ubuntu-window__content { height: 100%; }
 .ubuntu-window[data-app="cv"] .ubuntu-window__controls button { width: 27px; height: 27px; color: var(--app-ink, #3d3d3d); background: var(--app-panel, #ddd9d5); }
-.ubuntu-window[data-app="cv"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
+.ubuntu-window[data-app="cv"] .ubuntu-window__controls button:last-child { background: var(--brand-action); color: white; }
 .papers { position: relative; display: flex; flex-direction: column; height: 100%; min-width: 0; outline: 0; background: var(--app-surface, #fff); color: var(--app-ink, #3d3d3d); font: 13px var(--font-ubuntu); container-type: inline-size; container-name: papers; }
 html[data-desktop-theme="dark"] .papers { color: var(--theme-ink); background: var(--theme-surface); }
 html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-title, .papers__sidebar, .papers__search, .papers__status) { color: var(--theme-ink); background: var(--theme-surface-muted); border-color: var(--theme-line); }
 .papers button { font: inherit; cursor: pointer; }
 .papers button:disabled { opacity: .4; cursor: default; }
-.papers button:focus-visible, .papers a:focus-visible { outline: 2px solid #e95420; outline-offset: -2px; }
+.papers button:focus-visible, .papers a:focus-visible { outline: 2px solid var(--app-accent); outline-offset: -2px; }
 .papers__toolbar { display: flex; align-items: center; flex-shrink: 0; height: 48px; padding: 0 112px 0 6px; gap: 5px; border-bottom: 1px solid var(--app-line, #dedbd7); background: var(--app-surface, #f7f6f5); }
 .papers__toolbar button { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; border: 0; border-radius: 6px; background: transparent; color: inherit; }
 .papers__toolbar button:hover, .papers__toolbar button[aria-pressed="true"] { background: var(--app-hover, #0000000b); }
@@ -17,7 +17,7 @@ html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-t
 .papers__sidebar-title strong { font-size: 12px; font-weight: 600; text-align: center; }
 .papers__filename { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; padding: 0 8px; font-size: 13px; font-weight: 600; }
 .papers__page-selector { display: flex; flex-shrink: 0; gap: 6px; align-items: center; }
-.papers__page-selector input { width: 36px; height: 32px; border: 0; border-radius: 6px; color: inherit; background: var(--app-hover, #00000008); text-align: center; font: inherit; outline-color: #e95420; }
+.papers__page-selector input { width: 36px; height: 32px; border: 0; border-radius: 6px; color: inherit; background: var(--app-hover, #00000008); text-align: center; font: inherit; outline-color: var(--app-accent); }
 .papers__page-selector span { white-space: nowrap; color: var(--app-muted, #8a827a); font-size: 12px; }
 .papers__body { display: flex; min-height: 0; flex: 1; }
 .papers__sidebar { width: 230px; flex-shrink: 0; display: flex; min-height: 0; flex-direction: column; border-right: 1px solid var(--app-line, #dedbd7); background: var(--app-surface, #f2f0ee); }
@@ -26,7 +26,7 @@ html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-t
 .papers__sidebar-tabs button { display: grid; place-items: center; width: 52px; height: 34px; border: 0; border-radius: 6px; color: inherit; background: transparent; }
 .papers__sidebar-tabs button:hover, .papers__sidebar-tabs button[aria-pressed="true"] { background: var(--app-hover, #0000000c); }
 .papers__thumbnail { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 0 auto 18px; padding: 7px 15px; border: 2px solid transparent; border-radius: 7px; color: inherit; background: transparent; }
-.papers__thumbnail.is-current { border-color: #e95420; background: #e9542010; }
+.papers__thumbnail.is-current { border-color: var(--brand-action); background: color-mix(in srgb, var(--brand-action) 6.3%, transparent); }
 .papers__thumbnail:hover { background: var(--app-hover, #00000009); }
 .papers__main { min-width: 0; min-height: 0; flex: 1; position: relative; }
 .papers__scroll { height: 100%; padding: 18px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; overflow: auto; background: var(--app-surface, #f9f9f9); scrollbar-width: thin; scrollbar-color: #aaa49d transparent; outline: 0; }
@@ -36,10 +36,10 @@ html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-t
 .papers-page.is-thumbnail { box-shadow: 0 1px 4px #0003; }
 .papers-page .textLayer { z-index: 1; }
 .papers-page .textLayer mark { position: static; color: transparent; background: #ffcb0080; font: inherit; line-height: inherit; padding: 0; }
-.papers-page .textLayer ::selection { background: #e9542070; color: transparent; }
+.papers-page .textLayer ::selection { background: color-mix(in srgb, var(--brand-action) 43.9%, transparent); color: transparent; }
 .papers-page__links { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .papers-page__links a, .papers-page__links button { position: absolute; display: block; border: 0; padding: 0; background: transparent; pointer-events: auto; }
-.papers-page__links a:hover, .papers-page__links button:hover { background: #e9542025; }
+.papers-page__links a:hover, .papers-page__links button:hover { background: color-mix(in srgb, var(--brand-action) 14.5%, transparent); }
 .papers-page__error { position: absolute; top: 30%; left: 10%; width: 80%; color: #b51d2c; text-align: center; }
 .papers__zoom { position: absolute; right: 18px; bottom: 28px; display: flex; flex-direction: column; align-items: center; gap: 9px; }
 .papers__zoom button { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--app-line, #ffffff38); border-radius: 50%; color: #fff; background: #4b4b4beb; box-shadow: 0 2px 7px #0003; }
@@ -47,11 +47,11 @@ html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-t
 .papers__zoom span { padding: 3px 5px; border-radius: 4px; color: var(--app-muted, #666); background: var(--app-surface, #fafafae0); font-size: 10px; }
 .papers__search { display: flex; gap: 5px; align-items: center; padding: 6px; border: 1px solid var(--app-line, #c9c3bc); border-radius: 7px; background: var(--app-surface, #fff); }
 .papers__search input { width: 100%; min-width: 0; padding: 4px 0; border: 0; outline: 0; color: inherit; background: transparent; font: inherit; }
-.papers__search:focus-within { outline: 2px solid #e95420; }
+.papers__search:focus-within { outline: 2px solid var(--app-accent); }
 .papers__search button { border: 0; background: transparent; color: inherit; display: grid; place-items: center; }
 .papers__search-count { display: block; margin: 12px 4px; color: var(--app-muted, #827a73); font-size: 12px; }
 .papers__search-hit { display: flex; flex-direction: column; width: 100%; padding: 10px; gap: 6px; border: 0; border-radius: 6px; background: transparent; color: inherit; text-align: left; }
-.papers__search-hit:hover { background: #e9542015; }
+.papers__search-hit:hover { background: color-mix(in srgb, var(--brand-action) 8.2%, transparent); }
 .papers__search-hit strong { color: var(--app-accent, #aa3910); font-size: 12px; }
 .papers__search-hit span { line-height: 1.5; font-size: 12px; overflow-wrap: anywhere; }
 .papers-outline { padding: 0; list-style: none; }
@@ -76,7 +76,7 @@ html[data-desktop-theme="dark"] .papers :is(.papers__toolbar, .papers__sidebar-t
 .papers__dialog dd { margin: 0; overflow-wrap: anywhere; }
 .papers__loading { min-height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px; color: var(--app-muted, #827a73); text-align: center; }
 .papers__loading a { color: var(--app-accent, #bd4116); }
-.papers__spinner { width: 25px; height: 25px; border: 3px solid var(--app-line, #ddd7d1); border-top-color: #e95420; border-radius: 50%; animation: papers-spin 800ms linear infinite; }
+.papers__spinner { width: 25px; height: 25px; border: 3px solid var(--app-line, #ddd7d1); border-top-color: var(--brand-action); border-radius: 50%; animation: papers-spin 800ms linear infinite; }
 .papers.is-night { color: #eee; background: #262626; }
 .papers.is-night .papers__toolbar, .papers.is-night .papers__sidebar, .papers.is-night .papers__sidebar-title { color: #eee; background: #303030; border-color: var(--app-line, #ffffff20); }
 .papers.is-night .papers__scroll { background: #202020; }

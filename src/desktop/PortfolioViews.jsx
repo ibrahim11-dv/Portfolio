@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, Check, Copy, FileText, FolderGit2, GitBranch, Globe2, GraduationCap, Mail, MapPin, Search, Terminal } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BriefcaseBusiness, Copy, FileText, FolderGit2, GitBranch, Globe2, GraduationCap, Mail, MapPin, Search, Terminal } from 'lucide-react';
 import { PROFILE, PROJECTS } from './portfolioData';
 import { ProjectArtwork } from './ProjectReport';
 import { CVAction } from './PortfolioActions';
+import { SKILL_CAPABILITIES } from './skillCapabilities';
+import Certificates from './Certificates';
 
 function ProfileAvatar({ className = '' }) {
   const initials = PROFILE.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('');
@@ -100,10 +102,19 @@ export function ProjectsView({ onSelectProject, filters, setFilters }) {
   </>;
 }
 
-export function SkillsView() {
+export function SkillsView({ onSelectProject }) {
   return <>
-    <SectionHeading eyebrow="COMPÉTENCES / 03" title="Compétences" description="Technologies et méthodes utilisées à travers les projets, les stages et la formation." />
-    <div className="portfolio-app__skills-list">{PROFILE.skills.map((group, index) => <section className="portfolio-app__skill-group" key={group.category}><span>{String(index + 1).padStart(2, '0')}</span><div><h2>{group.category}</h2><Tags items={group.items} className="is-large" /></div></section>)}</div>
+    <SectionHeading eyebrow="COMPÉTENCES / 03" title="Mes compétences techniques." description="Les outils que j’utilise et ce que je sais faire avec, du développement des interfaces à la gestion des données et des accès." />
+    <div className="skill-capabilities">{SKILL_CAPABILITIES.map((capability, index) => <article className="skill-capability" key={capability.id}>
+      <div className="skill-capability__body">
+        <span className="portfolio-app__eyebrow">{String(index + 1).padStart(2, '0')} / {capability.domain}</span>
+        <h2>{capability.title}</h2>
+        <Tags items={capability.technologies} />
+        <ul className="skill-capability__practice">{capability.practices.map((practice) => <li key={practice}>{practice}</li>)}</ul>
+        <div className="skill-capability__links"><span>Exemples d’utilisation</span>{capability.projects.map((id) => { const project = PROJECTS.find((item) => item.id === id); return <button key={id} onClick={() => onSelectProject(id)} aria-label={`Voir un exemple : ${project.name}`}>{project.name}<ArrowUpRight size={15} aria-hidden="true" /></button>; })}</div>
+      </div>
+    </article>)}</div>
+    <details className="skills-inventory"><summary>Toutes les technologies et méthodes</summary><div className="portfolio-app__skills-list">{PROFILE.skills.map((group, index) => <section className="portfolio-app__skill-group" key={group.category}><span>{String(index + 1).padStart(2, '0')}</span><div><h2>{group.category}</h2><Tags items={group.items} className="is-large" /></div></section>)}</div></details>
     <section className="portfolio-app__languages"><div><Globe2 size={19} /><span>LANGUES</span></div><Tags items={PROFILE.languages} className="is-large" /></section>
   </>;
 }
@@ -113,7 +124,7 @@ export function JourneyView() {
     <SectionHeading eyebrow="PARCOURS / 04" title="Parcours" description="Une trajectoire orientée développement logiciel et applications web." action={<CVAction className="portfolio-app__utility-link"><FileText size={15} />Lire le CV</CVAction>} />
     <section className="portfolio-app__chronicle"><h2><BriefcaseBusiness size={18} />Expériences</h2>{PROFILE.experience.map((item, index) => <article key={`${item.title}-${index}`}><span>{item.period}</span><div><h3>{item.title}</h3><strong>{item.organization}</strong><p>{item.description}</p></div></article>)}</section>
     <section className="portfolio-app__chronicle"><h2><GraduationCap size={18} />Formation</h2>{PROFILE.education.map((item, index) => <article key={`${item.title}-${index}`}><span>{item.period}</span><div><h3>{item.title}</h3><strong>{item.school}</strong></div></article>)}</section>
-    <section className="portfolio-app__certifications"><span>CERTIFICATIONS</span>{PROFILE.certifications.map((item) => <p key={item}><Check size={15} />{item}</p>)}</section>
+    <Certificates />
   </>;
 }
 

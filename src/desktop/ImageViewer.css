@@ -3,11 +3,11 @@
 .ubuntu-window[data-app="images"] .ubuntu-window__title { display: none; }
 .ubuntu-window[data-app="images"] .ubuntu-window__content { height: 100%; }
 .ubuntu-window[data-app="images"] .ubuntu-window__controls button { width: 27px; height: 27px; color: var(--app-ink, #3d3d3d); background: var(--app-panel, #ddd9d5); }
-.ubuntu-window[data-app="images"] .ubuntu-window__controls button:last-child { background: #e95420; color: white; }
+.ubuntu-window[data-app="images"] .ubuntu-window__controls button:last-child { background: var(--brand-action); color: white; }
 .loupe { position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; outline: none; color: var(--app-ink, #3d3d3d); background: var(--app-surface, #fafafa); font: 14px var(--font-ubuntu); container: loupe / inline-size; }
 .loupe button { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 6px; color: inherit; background: transparent; font: inherit; cursor: default; }
 .loupe button:hover:not(:disabled) { background: var(--app-hover, #0000000d); }
-.loupe button:focus-visible { outline: 2px solid #e95420; outline-offset: -2px; }
+.loupe button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: -2px; }
 .loupe button:disabled { opacity: .35; }
 .loupe__toolbar { position: relative; flex-shrink: 0; display: flex; align-items: center; height: 48px; padding: 0 112px 0 6px; gap: 4px; background: var(--app-surface, #f2f0ee); box-shadow: 0 1px #00000014; z-index: 3; touch-action: none; }
 .loupe__toolbar > button { width: 34px; height: 34px; }
@@ -44,8 +44,8 @@
 .loupe__rotate button { width: 35px; height: 34px; }
 .loupe__zoom-menu { right: 18px; bottom: 76px; width: 234px; max-height: calc(100% - 84px); overflow: auto; }
 .loupe__zoom-menu form { display: flex; gap: 8px; padding: 6px; }
-.loupe__zoom-menu input { width: 100%; min-width: 0; padding: 7px; border-radius: 6px; border: 1px solid var(--app-line, #bbb); background: var(--app-surface, #fafafa); color: var(--app-ink, #333); font: inherit; outline-color: #e95420; }
-.loupe__zoom-menu form button { width: 34px; background: #e95420; color: white; }
+.loupe__zoom-menu input { width: 100%; min-width: 0; padding: 7px; border-radius: 6px; border: 1px solid var(--app-line, #bbb); background: var(--app-surface, #fafafa); color: var(--app-ink, #333); font: inherit; outline-color: var(--app-accent); }
+.loupe__zoom-menu form button { width: 34px; background: var(--brand-action); color: white; }
 .loupe__properties { width: 275px; flex-shrink: 0; overflow: auto; border-left: 1px solid #0002; background: var(--app-surface, #f6f5f4); padding: 12px; box-sizing: border-box; animation: loupe-reveal 250ms ease-out; }
 .loupe__properties-title { display: flex; align-items: center; gap: 8px; justify-content: space-between; font-size: 13px; }
 .loupe__properties-title button { width: 28px; height: 28px; }
@@ -60,7 +60,7 @@
 .loupe__picker > button:hover { background: var(--app-panel, #eae7e4); }
 .loupe__picker img { width: 40px; height: 40px; object-fit: contain; }
 .loupe__picker small { display: block; margin-top: 3px; color: var(--app-muted, #777); }
-.loupe__picker .loupe__import { justify-content: center; color: var(--app-accent, #e95420); }
+.loupe__picker .loupe__import { justify-content: center; color: var(--app-accent, var(--brand-action)); }
 .loupe__about { text-align: center; }
 .loupe__about img { width: 96px; height: 96px; }
 .loupe__shortcuts { max-height: 360px; overflow: auto; font: 12px var(--font-ubuntu); }

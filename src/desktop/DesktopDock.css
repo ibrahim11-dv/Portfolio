@@ -1,4 +1,4 @@
-.ubuntu-dock { position: fixed; z-index: 7000; top: 42px; bottom: 10px; left: 8px; width: 66px; padding: 9px 7px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid #ffffff1c; border-radius: 22px; background: #181818e8; box-shadow: 0 8px 28px #0007; backdrop-filter: blur(18px); font-family: var(--font-ubuntu); }
+.ubuntu-dock { position: fixed; z-index: 7000; top: 42px; bottom: 10px; left: 8px; width: 66px; padding: 9px 7px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid #ffffff1c; border-radius: 22px; background: color-mix(in srgb, var(--brand-shell) 94%, transparent); box-shadow: 0 8px 28px #0007; backdrop-filter: blur(18px); font-family: var(--font-ubuntu); }
 .ubuntu-dock__apps, .ubuntu-dock__bottom { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 100%; }
 .ubuntu-dock__apps { min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding: 0 4px; box-sizing: content-box; }
 .ubuntu-dock__apps::-webkit-scrollbar { display: none; }
@@ -15,7 +15,7 @@
 .ubuntu-dock__item.is-launching { animation: ubuntu-dock-launch 450ms ease-out; }
 .ubuntu-dock__separator { width: 40px; height: 1px; margin: 3px 0; background: #ffffff31; }
 .ubuntu-dock__trash { margin-top: 1px; }
-.ubuntu-dock__tooltip { position: fixed; z-index: 10050; transform: translateY(-50%); max-width: 230px; padding: 7px 11px; border: 1px solid #ffffff20; border-radius: 7px; background: #303030; box-shadow: 0 3px 10px #0005; color: #fff; font: 13px var(--font-ubuntu); white-space: nowrap; pointer-events: none; opacity: 0; animation: ubuntu-dock-tooltip 100ms ease-out 450ms forwards; }
+.ubuntu-dock__tooltip { position: fixed; z-index: 10050; transform: translateY(-50%); max-width: 230px; padding: 7px 11px; border: 1px solid #ffffff20; border-radius: 7px; background: var(--brand-shell-panel); box-shadow: 0 3px 10px #0005; color: #fff; font: 13px var(--font-ubuntu); white-space: nowrap; pointer-events: none; opacity: 0; animation: ubuntu-dock-tooltip 100ms ease-out 450ms forwards; }
 .ubuntu-dock__tooltip.is-mobile { transform: translate(-50%, -100%); }
 .ubuntu-dock__tooltip.is-keyboard { animation-delay: 0ms; }
 .ubuntu-dock.is-app-dragging { z-index: 8500; }
@@ -27,10 +27,10 @@
 .ubuntu-dock__item[data-drop-before]::before { top: -5px; }
 .ubuntu-dock__item[data-drop-after]::after { bottom: -5px; }
 .ubuntu-dock__empty { width: 50px; height: 50px; border: 2px dashed #ffffff26; border-radius: 12px; transition: border-color 120ms ease; }
-.ubuntu-dock__empty.is-drop-target { border-color: var(--ubuntu-orange); background: #e9542020; }
-.ubuntu-dock__trash.is-drop-allowed { outline: 2px solid var(--ubuntu-orange); outline-offset: -2px; background: #e9542038; }
+.ubuntu-dock__empty.is-drop-target { border-color: var(--ubuntu-orange); background: color-mix(in srgb, var(--brand-action) 12.5%, transparent); }
+.ubuntu-dock__trash.is-drop-allowed { outline: 2px solid var(--ubuntu-orange); outline-offset: -2px; background: color-mix(in srgb, var(--brand-action) 22.0%, transparent); }
 .ubuntu-dock__trash.is-drop-denied { outline: 2px solid #d96a64; outline-offset: -2px; background: #d96a6424; }
-.ubuntu-launcher-menu { position: fixed; z-index: 9000; width: 224px; max-height: calc(100dvh - 48px); overflow: auto; padding: 6px; border: 1px solid #ffffff1e; border-radius: 12px; background: #353535; box-shadow: 0 4px 18px #0007; color: #fff; font: 13px var(--font-ubuntu); animation: launcher-menu-in 120ms cubic-bezier(.25,.46,.45,.94); }
+.ubuntu-launcher-menu { position: fixed; z-index: 9000; width: 224px; max-height: calc(100dvh - 48px); overflow: auto; padding: 6px; border: 1px solid #ffffff1e; border-radius: 12px; background: var(--brand-shell-panel); box-shadow: 0 4px 18px #0007; color: #fff; font: 13px var(--font-ubuntu); animation: launcher-menu-in 120ms cubic-bezier(.25,.46,.45,.94); }
 .ubuntu-launcher-menu button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 7px 10px; border: 0; border-radius: 6px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .ubuntu-launcher-menu button:hover, .ubuntu-launcher-menu button:focus-visible { background: #ffffff18; outline: none; }
 .ubuntu-launcher-menu button svg { flex-shrink: 0; }

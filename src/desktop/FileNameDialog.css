@@ -5,23 +5,23 @@
 .ubuntu-name-dialog p { margin: 8px 0 24px; text-align: center; color: var(--app-muted, #777); font-size: 13px; overflow-wrap: anywhere; }
 .ubuntu-name-dialog label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; }
 .ubuntu-name-dialog input { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #0003; border-radius: 9px; color: inherit; background: var(--app-surface, white); font: 14px var(--font-ubuntu); outline: none; }
-.ubuntu-name-dialog input:focus { border-color: #e95420; box-shadow: 0 0 0 2px #e9542033; }
+.ubuntu-name-dialog input:focus { border-color: var(--brand-action); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-action) 20.0%, transparent); }
 .ubuntu-name-dialog input[aria-invalid="true"] { border-color: #c01c28; }
 .ubuntu-name-dialog__feedback { min-height: 34px; margin: 9px 0 14px; color: var(--app-muted, #777); font-size: 12px; line-height: 1.4; }
 .ubuntu-name-dialog__feedback.is-error { color: var(--app-danger, #a51d2d); }
 .ubuntu-name-dialog footer { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .ubuntu-name-dialog footer button { min-height: 42px; padding: 10px 16px; border: 0; border-radius: 9px; background: var(--app-panel, #e8e8e8); color: inherit; font: 600 14px var(--font-ubuntu); cursor: pointer; }
-.ubuntu-name-dialog footer button.is-primary { color: white; background: #e95420; }
+.ubuntu-name-dialog footer button.is-primary { color: white; background: var(--brand-action); }
 .ubuntu-name-dialog footer button:hover:not(:disabled) { filter: brightness(.96); }
 .ubuntu-name-dialog footer button:disabled { opacity: .45; cursor: default; }
-.ubuntu-name-dialog footer button:focus-visible { outline: 2px solid #e95420; outline-offset: 3px; }
+.ubuntu-name-dialog footer button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 3px; }
 .ubuntu-name-dialog.is-files { width: min(450px, calc(100vw - 32px)); border-radius: 12px; }
 .ubuntu-name-dialog.is-files form { padding: 0 24px 24px; }
 .ubuntu-name-dialog.is-files header { position: relative; height: 48px; display: flex; align-items: center; justify-content: center; margin: 0 -24px 24px; padding: 0 48px; }
 .ubuntu-name-dialog.is-files h2 { font-size: 14px; }
 .ubuntu-name-dialog.is-files header button { position: absolute; right: 12px; display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--app-panel, #e5e5e5); color: inherit; cursor: pointer; }
 .ubuntu-name-dialog.is-files .ubuntu-name-dialog__entry { padding: 10px 12px 8px; border: 1px solid #0002; border-radius: 9px; background: var(--app-surface, white); box-shadow: 0 1px 3px #0001; }
-.ubuntu-name-dialog.is-files .ubuntu-name-dialog__entry:focus-within { border-color: #e95420; box-shadow: 0 0 0 2px #e9542033; }
+.ubuntu-name-dialog.is-files .ubuntu-name-dialog__entry:focus-within { border-color: var(--brand-action); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-action) 20.0%, transparent); }
 .ubuntu-name-dialog.is-files label { margin-bottom: 3px; color: var(--app-muted, #777); font-size: 11px; }
 .ubuntu-name-dialog.is-files input { border: 0; padding: 0; border-radius: 0; box-shadow: none; }
 .ubuntu-name-dialog.is-files .ubuntu-name-dialog__feedback { min-height: 0; margin: 6px 0; }

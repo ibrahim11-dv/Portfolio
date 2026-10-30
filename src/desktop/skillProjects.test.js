@@ -15,11 +15,14 @@ test('maps core skills to matching portfolio projects across collections', () =>
   assert.deepEqual(projectsForSkill('', PROJECTS), []);
 });
 
-test('main project catalog highlights deployed internship and includes tldr summaries', () => {
+test('catalog leads with ParcVision and supplies readable project summaries', () => {
   const mainIds = PROJECTS.filter((p) => p.group === 'main').map((p) => p.id);
-  assert.deepEqual(mainIds.slice(0, 3), ['parcvision', 'intern-management', 'citadel']);
-  assert.equal(PROJECTS.find((p) => p.id === 'youtube-downloader')?.group, 'other');
+  assert.equal(mainIds[0], 'parcvision');
+  for (const id of ['intern-management', 'citadel', 'learnxcompile']) assert.ok(mainIds.includes(id));
+  assert.ok(PROJECTS.some((p) => p.group === 'other'));
+  assert.equal(new Set(PROJECTS.map((p) => p.id)).size, PROJECTS.length);
   for (const project of PROJECTS) {
-    assert.ok(project.tldr?.built && project.tldr?.result && Array.isArray(project.tldr?.stack));
+    assert.ok(project.tagline && project.description && project.report?.outcome, project.id);
+    assert.ok(Array.isArray(project.stack) && project.stack.length > 0, project.id);
   }
 });

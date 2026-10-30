@@ -543,7 +543,7 @@ html[data-desktop-saver="true"] .desktop *, html[data-desktop-saver="true"] .des
 
 .ubuntu-battery { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
 .ubuntu-battery svg { flex-shrink: 0; }
-.ubuntu-qs-power-menu { order: 2; margin-bottom: 12px; padding: 6px; border: 1px solid var(--ubuntu-border); border-radius: 12px; background: #29292d; }
+.ubuntu-qs-power-menu { order: 2; margin-bottom: 12px; padding: 6px; border: 1px solid var(--ubuntu-border); border-radius: 12px; background: var(--brand-shell); }
 .ubuntu-qs-power-menu button, .ubuntu-power-option { display: flex; align-items: center; justify-content: space-between; width: 100%; border: 0; border-radius: 8px; padding: 12px; color: inherit; background: transparent; text-align: left; cursor: pointer; }
 .ubuntu-qs-power-menu button:hover, .ubuntu-power-option:hover { background: #ffffff16; }
 
