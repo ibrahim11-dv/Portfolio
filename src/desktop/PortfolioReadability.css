@@ -1,4 +1,41 @@
 /* Shared reading scale for the five portfolio applications. */
+.contact-page { max-width: 900px; margin-inline: auto; }
+.contact-page .portfolio-app__section-heading { padding-bottom: 24px; }
+.contact-email { margin: 24px 0 32px; padding: 24px; background: var(--app-panel); border: 1px solid var(--app-line); border-top: 3px solid var(--app-accent); }
+.contact-page h2 { font-size: 21px; line-height: 1.4; font-weight: 600; }
+.contact-email h2 { display: flex; align-items: center; gap: 10px; }
+.contact-email__address { display: block; margin: 14px 0 20px; font-size: clamp(21px,3.4cqw,30px); line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.contact-email__address:hover { text-decoration: underline; text-underline-offset: 4px; }
+.contact-email__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.contact-email__actions :is(a,button) { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 10px 16px; border: 1px solid var(--app-line); background: var(--app-surface); color: var(--app-ink); font: 16px/1.5 var(--font-reading); }
+.contact-email__actions .contact-email__write { background: var(--brand-action); border-color: var(--brand-action); color: var(--brand-on-action); }
+.contact-email__actions :is(a,button):hover { border-color: var(--app-accent); }
+.contact-email__actions .contact-email__write:hover { background: var(--brand-action-hover); }
+.contact-email .contact-email__status { min-height: 24px; margin-top: 12px; font-size: 16px; line-height: 1.5; color: var(--app-ink); }
+.contact-email__fallback { display: grid; gap: 8px; font-size: 16px; }
+.contact-email__fallback input { min-width: 0; width: 100%; padding: 12px; border: 1px solid var(--app-line); background: var(--app-surface); color: var(--app-ink); }
+.contact-resources { display: grid; gap: 0; }
+.contact-resources h2 { margin-bottom: 14px; }
+.contact-resources > a { display: flex; align-items: center; gap: 16px; min-height: 86px; padding: 18px 8px; border-top: 1px solid var(--app-line); }
+.contact-resources > a:hover { background: var(--app-hover); }
+.contact-resources > a > svg { flex: none; color: var(--app-accent); }
+.contact-resources > a > svg:last-child { margin-left: auto; }
+.contact-resources span { min-width: 0; display: grid; gap: 4px; }
+.contact-resources strong { font-size: 20px; line-height: 1.4; }
+.contact-resources small { font-size: 16px; line-height: 1.5; color: var(--app-muted); }
+.contact-resources > .contact-resources__download { min-height: 48px; margin-top: 10px; font-size: 16px; color: var(--app-accent); }
+.contact-identity { display: flex; align-items: center; gap: 16px; padding-top: 24px; margin-top: 24px; border-top: 1px solid var(--app-line); }
+.contact-identity > div:last-child { display: grid; gap: 4px; min-width: 0; }
+.contact-identity strong { font-size: 18px; }
+.contact-identity span { display: flex; align-items: center; gap: 6px; color: var(--app-muted); font-size: 15px; }
+.contact-identity .portfolio-app__avatar { width: 60px; height: 60px; }
+@container portfolio (max-width: 420px) {
+  .contact-email { padding: 16px; }
+  .contact-email__actions { flex-direction: column; }
+  .contact-email__actions :is(a,button) { width: 100%; padding-inline: 8px; }
+  .contact-resources > a { gap: 10px; }
+  .contact-resources small { font-size: 15px; }
+}
 .portfolio-app { font-family: var(--font-reading); font-size: 16px; line-height: 1.65; }
 .portfolio-app .portfolio-app__section-heading p { font-size: 17px; line-height: 1.65; }
 .portfolio-app .portfolio-app__eyebrow { font: 13px/1.5 var(--font-reading); letter-spacing: .08em; }

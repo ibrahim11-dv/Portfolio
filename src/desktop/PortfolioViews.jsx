@@ -130,15 +130,30 @@ export function JourneyView() {
 
 export function ContactView() {
   const [copyStatus, setCopyStatus] = useState('');
-  async function copyEmail() { try { await navigator.clipboard.writeText(PROFILE.email); setCopyStatus('Adresse copiée.'); } catch { setCopyStatus('Copie automatique indisponible. Sélectionnez l’adresse ci-dessous et copiez-la.'); } }
-  return <>
-    <SectionHeading eyebrow="CONTACT / 05" title="Parlons du prochain projet." description="Disponible pour échanger au sujet d’un stage en développement logiciel." />
-    <section className="portfolio-app__contact-sheet"><div className="portfolio-app__contact-signature"><ProfileAvatar /><div><h2>{PROFILE.name}</h2><p>{PROFILE.role}</p><span><MapPin size={14} />{PROFILE.location}</span></div></div><div className="portfolio-app__contact-actions">
-      <a href={`mailto:${PROFILE.email}`}><span>EMAIL</span><strong>{PROFILE.email}</strong><ArrowUpRight size={17} /></a>
-      {PROFILE.github && <a href={PROFILE.github} target="_blank" rel="noreferrer" title="Ouvrir dans un nouvel onglet"><span>GITHUB</span><strong>ibrahim11-dv</strong><ArrowUpRight size={17} /></a>}
-      {PROFILE.linkedin && <a href={PROFILE.linkedin} target="_blank" rel="noreferrer" title="Ouvrir LinkedIn dans un nouvel onglet"><span>LINKEDIN</span><strong>Ibrahim Chehlafi</strong><ArrowUpRight size={17} /></a>}
-      <CVAction><span>CV</span><strong>Lire le CV</strong><FileText size={16} /></CVAction>
-    </div><div className="portfolio-app__contact-copy"><button onClick={copyEmail}><Copy size={15} />Copier l’adresse</button><span role="status">{copyStatus}</span>{copyStatus.startsWith('Copie automatique') && <input readOnly aria-label="Adresse email à copier" value={PROFILE.email} onFocus={(event) => event.target.select()} />}</div></section>
-  </>;
+  const [copyFailed, setCopyFailed] = useState(false);
+  async function copyEmail() {
+    try { await navigator.clipboard.writeText(PROFILE.email); setCopyFailed(false); setCopyStatus('Adresse e-mail copiée.'); }
+    catch { setCopyFailed(true); setCopyStatus('Sélectionnez l’adresse ci-dessous, puis copiez-la manuellement.'); }
+  }
+  return <div className="contact-page">
+    <SectionHeading eyebrow="CONTACT" title="Contactez-moi." description="À la recherche d’un stage en développement informatique. Échangeons sur votre équipe et vos projets." />
+    <section className="contact-email" aria-labelledby="contact-email-title">
+      <h2 id="contact-email-title"><Mail size={21} aria-hidden="true" />Par e-mail</h2>
+      <a className="contact-email__address" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
+      <div className="contact-email__actions">
+        <a className="contact-email__write" href={`mailto:${PROFILE.email}`}><Mail size={18} />Écrire un e-mail</a>
+        <button onClick={copyEmail}><Copy size={18} />Copier l’adresse</button>
+      </div>
+      <p className="contact-email__status" role="status">{copyStatus}</p>
+      {copyFailed && <label className="contact-email__fallback">Adresse à copier<input readOnly value={PROFILE.email} onFocus={(event) => event.target.select()} /></label>}
+    </section>
+    <section className="contact-resources" aria-labelledby="contact-resources-title">
+      <h2 id="contact-resources-title">Retrouvez-moi aussi ici</h2>
+      {PROFILE.linkedin && <a href={PROFILE.linkedin} target="_blank" rel="noreferrer"><Globe2 size={24} aria-hidden="true" /><span><strong>LinkedIn</strong><small>Mon profil professionnel · nouvel onglet</small></span><ArrowUpRight size={20} aria-hidden="true" /></a>}
+      {PROFILE.github && <a href={PROFILE.github} target="_blank" rel="noreferrer"><GitBranch size={24} aria-hidden="true" /><span><strong>GitHub</strong><small>Mes dépôts et mon code · nouvel onglet</small></span><ArrowUpRight size={20} aria-hidden="true" /></a>}
+      <CVAction><FileText size={24} aria-hidden="true" /><span><strong>Lire mon CV</strong><small>Ouvrir le document dans IbrahimOS</small></span><ArrowRight size={20} aria-hidden="true" /></CVAction>
+      <CVAction download className="contact-resources__download"><FileText size={18} />Télécharger le CV en PDF</CVAction>
+    </section>
+    <footer className="contact-identity"><ProfileAvatar /><div><strong>{PROFILE.name}</strong><span>{PROFILE.role}</span><span><MapPin size={15} aria-hidden="true" />{PROFILE.location}</span></div></footer>
+  </div>;
 }
-
