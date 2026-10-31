@@ -5,6 +5,7 @@ import { ProjectArtwork } from './ProjectReport';
 import { CVAction } from './PortfolioActions';
 import { SKILL_CAPABILITIES } from './skillCapabilities';
 import Certificates from './Certificates';
+import { gmailComposeUrl } from './desktopLinks';
 
 function ProfileAvatar({ className = '' }) {
   const initials = PROFILE.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('');
@@ -139,9 +140,9 @@ export function ContactView() {
     <SectionHeading eyebrow="CONTACT" title="Contactez-moi." description="À la recherche d’un stage en développement informatique. Échangeons sur votre équipe et vos projets." />
     <section className="contact-email" aria-labelledby="contact-email-title">
       <h2 id="contact-email-title"><Mail size={21} aria-hidden="true" />Par e-mail</h2>
-      <a className="contact-email__address" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
+      <a className="contact-email__address" href={gmailComposeUrl(PROFILE.email)} target="_blank" rel="noopener noreferrer" title="Écrire dans Gmail · nouvel onglet">{PROFILE.email}</a>
       <div className="contact-email__actions">
-        <a className="contact-email__write" href={`mailto:${PROFILE.email}`}><Mail size={18} />Écrire un e-mail</a>
+        <a className="contact-email__write" href={gmailComposeUrl(PROFILE.email)} target="_blank" rel="noopener noreferrer" aria-label="Écrire un e-mail dans Gmail (nouvel onglet)"><Mail size={18} />Écrire un e-mail<ArrowUpRight size={16} aria-hidden="true" /></a>
         <button onClick={copyEmail}><Copy size={18} />Copier l’adresse</button>
       </div>
       <p className="contact-email__status" role="status">{copyStatus}</p>

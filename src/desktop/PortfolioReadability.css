@@ -4,7 +4,7 @@
 .contact-email { margin: 24px 0 32px; padding: 24px; background: var(--app-panel); border: 1px solid var(--app-line); border-top: 3px solid var(--app-accent); }
 .contact-page h2 { font-size: 21px; line-height: 1.4; font-weight: 600; }
 .contact-email h2 { display: flex; align-items: center; gap: 10px; }
-.contact-email__address { display: block; margin: 14px 0 20px; font-size: clamp(21px,3.4cqw,30px); line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.portfolio-app .contact-email__address { display: block; margin: 14px 0 20px; font-size: clamp(21px,3.4cqw,30px); line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
 .contact-email__address:hover { text-decoration: underline; text-underline-offset: 4px; }
 .contact-email__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .contact-email__actions :is(a,button) { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 10px 16px; border: 1px solid var(--app-line); background: var(--app-surface); color: var(--app-ink); font: 16px/1.5 var(--font-reading); }

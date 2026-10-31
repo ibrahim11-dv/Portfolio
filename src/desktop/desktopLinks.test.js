@@ -12,6 +12,6 @@ test('social desktop shortcuts use the professional URLs and prefill Gmail', () 
   ]);
   assert.equal(shortcuts[0].external, PROFILE.github);
   assert.equal(shortcuts[1].external, PROFILE.linkedin);
-  assert.equal(shortcuts[2].external, `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(PROFILE.email)}`);
+  assert.equal(shortcuts[2].external, `https://mail.google.com/mail/u/0/?fs=1&to=${encodeURIComponent(PROFILE.email)}&tf=cm`);
   assert.ok(shortcuts.every((shortcut) => shortcut.protected));
 });
