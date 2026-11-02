@@ -12,6 +12,7 @@ import { createDocument } from './editorDocument';
 import VirtualTerminal from './VirtualTerminal';
 import AppGrid from './AppGrid';
 import PortfolioApp from './PortfolioApp';
+import CircuitApp from './CircuitApp';
 import DesktopItems from './DesktopItems';
 import DesktopIntroduction from './DesktopIntroduction';
 import WindowOverview from './WindowOverview';
@@ -319,6 +320,7 @@ export default function DesktopShell() {
         const icon = app?.icon || '/ubuntu-apps/trash.png';
         let content;
         if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} onProjectRouteChange={syncProjectRoute} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
+        else if (kind === 'circuit') content = <CircuitApp session={appSessions.circuit} onSaveSession={saveAppSession} />;
         else if (kind === 'appearance') content = <AppearanceApp onNotify={setDesktopNotice} />;
         else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('contact')} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
         else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;

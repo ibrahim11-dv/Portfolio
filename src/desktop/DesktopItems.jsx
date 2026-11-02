@@ -15,7 +15,7 @@ const POSITIONS_KEY = 'portfolio.desktop-positions.v1';
 const DESKTOP_DRAG = 'application/x-ubuntu-desktop';
 const CELL_WIDTH = 116;
 const CELL_HEIGHT = 116;
-const SHORTCUTS = DESKTOP_APPS.filter((app) => PORTFOLIO_APP_IDS.includes(app.id) || app.id === 'cv').map((app) => ({
+const SHORTCUTS = DESKTOP_APPS.filter((app) => PORTFOLIO_APP_IDS.includes(app.id) || ['cv', 'circuit'].includes(app.id)).sort((a, b) => Number(a.id === 'circuit') - Number(b.id === 'circuit')).map((app) => ({
   id: app.id === 'presentation' ? '@profile' : `@${app.id}`,
   name: app.id === 'cv' ? 'Mon CV' : app.name, icon: app.icon, app: app.id, protected: true,
 }));

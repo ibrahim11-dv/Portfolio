@@ -1,4 +1,5 @@
 export const DESKTOP_APPS = [
+  { id: 'circuit', name: 'Circuit', icon: '/ubuntu-apps/circuit.svg' },
   { id: 'presentation', name: 'Présentation', icon: '/ubuntu-apps/presentation.svg' },
   { id: 'projects', name: 'Projets', icon: '/ubuntu-apps/projects.svg' },
   { id: 'skills', name: 'Compétences', icon: '/ubuntu-apps/skills.svg' },
