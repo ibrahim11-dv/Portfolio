@@ -1,0 +1,78 @@
+:root {
+  /* Shared palette, taken from the Presentation application. */
+  --brand-action: #216b62;
+  --brand-action-hover: #18564f;
+  --brand-action-active: #12473f;
+  --brand-on-action: #ffffff;
+  --brand-highlight: #8fd8cf;
+  --brand-selection: #d8eeea;
+  --brand-shell: #17191b;
+  --brand-shell-panel: #292e30;
+  --brand-shell-raised: #353d3f;
+  --brand-shell-muted: #bcc6c5;
+  --brand-shell-ink: #f4f6f5;
+  --app-ink: #101112;
+  --app-surface: #f5f6f4;
+  --app-panel: #eceeec;
+  --app-line: #d7d9da;
+  --app-hover: #1011120a;
+  --app-danger: #a51d2d;
+  --app-muted: #596164;
+  --app-accent: #216b62;
+  --font-reading: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --motion-feedback: 120ms;
+  --motion-content: 180ms;
+  --motion-window: 240ms;
+  --motion-ease: cubic-bezier(.2, .8, .2, 1);
+  --ib-accent: #8fd8cf;
+  --ubuntu-orange: var(--brand-action);
+  --ubuntu-orange-hover: var(--brand-action-hover);
+  --ubuntu-orange-active: var(--brand-action-active);
+  --ubuntu-aubergine: var(--brand-shell-panel);
+  --ubuntu-aubergine-dark: var(--brand-shell);
+  --ubuntu-panel-bg: var(--brand-shell);
+  --ubuntu-panel-active: rgba(255, 255, 255, 0.17);
+  --ubuntu-menu-bg: var(--brand-shell-panel);
+  --ubuntu-surface: var(--brand-shell-raised);
+  --ubuntu-surface-hover: #424c4f;
+  --ubuntu-surface-active: var(--brand-shell);
+  --ubuntu-slider-track: var(--brand-shell);
+  --ubuntu-border: rgba(255, 255, 255, 0.15);
+  --ubuntu-text: #FFFFFF;
+  --ubuntu-text-muted: rgba(255, 255, 255, 0.8);
+  --ubuntu-text-subtle: rgba(255, 255, 255, 0.5);
+  --font-ubuntu: "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --desktop-wallpaper: url('../assets/wallpapers/background.webp');
+  --desktop-wallpaper-size: cover;
+  --theme-window: var(--brand-shell-panel);
+  --theme-window-header: var(--brand-shell);
+  --theme-surface: var(--app-surface);
+  --theme-surface-muted: var(--app-panel);
+  --theme-ink: var(--app-ink);
+  --theme-muted: #596164;
+  --theme-line: var(--app-line);
+  --theme-menu: var(--brand-shell-panel);
+  --theme-menu-text: #fff;
+}
+
+html[data-desktop-theme="dark"] {
+  --brand-selection: #24443f;
+  color-scheme: dark;
+  --app-ink: #f4f6f5;
+  --app-muted: #bcc6c5;
+  --app-accent: #8fd8cf;
+  --app-danger: #ff9ba5;
+  --app-surface: #1f2325;
+  --app-panel: #2b3133;
+  --app-line: #515b5e;
+  --app-hover: #ffffff14;
+  --theme-window: var(--brand-shell-panel);
+  --theme-window-header: var(--brand-shell);
+  --theme-surface: var(--app-surface);
+  --theme-surface-muted: var(--app-panel);
+  --theme-ink: var(--app-ink);
+  --theme-muted: var(--app-muted);
+  --theme-line: var(--app-line);
+  --theme-menu: var(--brand-shell-panel);
+  --theme-menu-text: #fff;
+}

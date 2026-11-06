@@ -27,7 +27,7 @@ Implemented:
 - PFE-ESTO: https://github.com/Movved/PFE-ESTO/blob/main/pfe-app/routes/web.php and README. The CV links this collaborative repository.
 - Gestion des stagiaires: CV only; no public repository was supplied.
 - YouTube downloader: https://github.com/ibrahim11-dv/YoutubeVideosDownloader/blob/master/server.js and `public/index.html`.
-- MiniChat: https://github.com/ibrahim11-dv/MiniChatApp-using-socket.io/blob/master/server/index.js and `client/src/App.jsx`.
+- MiniChat: https://github.com/ibrahim11-dv/MiniChatApp-using-socket.io/blob/master/server/index.js and `client/src/app/App.jsx`.
 - Exercise Tracker: https://github.com/ibrahim11-dv/exerciceTracker-freeCodeCamp_/blob/main/index.js
 - URL Shortener: https://github.com/ibrahim11-dv/url-shortening/blob/main/index.js
 
@@ -57,7 +57,7 @@ Verification for this integration:
 
 - `npm run lint`: passed.
 - `npm run build`: passed, 1955 transformed modules.
-- `node --test src/desktop/portfolioCatalogMigration.test.js src/desktop/virtualFs.test.js src/desktop/terminalShell.test.js`: 26 passed.
+- `node --test src/shared/filesystem/portfolioCatalogMigration.test.js src/shared/filesystem/virtualFs.test.js src/apps/terminal/terminalShell.test.js`: 26 passed.
 - Migration tests cover exact legacy replacement, retired empty folders, visitor children/copies, modified text, persisted old protection, idempotence, and later generated-report editions.
 - Browser inspection at 319px and 1280px widths: no report/content horizontal overflow. The chapter navigation itself intentionally scrolls on narrow screens.
 - All eight project pages were opened. Seven had five chapters and a functioning second tour step; LearnXcompile correctly displayed the pending page.

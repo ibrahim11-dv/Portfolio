@@ -1,39 +1,33 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { HelpCircle, PackageOpen } from 'lucide-react';
-import AppearanceApp from './AppearanceApp';
-import TopBar from '../components/TopBar/TopBar';
-import DesktopDock from './DesktopDock';
-import DesktopWindow from './DesktopWindow';
-import FileManager from './FileManager';
-import TextEditor from './TextEditor';
-import ImageViewer from './ImageViewer';
-import { readImage } from './imageFiles';
-import { createDocument } from './editorDocument';
-import VirtualTerminal from './VirtualTerminal';
-import AppGrid from './AppGrid';
-import PortfolioApp from './PortfolioApp';
-import CircuitApp from './CircuitApp';
-import DesktopItems from './DesktopItems';
-import DesktopIntroduction from './DesktopIntroduction';
-import WindowOverview from './WindowOverview';
-import WorkspaceTransition from './WorkspaceTransition';
-import { CV_DOCUMENT, PROFILE, PROJECTS } from './portfolioData';
-import { appById, DESKTOP_APPS, readAppShortcut, PORTFOLIO_APP_IDS, resolveAppId } from './apps';
-import { canDeletePath, readFiles, ROOT, trashPaths, uniquePath, writeFiles } from './virtualFs';
+import SystemApp from '../apps/system/SystemApp';
+import AppearanceApp from '../apps/appearance/AppearanceApp';
+import TopBar from './topbar/TopBar';
+import DesktopDock from './launcher/DesktopDock';
+import DesktopWindow from './windows/DesktopWindow';
+import FileManager from '../apps/files/FileManager';
+import TextEditor from '../apps/editor/TextEditor';
+import ImageViewer from '../apps/images/ImageViewer';
+import { readImage } from '../shared/filesystem/imageFiles';
+import { createDocument } from '../apps/editor/editorDocument';
+import VirtualTerminal from '../apps/terminal/VirtualTerminal';
+import AppGrid from './launcher/AppGrid';
+import PortfolioApp from '../apps/portfolio/PortfolioApp';
+import CircuitApp from '../apps/circuit/CircuitApp';
+import DesktopItems from './launcher/DesktopItems';
+import DesktopIntroduction from './introduction/DesktopIntroduction';
+import WindowOverview from './windows/WindowOverview';
+import WorkspaceTransition from './windows/WorkspaceTransition';
+import { CV_DOCUMENT, PROFILE, PROJECTS } from '../data/portfolioData';
+import { appById, readAppShortcut, PORTFOLIO_APP_IDS, resolveAppId } from '../config/apps';
+import { canDeletePath, readFiles, ROOT, trashPaths, uniquePath, writeFiles } from '../shared/filesystem/virtualFs';
 import './DesktopShell.css';
-import './FileManager.css';
-import './Applications.css';
-import { findReusableWindow, shouldStartMaximized } from './recruiterJourney';
-import { completeIntroduction, initialIntroductionState, transitionIntroduction } from './introJourney';
-import { projectIdFromSearch, searchWithProject } from './projectRoute';
+import '../apps/files/FileManager.css';
+import '../styles/applications.css';
+import { findReusableWindow, shouldStartMaximized } from '../shared/sessionState';
+import { completeIntroduction, initialIntroductionState, transitionIntroduction } from './introduction/introJourney';
+import { projectIdFromSearch, searchWithProject } from '../apps/portfolio/projects/projectRoute';
 
-const DocumentViewer = lazy(() => import('./DocumentViewer'));
-
-function SimpleApp({ kind, onOpen, onReplayIntroduction }) {
-  if (kind === 'help') return <div className="ubuntu-simple-app"><HelpCircle size={44} /><h2>Guide du bureau IbrahimOS</h2><p>Tout ce dont vous avez besoin pour commencer.</p><div className="ubuntu-help-topics"><article><h3>Fichiers et dossiers</h3><p>Cliquez dans un espace vide du bureau pour créer un document ou un dossier. Ouvrez-le par double-clic, renommez-le avec F2 et supprimez-le avec Suppr. Les éléments du portfolio sont protégés.</p></article><article><h3>Terminal</h3><p>Ouvrez le terminal avec Ctrl+Alt+T. Tapez help pour afficher les commandes disponibles et Ctrl+Maj+T pour créer un onglet.</p></article><article><h3>Corbeille</h3><p>Vos créations supprimées vont dans la corbeille. Vous pouvez les restaurer à leur emplacement d’origine ou vider la corbeille.</p></article><article><h3>Fenêtres</h3><p>Utilisez le bouton d’agrandissement ou double-cliquez sur la barre supérieure. Déplacez la fenêtre vers un bord pour l’ancrer et tirez ses bords pour la redimensionner. Le dock permet de réduire et rouvrir les applications.</p></article></div><div className="ubuntu-help-actions"><button className="desktop-action" onClick={(event) => onReplayIntroduction?.(event.currentTarget)}>Revoir l’accueil et la visite</button><button className="desktop-action" onClick={() => window.open('https://help.ubuntu.com/', '_blank', 'noopener,noreferrer')}>Documentation Ubuntu</button></div></div>;
-  if (kind === 'store') return <div className="ubuntu-simple-app"><PackageOpen size={44} /><h2>Applications installées</h2><p>Retrouvez les applications de votre bureau.</p>{DESKTOP_APPS.filter((app) => app.id !== 'store').map((app) => <div className="ubuntu-store-card" key={app.id}><img src={app.icon} alt="" /><div><strong>{app.name}</strong><small>Installé</small></div><button onClick={() => onOpen(app.id)}>Ouvrir</button></div>)}</div>;
-  return null;
-}
+const DocumentViewer = lazy(() => import('../apps/documents/DocumentViewer'));
 
 function frontWindow(windows, excluding, workspace) {
   return windows.filter((item) => !item.minimized && item.id !== excluding && (workspace === undefined || item.workspace === workspace)).sort((a, b) => Number(Boolean(b.alwaysOnTop)) - Number(Boolean(a.alwaysOnTop)) || b.zIndex - a.zIndex)[0]?.id || null;
@@ -327,7 +321,7 @@ export default function DesktopShell() {
         else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} />;
         else if (kind === 'editor') content = <TextEditor key={window.id} windowId={window.id} files={files} filePath={window.filePath} navigationRequest={window.navigationRequest} openRequests={window.editorRequests} initialDocument={window.editorDocument} setFiles={setFiles} onNewWindow={(editorDocument) => openApp('editor', { newWindow: true, editorDocument: editorDocument || createDocument(files, uniquePath(files, `${ROOT}/Documents`, 'Sans titre.txt'), 0, true) })} onOpenDirectory={(directory) => openApp('files', { directory })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
         else if (kind === 'images') content = <ImageViewer key={`${window.id}-${window.navigationRequest || 0}`} files={files} setFiles={setFiles} filePath={window.filePath} onNavigate={(filePath) => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, filePath: filePath || undefined } : item))} onOpenDirectory={(directory) => openApp('files', { directory })} onNewWindow={() => openApp('images', { newWindow: true })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
-        else content = <SimpleApp kind={kind} onOpen={openApp} onReplayIntroduction={replayIntroduction} />;
+        else content = <SystemApp kind={kind} onOpen={openApp} onReplayIntroduction={replayIntroduction} />;
         return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} initialMaximized={window.initialMaximized} minimized={window.minimized} workspaceHidden={window.workspace !== workspace} isActive={activeApp === window.id && window.workspace === workspace && !showOverview && !showApps} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
       })}
     </main>

@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'artifacts', '.artifacts']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -16,6 +16,31 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+  },
+  {
+    files: ['src/{apps,shared}/**/*.{js,jsx}'],
+    ignores: ['**/*.test.js'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['**/desktop/**', '**/app/**'],
+          message: 'Pass desktop actions through callbacks; apps and shared modules must not import the desktop shell.',
+        }],
+      }],
+    },
+  },
+  {
+    files: ['src/{data,config}/**/*.{js,jsx}'],
+    ignores: ['**/*.test.js'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        paths: ['react', 'react-dom'],
+        patterns: [{
+          group: ['**/apps/**', '**/desktop/**', '**/app/**', '**/shared/**'],
+          message: 'Data and application definitions must stay independent from UI components and services.',
+        }],
+      }],
     },
   },
 ])
