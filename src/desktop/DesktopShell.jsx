@@ -28,6 +28,7 @@ import { completeIntroduction, initialIntroductionState, transitionIntroduction 
 import { projectIdFromSearch, searchWithProject } from '../apps/portfolio/projects/projectRoute';
 
 const DocumentViewer = lazy(() => import('../apps/documents/DocumentViewer'));
+const ChessApp = lazy(() => import('../apps/chess/ChessApp'));
 
 function frontWindow(windows, excluding, workspace) {
   return windows.filter((item) => !item.minimized && item.id !== excluding && (workspace === undefined || item.workspace === workspace)).sort((a, b) => Number(Boolean(b.alwaysOnTop)) - Number(Boolean(a.alwaysOnTop)) || b.zIndex - a.zIndex)[0]?.id || null;
@@ -127,7 +128,7 @@ export default function DesktopShell() {
     const { newWindow = false, workspace: requestedWorkspace, ...options } = payload;
     const pendingLaunch = pendingLaunches.current.get(appId);
     const candidates = [...windows.filter((item) => item.appId === appId), ...(pendingLaunch && !windows.some((item) => item.id === pendingLaunch.id) ? [pendingLaunch] : [])].sort((a, b) => b.zIndex - a.zIndex);
-    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow && !PORTFOLIO_APP_IDS.includes(appId));
+    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow && !PORTFOLIO_APP_IDS.includes(appId) && appId !== 'chess');
     if (existing) {
       zIndex.current += 1;
       const layer = zIndex.current;
@@ -315,6 +316,7 @@ export default function DesktopShell() {
         let content;
         if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} onProjectRouteChange={syncProjectRoute} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
         else if (kind === 'circuit') content = <CircuitApp session={appSessions.circuit} onSaveSession={saveAppSession} />;
+        else if (kind === 'chess') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture de l’échiquier…</div>}><ChessApp session={appSessions.chess} onSaveSession={saveAppSession} /></Suspense>;
         else if (kind === 'appearance') content = <AppearanceApp onNotify={setDesktopNotice} />;
         else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('contact')} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
         else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;

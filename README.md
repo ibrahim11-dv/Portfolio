@@ -43,6 +43,7 @@ src/
   apps/              Une zone par application
     appearance/      Réglages d’apparence
     circuit/         Jeu, règles et tests
+    chess/           Échecs contre un robot débutant, règles et tests
     documents/       Lecteur PDF/CV
     editor/          Éditeur de texte
     files/           Gestionnaire de fichiers
