@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Grid2X2, MonitorDot, UserRound, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, FolderOpen, Grid2X2, Mail, MonitorDot, UserRound, X } from 'lucide-react';
 import { INTRODUCTION_STEPS } from './introJourney';
 import './DesktopIntroduction.css';
 
@@ -29,7 +29,7 @@ function focusable(root) {
     .filter((element) => !element.hidden && element.getClientRects().length);
 }
 
-export default function DesktopIntroduction({ phase, step, onBootComplete, onSkip, onExplore, onStartGuide, onPrevious, onNext, onOpenPresentation }) {
+export default function DesktopIntroduction({ phase, step, onBootComplete, onSkip, onExplore, onStartGuide, onPrevious, onNext, onOpenPresentation, onOpenProjects, onOpenCV, onOpenContact }) {
   const panelRef = useRef(null);
   const dialogRef = useRef(null);
   const [rectangles, setRectangles] = useState([]);
@@ -126,12 +126,16 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
         <h1 id="ib-introduction-title">Bonjour, bienvenue dans le portfolio d’Ibrahim.</h1>
         <div id="ib-introduction-description" className="ib-introduction__copy">
           <p>Je suis Ibrahim Chehlafi, développeur Full-Stack à Perpignan, à la recherche d’un stage en développement informatique.</p>
-          <p>Ce bureau inspiré d’Ubuntu est mon portfolio. Ouvrez les applications pour découvrir mes projets, mes compétences, mon parcours et mon CV.</p>
-          <p>Une courte visite vous montre où les trouver. Vous pouvez aussi entrer directement et explorer à votre rythme.</p>
         </div>
-        <div className="ib-introduction__actions">
-          <button data-introduction-primary className="ib-introduction__primary" type="button" onClick={onStartGuide}>Me guider <ArrowRight size={17} /></button>
-          <button type="button" className="ib-introduction__secondary" onClick={onExplore}>Entrer dans le bureau</button>
+        <div className="ib-introduction__actions ib-introduction__destinations" role="group" aria-label="Accès directs au portfolio">
+          <button data-introduction-primary className="ib-introduction__primary" type="button" onClick={onOpenProjects}><FolderOpen size={20} aria-hidden="true" /> Voir les projets <ArrowRight size={18} aria-hidden="true" /></button>
+          <button type="button" className="ib-introduction__secondary" onClick={onOpenCV}><FileText size={20} aria-hidden="true" /> Lire le CV</button>
+          <button type="button" className="ib-introduction__secondary" onClick={onOpenContact}><Mail size={20} aria-hidden="true" /> Contact</button>
+        </div>
+        <p className="ib-introduction__explore-copy">Ce bureau inspiré d’Ubuntu est mon portfolio. Explorez-le librement ou laissez-vous guider.</p>
+        <div className="ib-introduction__actions ib-introduction__explore-actions">
+          <button className="ib-introduction__secondary" type="button" onClick={onStartGuide}>Me guider</button>
+          <button type="button" className="ib-introduction__secondary" onClick={onExplore}>Passer l’introduction <ArrowRight size={17} aria-hidden="true" /></button>
         </div>
       </> : <>
         <span className="ib-introduction__eyebrow"><StepIcon size={14} aria-hidden="true" /> VISITE DU BUREAU</span>

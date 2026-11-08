@@ -44,17 +44,26 @@
 .ib-introduction__welcome-mark svg { width: 64px; height: 64px; }
 .ib-introduction--presentation .ib-introduction__eyebrow { justify-content: center; color: var(--theme-muted); font-size: 12px; letter-spacing: .02em; text-transform: none; }
 .ib-introduction--presentation .ib-introduction__panel h1 { max-width: none; margin: 16px 0; font-size: clamp(25px, 3vw, 32px); line-height: 1.15; }
-.ib-introduction--presentation .ib-introduction__copy { color: var(--theme-muted); }
+.ib-introduction--presentation .ib-introduction__copy { color: var(--theme-muted); font-size: 16px; }
 .ib-introduction--presentation .ib-introduction__actions { justify-content: center; }
-.ib-introduction--presentation .ib-introduction__primary { background: #b83a10; border-color: #b83a10; color: #fff; }
-.ib-introduction--presentation .ib-introduction__primary:hover { background: #9c300c; }
+.ib-introduction--presentation .ib-introduction__primary { background: var(--brand-action); border-color: var(--brand-action); color: var(--brand-on-action); }
+.ib-introduction--presentation .ib-introduction__primary:hover { background: var(--brand-action-hover); }
 .ib-introduction--presentation .ib-introduction__secondary { background: var(--theme-surface-muted); border-color: var(--theme-line); color: var(--theme-ink); }
 .ib-introduction--presentation .ib-introduction__close { color: var(--theme-ink); background: var(--theme-surface-muted); }
 .ib-introduction--presentation button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 3px; }
+.ib-introduction--presentation .ib-introduction__destinations { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 22px; }
+.ib-introduction__destinations .ib-introduction__primary { grid-column: 1 / -1; }
+.ib-introduction--presentation .ib-introduction__actions button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-width: 0; min-height: 44px; font-size: 15px; }
+.ib-introduction__destinations svg { flex-shrink: 0; }
+.ib-introduction--presentation .ib-introduction__destinations button { min-height: 50px; font-size: 17px; }
+.ib-introduction__explore-copy { margin: 24px 0 0; padding-top: 20px; border-top: 1px solid var(--theme-line); color: var(--theme-muted); font-size: 14px; line-height: 1.5; }
+.ib-introduction--presentation .ib-introduction__explore-actions { margin-top: 12px; }
+.ib-introduction--presentation .ib-introduction__close { width: 44px; height: 44px; }
 @media (max-width: 620px) {
   .ib-introduction--presentation { padding: 12px; }
   .ib-introduction--presentation .ib-introduction__panel { padding: 28px 20px 20px; max-height: calc(100dvh - 24px); }
   .ib-introduction--presentation .ib-introduction__actions { flex-direction: column; }
+  .ib-introduction--presentation .ib-introduction__destinations button { gap: 6px; padding-inline: 8px; font-size: 16px; }
   .ib-introduction__welcome-mark { width: 60px; height: 60px; margin-bottom: 16px; }
   .ib-introduction__welcome-mark svg { width: 50px; height: 50px; }
 }

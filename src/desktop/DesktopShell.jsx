@@ -169,12 +169,13 @@ export default function DesktopShell() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [windows, workspace]);
 
-  function finishIntroduction({ openPresentation = false } = {}) {
+  function finishIntroduction({ appId } = {}) {
     completeIntroduction();
     const trigger = introductionTrigger.current;
     introductionTrigger.current = null;
-    setIntroduction((current) => transitionIntroduction(current, openPresentation ? 'open-presentation' : 'explore'));
-    if (openPresentation) { openApp('presentation'); return; }
+    setIntroduction((current) => transitionIntroduction(current, 'explore'));
+    if (appId === 'cv') { openCV(null, document.querySelector('[data-desktop-id="@cv"]')); return; }
+    if (appId) { openApp(appId); return; }
     requestAnimationFrame(() => (trigger?.isConnected ? trigger : document.querySelector('[data-intro-app="presentation"]'))?.focus({ preventScroll: true }));
   }
 
@@ -339,6 +340,9 @@ export default function DesktopShell() {
       onStartGuide={() => setIntroduction((current) => transitionIntroduction(current, 'start-guide'))}
       onPrevious={() => setIntroduction((current) => transitionIntroduction(current, 'previous'))}
       onNext={() => setIntroduction((current) => transitionIntroduction(current, 'next'))}
-      onOpenPresentation={() => finishIntroduction({ openPresentation: true })} />
+      onOpenPresentation={() => finishIntroduction({ appId: 'presentation' })}
+      onOpenProjects={() => finishIntroduction({ appId: 'projects' })}
+      onOpenCV={() => finishIntroduction({ appId: 'cv' })}
+      onOpenContact={() => finishIntroduction({ appId: 'contact' })} />
   </div>;
 }
