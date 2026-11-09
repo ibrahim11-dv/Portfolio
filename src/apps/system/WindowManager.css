@@ -1,0 +1,19 @@
+.window-manager { container-type: inline-size; height: 100%; overflow: auto; box-sizing: border-box; padding: clamp(16px, 3vw, 28px); background: var(--theme-surface); color: var(--theme-ink); font: 16px/1.5 var(--font-ubuntu); }
+.window-manager h1 { margin: 0; font-size: 26px; }
+.window-manager header p { margin: 8px 0; }
+.window-manager small { color: var(--theme-muted); font-size: 14px; }
+.window-manager label { display: grid; gap: 6px; }
+.window-manager > label { margin-top: 22px; }
+.window-manager input, .window-manager select, .window-manager button { box-sizing: border-box; min-width: 0; min-height: 44px; padding: 8px 12px; font: inherit; border: 1px solid var(--theme-line); border-radius: 6px; background: var(--theme-surface-muted); color: inherit; }
+.window-manager button { cursor: pointer; }
+.window-manager button:disabled { opacity: .5; cursor: default; }
+.window-manager :focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
+.window-manager__list { display: grid; gap: 12px; }
+.window-manager article { border: 1px solid var(--theme-line); padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; }
+.window-manager__identity { display: flex; align-items: center; gap: 12px; min-width: 0; overflow-wrap: anywhere; }
+.window-manager__identity img { width: 38px; height: 38px; object-fit: contain; }
+.window-manager h2 { font-size: 18px; margin: 0; }
+.window-manager__identity p { margin: 2px 0; }
+.window-manager__actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 620px) { .window-manager article { grid-template-columns: minmax(0, 1fr); } .window-manager__actions button { flex: 1; padding-inline: 8px; } }
+@container (max-width: 480px) { .window-manager article { grid-template-columns: minmax(0, 1fr); } .window-manager__actions button { flex: 1; padding-inline: 8px; } }

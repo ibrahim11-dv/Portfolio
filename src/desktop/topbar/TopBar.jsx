@@ -9,6 +9,7 @@ import {
   Power,
   Lock,
   Camera,
+  Search,
   ChevronRight,
 } from "lucide-react";
 import "./TopBar.css";
@@ -27,7 +28,7 @@ function SymbolicIcon({ name }) {
   return <span aria-hidden="true" className="ubuntu-symbolic-icon" style={{ '--icon': `url("${import.meta.env.BASE_URL}ubuntu-icons/${name}-symbolic.svg")` }} />;
 }
 
-export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
+export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, onQuickLaunch, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
   const { effectiveTheme, setTheme } = useAppearance();
   const [now, setNow] = useState(new Date());
   const [openMenu, setOpenMenu] = useState(null); // "clock" | "system" | null
@@ -235,6 +236,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
             />
           ))}
         </button>
+        <button className="ubuntu-topbar__quick-launch" aria-label="Lancement rapide" title="Lancement rapide (Alt+F2)" onClick={() => { setOpenMenu(null); onQuickLaunch?.(); }}><Search size={16} aria-hidden="true" /></button>
         {appName && <span className="ubuntu-topbar__app-name">{appName}</span>}
       </div>
 

@@ -12,6 +12,7 @@ export const DESKTOP_APPS = [
   { id: 'editor', name: 'Éditeur de texte', icon: '/ubuntu-apps/editor.png' },
   { id: 'images', name: 'Visionneur d’images', icon: '/ubuntu-apps/loupe.svg' },
   { id: 'appearance', name: 'Apparence', icon: '/ubuntu-apps/appearance.svg' },
+  { id: 'windows', name: 'Gestionnaire de fenêtres', icon: '/ubuntu-apps/windows.svg' },
   { id: 'help', name: 'Aide', icon: '/ubuntu-apps/help.png' },
   { id: 'store', name: 'App Center', icon: '/ubuntu-apps/store.png' },
 ];
