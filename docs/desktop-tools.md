@@ -6,6 +6,14 @@ La loupe de la barre supérieure, Alt+F2 et l’application Aide ouvrent le mêm
 
 Les résultats de fenêtres restaurent leur instance existante, y compris depuis un autre bureau. Les résultats d’applications utilisent le routage habituel : aucune exécution de commandes système, aucun nouveau stockage.
 
+### Fichiers, documents récents et actions
+
+Les filtres Tout, Applications, Fenêtres, Fichiers, Récents et Actions limitent la recherche. Les fichiers et dossiers sont recherchés par nom et chemin dans le système virtuel uniquement, sans indexer leur contenu ni accéder au disque de l’ordinateur. Les dossiers implicites sont inclus ; les résultats s’ouvrent dans Fichiers, l’éditeur, le lecteur PDF ou le lecteur d’images existants.
+
+Récents conserve au plus vingt chemins de documents ouverts via le bureau pendant la session, sans doublons et sans stockage persistant. Les chemins supprimés ou renommés sont masqués. Effacer la liste ne supprime aucun fichier. Le CV ouvert directement est également mémorisé ; la liste n’est pas un historique de chaque changement d’onglet interne à une application.
+
+Actions propose Afficher le bureau, puis Restaurer les fenêtres, ainsi que Vue des bureaux. La même logique est utilisée par Super+D : seules les fenêtres visibles du bureau courant sont réduites. La restauration exclut les fenêtres déjà réduites avant l’action, fermées ou déplacées ailleurs entre-temps.
+
 ## Gestionnaire de fenêtres
 
 Accessible dans la grille, le lanceur, Aide et via Ctrl+Alt+M. Il affiche uniquement les fenêtres virtuelles d’IbrahimOS, sans prétendre mesurer le processeur ou la mémoire de l’ordinateur. Il permet de rechercher, afficher, restaurer, réduire, déplacer vers un autre bureau et fermer une fenêtre.

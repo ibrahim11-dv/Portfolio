@@ -2,6 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import SystemApp from '../apps/system/SystemApp';
 import WindowManager from '../apps/system/WindowManager';
 import QuickLauncher from './launcher/QuickLauncher';
+import { desktopVisibilityAction } from './windows/desktopVisibility';
+import { rememberDocument } from '../shared/filesystem/recentDocuments';
 import AppearanceApp from '../apps/appearance/AppearanceApp';
 import TopBar from './topbar/TopBar';
 import DesktopDock from './launcher/DesktopDock';
@@ -21,7 +23,7 @@ import WindowOverview from './windows/WindowOverview';
 import WorkspaceTransition from './windows/WorkspaceTransition';
 import { CV_DOCUMENT, PROFILE, PROJECTS } from '../data/portfolioData';
 import { appById, readAppShortcut, PORTFOLIO_APP_IDS, resolveAppId } from '../config/apps';
-import { canDeletePath, readFiles, ROOT, trashPaths, uniquePath, writeFiles } from '../shared/filesystem/virtualFs';
+import { canDeletePath, readFiles, ROOT, isDirectory, trashPaths, uniquePath, writeFiles } from '../shared/filesystem/virtualFs';
 import './DesktopShell.css';
 import '../apps/files/FileManager.css';
 import '../styles/applications.css';
@@ -39,6 +41,7 @@ function frontWindow(windows, excluding, workspace) {
 export default function DesktopShell() {
   const initialProjectRoute = projectIdFromSearch(window.location.search, PROJECTS.map((project) => project.id));
   const [files, setFiles] = useState(readFiles);
+  const [recentDocuments, setRecentDocuments] = useState([]);
   const [windows, setWindows] = useState(() => initialProjectRoute ? [{
     id: 'projects',
     appId: 'projects',
@@ -74,7 +77,7 @@ export default function DesktopShell() {
   const [cvBackLabel, setCVBackLabel] = useState('Retour au portfolio');
   const [cvReadingState, setCVReadingState] = useState(null);
   const metaChord = useRef(false);
-  const hiddenByDesktop = useRef({});
+  const [hiddenByDesktop, setHiddenByDesktop] = useState({});
   const workspaceTransition = useRef(null);
   const introductionTrigger = useRef(null);
   const workspaceCount = Math.max(2, workspace + 1, ...windows.map((item) => item.workspace + 2));
@@ -125,6 +128,10 @@ export default function DesktopShell() {
 
   function openApp(appId, payload = {}) {
     appId = resolveAppId(appId, payload.section);
+    const documentPath = payload.filePath || (appId === 'cv' ? `${ROOT}/Documents/CV.pdf` : null);
+    if (documentPath && Object.hasOwn(files, documentPath) && files[documentPath] !== null && !readAppShortcut(files[documentPath])) {
+      setRecentDocuments((current) => rememberDocument(current, documentPath));
+    }
     setShowApps(false);
     setShowOverview(false);
     setSwitcher(null);
@@ -241,7 +248,32 @@ export default function DesktopShell() {
     setDesktopNotice(`${allowed.length} élément${allowed.length > 1 ? 's' : ''} déplacé${allowed.length > 1 ? 's' : ''} dans la corbeille.`);
   }
 
+  function toggleDesktop() {
+    const action = desktopVisibilityAction(windows, workspace, hiddenByDesktop[workspace]);
+    setShowApps(false); setShowOverview(false); setSwitcher(null);
+    if (action.type === 'restore') {
+      const restored = windows.map((item) => action.ids.includes(item.id) ? { ...item, minimized: false } : item);
+      setWindows((current) => current.map((item) => action.ids.includes(item.id) ? { ...item, minimized: false } : item));
+      setActiveApp(frontWindow(restored, null, workspace));
+      setHiddenByDesktop((current) => ({ ...current, [workspace]: [] }));
+      setDesktopNotice('Fenêtres du bureau restaurées.');
+    } else {
+      setHiddenByDesktop((current) => ({ ...current, [workspace]: action.ids }));
+      action.ids.forEach((id) => window.dispatchEvent(new CustomEvent('portfolio:window-minimize', { detail: { id } })));
+      setActiveApp(null);
+      setDesktopNotice(action.ids.length ? 'Bureau affiché. Utilisez Restaurer les fenêtres pour revenir.' : 'Le bureau est déjà dégagé.');
+      requestAnimationFrame(() => document.querySelector('[data-intro-app="presentation"]')?.focus({ preventScroll: true }));
+    }
+  }
+
+  function openSearchPath(path) {
+    if (isDirectory(files, path)) openApp('files', { directory: path });
+    else if (Object.hasOwn(files, path)) openFile(path);
+    else setDesktopNotice('Ce fichier n’existe plus.');
+  }
+
   function openFile(path) {
+    if (!Object.hasOwn(files, path)) { setDesktopNotice('Ce fichier n’existe plus.'); return; }
     const shortcut = readAppShortcut(files[path]);
     if (shortcut) openApp(shortcut.id);
     else if (files[path] === CV_DOCUMENT) openApp('cv', { filePath: path });
@@ -274,18 +306,7 @@ export default function DesktopShell() {
       }
       if (event.metaKey && event.key.toLowerCase() === 'd') {
         event.preventDefault();
-        const hidden = hiddenByDesktop.current[workspace] || [];
-        const ids = hidden.filter((id) => windows.some((item) => item.id === id && item.workspace === workspace));
-        if (ids.length) {
-          setWindows((current) => current.map((item) => ids.includes(item.id) ? { ...item, minimized: false } : item));
-          setActiveApp(frontWindow(windows.map((item) => ids.includes(item.id) ? { ...item, minimized: false } : item), null, workspace));
-          hiddenByDesktop.current[workspace] = [];
-        } else {
-          const visible = windows.filter((item) => item.workspace === workspace && !item.minimized);
-          hiddenByDesktop.current[workspace] = visible.map((item) => item.id);
-          visible.forEach((item) => window.dispatchEvent(new CustomEvent('portfolio:window-minimize', { detail: { id: item.id } })));
-          setActiveApp(null);
-        }
+        toggleDesktop();
       }
       if (event.ctrlKey && event.altKey && event.key === 'Tab') { event.preventDefault(); document.querySelector('.ubuntu-topbar__workspace-track')?.focus(); return; }
       if ((event.altKey || event.metaKey) && !event.ctrlKey && event.key === 'Tab' && windows.length > 1) {
@@ -314,7 +335,7 @@ export default function DesktopShell() {
     return () => { window.removeEventListener('keydown', handleShortcuts); window.removeEventListener('keyup', releaseShortcut); window.removeEventListener('blur', releaseOnBlur); window.removeEventListener('pointerdown', markPointerChord, true); };
   // Keyboard shortcuts intentionally use the current window action.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase]);
+  }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase, hiddenByDesktop]);
 
   return <div className="desktop-shell">
     <TopBar notifications={notifications} quiet={quiet} onQuiet={setQuiet} onClearNotifications={() => setNotifications([])} onDismissNotification={(id) => setNotifications(current => current.filter(item => item.id !== id))} appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} onQuickLaunch={openQuickLauncher} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
@@ -341,7 +362,10 @@ export default function DesktopShell() {
         return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} initialMaximized={window.initialMaximized} minimized={window.minimized} workspaceHidden={window.workspace !== workspace} isActive={activeApp === window.id && window.workspace === workspace && !showOverview && !showApps && !showLauncher} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
       })}
     </main>
-    {showLauncher && <QuickLauncher windows={windows} onOpen={openApp} onFocus={focusApp} onClose={() => setShowLauncher(false)} />}
+    {showLauncher && <QuickLauncher windows={windows} files={files} recent={recentDocuments} commands={[
+      { command: 'desktop', name: desktopVisibilityAction(windows, workspace, hiddenByDesktop[workspace]).type === 'restore' ? 'Restaurer les fenêtres' : 'Afficher le bureau' },
+      { command: 'overview', name: 'Vue des bureaux' },
+    ]} onOpen={openApp} onOpenPath={openSearchPath} onCommand={(command) => { if (command === 'desktop') toggleDesktop(); else { setShowApps(false); setShowOverview(true); } }} onClearRecent={() => { setRecentDocuments([]); setDesktopNotice('Liste des documents récents effacée. Les fichiers sont conservés.'); }} onFocus={focusApp} onClose={() => setShowLauncher(false)} />}
     <WorkspaceTransition ref={workspaceTransition} />
     {switcher && <div className="ubuntu-app-switcher" role="dialog" aria-label="Changer d’application"><div className="ubuntu-app-switcher__apps">{switcher.ids.map((id, index) => { const item = windows.find((candidate) => candidate.id === id); const app = appById(item?.appId); return <button key={id} className={switcher.index === index ? 'is-selected' : ''} aria-pressed={switcher.index === index} onClick={() => { focusApp(id); setSwitcher(null); }}><img src={app?.icon || '/ubuntu-apps/trash.png'} alt="" /><span>{app?.name || 'Corbeille'}</span></button>; })}</div></div>}
     {workspaceNotice !== null && !showOverview && <div className="ubuntu-workspace-osd" role="status">{Array.from({ length: workspaceCount }, (_, index) => <span key={index} className={workspaceNotice === index ? 'is-current' : ''}>{index + 1}</span>)}</div>}

@@ -1,4 +1,4 @@
-.quick-launcher { width: min(540px, calc(100vw - 24px)); max-height: calc(100dvh - 48px); box-sizing: border-box; padding: 20px; border: 1px solid var(--theme-line); border-radius: 12px; background: var(--theme-surface); color: var(--theme-ink); font: 16px var(--font-ubuntu); box-shadow: 0 20px 60px #0006; }
+.quick-launcher { inset: 0; margin: auto; width: min(540px, calc(100vw - 24px)); max-height: calc(100dvh - 48px); box-sizing: border-box; padding: 20px; border: 1px solid var(--theme-line); border-radius: 12px; background: var(--theme-surface); color: var(--theme-ink); font: 16px var(--font-ubuntu); box-shadow: 0 20px 60px #0006; }
 .quick-launcher::backdrop { background: #0008; }
 .quick-launcher header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .quick-launcher h2 { font-size: 22px; margin: 0; }
@@ -14,3 +14,7 @@
 .quick-launcher__results small { display: block; margin-top: 4px; color: var(--theme-muted); font-size: 13px; }
 .quick-launcher button:hover { border-color: var(--app-accent); }
 .quick-launcher :focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
+.quick-launcher__filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.quick-launcher__filters button, .quick-launcher__clear { font: inherit; padding: 8px 12px; }
+.quick-launcher__filters button[aria-pressed="true"] { background: var(--brand-action); color: var(--brand-on-action); border-color: var(--brand-action); text-decoration: underline; text-underline-offset: 4px; }
+.quick-launcher__clear { margin-bottom: 8px; }
