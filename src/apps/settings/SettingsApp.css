@@ -1,0 +1,280 @@
+.settings-app {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  height: 100%;
+  background: var(--theme-surface);
+  color: var(--theme-ink);
+  font: 14px/1.5 var(--font-ubuntu);
+  overflow: hidden;
+}
+
+.settings-app__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 12px;
+  background: var(--theme-surface-muted);
+  border-right: 1px solid var(--theme-line);
+  overflow-y: auto;
+}
+
+.settings-app__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 14px;
+  font-size: 16px;
+}
+
+.settings-app__sidebar button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-app__sidebar button:hover {
+  background: var(--theme-canvas);
+}
+
+.settings-app__sidebar button.is-active {
+  background: var(--brand-action);
+  color: var(--brand-on-action);
+  font-weight: 500;
+}
+
+.settings-app__content {
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+.settings-panel {
+  max-width: 680px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.settings-panel > header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.settings-panel > header p {
+  margin: 0;
+  color: var(--theme-muted);
+}
+
+.settings-card {
+  border: 1px solid var(--theme-line);
+  border-radius: 12px;
+  background: var(--theme-surface-muted);
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--theme-line);
+}
+
+.settings-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-row strong {
+  display: block;
+}
+
+.settings-row small {
+  display: block;
+  color: var(--theme-muted);
+  font-size: 12px;
+}
+
+.settings-row input[type="range"] {
+  width: 170px;
+  accent-color: var(--brand-action);
+}
+
+.settings-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--brand-action);
+  cursor: pointer;
+}
+
+.settings-inline-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-segmented {
+  display: inline-flex;
+  border: 1px solid var(--theme-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.settings-segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 0;
+  background: var(--theme-surface);
+  color: inherit;
+  font: 12px var(--font-ubuntu);
+  cursor: pointer;
+}
+
+.settings-segmented button[aria-pressed="true"] {
+  background: var(--brand-action);
+  color: var(--brand-on-action);
+  font-weight: 500;
+}
+
+.settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--theme-line);
+  border-radius: 8px;
+  background: var(--theme-surface);
+  color: inherit;
+  font: 13px var(--font-ubuntu);
+  cursor: pointer;
+}
+
+.settings-btn.is-primary {
+  background: var(--brand-action);
+  border-color: var(--brand-action);
+  color: var(--brand-on-action);
+}
+
+.settings-btn img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.settings-dock-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-dock-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--theme-line);
+}
+
+.settings-dock-item img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.settings-dock-item strong {
+  flex: 1;
+}
+
+.settings-dock-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-dock-item__actions > button:not(.settings-btn) {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--theme-line);
+  border-radius: 6px;
+  background: var(--theme-surface);
+  color: inherit;
+  cursor: pointer;
+}
+
+.settings-dock-item__actions > button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.settings-app-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 16px;
+}
+
+.settings-about-hero {
+  text-align: center;
+  padding: 22px;
+  border: 1px solid var(--theme-line);
+  border-radius: 14px;
+  background: var(--theme-surface-muted);
+}
+
+.settings-about-hero__badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: var(--brand-action);
+  color: var(--brand-on-action);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.settings-about-hero h2 {
+  margin: 0 0 4px;
+}
+
+.settings-about-hero p {
+  margin: 0;
+  color: var(--theme-muted);
+}
+
+.settings-about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .settings-app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .settings-app__sidebar {
+    flex-direction: row;
+    border-right: 0;
+    border-bottom: 1px solid var(--theme-line);
+    padding: 8px 10px;
+  }
+  .settings-app__brand {
+    display: none;
+  }
+  .settings-app__sidebar button {
+    white-space: nowrap;
+  }
+}

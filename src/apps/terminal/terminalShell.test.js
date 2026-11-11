@@ -124,3 +124,45 @@ test('completion handles commands, home paths, ambiguous prefixes and escaped na
   assert.equal(completeShell(quoted, quoted.length, files, ROOT).value, 'cat Desktop/Space\\ folder/note.txt ');
   assert.equal(completeShell(quoted + '"', quoted.length, files, ROOT).value, 'cat Desktop/Space\\ folder/note.txt ');
 });
+
+test('tree, find, du and df inspect the virtual filesystem accurately', () => {
+  const treeResult = run('tree ~/Documents');
+  assert.equal(treeResult.status, 0);
+  assert.match(treeResult.output, /CV\.pdf/);
+  assert.match(treeResult.output, /Compétences\.md/);
+
+  const findResult = run('find ~/Projets -name README.md -type f');
+  assert.equal(findResult.status, 0);
+  assert.match(findResult.output, /~\/Projets\/ParcVision\/README\.md/);
+
+  const duResult = run('du -sh ~/Documents/CV.pdf');
+  assert.equal(duResult.status, 0);
+  assert.match(duResult.output, /243,9 ko/);
+
+  const dfResult = run('df -h');
+  assert.equal(dfResult.status, 0);
+  assert.match(dfResult.output, /ibrahimos-vfs/);
+});
+
+test('ps, kill, focus, sort, uniq, uname, uptime and history work in pipelines and emit window effects', () => {
+  const windows = [
+    { id: 'presentation', appId: 'presentation', workspace: 0, minimized: false },
+    { id: 'terminal', appId: 'terminal', workspace: 1, minimized: true },
+  ];
+  const psResult = run('ps', { windows });
+  assert.match(psResult.output, /presentation.*B1.*Active.*Présentation/);
+  assert.match(psResult.output, /terminal.*B2.*Réduite.*Terminal/);
+
+  const effectResult = run('focus presentation && kill terminal', { windows });
+  assert.deepEqual(effectResult.effects, [
+    { type: 'focus-window', target: 'presentation' },
+    { type: 'close-window', target: 'terminal' },
+  ]);
+
+  const sortUniq = run('echo "b\na\nb\na\nc" | sort | uniq -c');
+  assert.equal(sortUniq.output, '   2 a\n   2 b\n   1 c\n');
+
+  assert.match(run('uname -a').output, /IbrahimOS.*GNOME 50/);
+  assert.match(run('uptime', { sessionStart: 1000, now: 125000, windows }).output, /up 2 min 4 s.*2 fenêtres/);
+  assert.equal(run('history', { history: ['ls', 'pwd'] }).output, '   1  pwd\n   2  ls\n');
+});

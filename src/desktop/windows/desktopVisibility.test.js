@@ -13,3 +13,8 @@ test('restore ignores windows closed, moved or already restored', () => {
   assert.deepEqual(desktopVisibilityAction(windows, 0, ['a', 'b', 'c', 'closed']), { type: 'restore', ids: ['a'] });
   assert.deepEqual(desktopVisibilityAction(windows, 0, ['b', 'c']), { type: 'hide', ids: ['c'] });
 });
+
+test('sticky windows on all workspaces participate in show and restore desktop', () => {
+  const windows = [{ id: 'sticky', workspace: 0, onAllWorkspaces: true }, { id: 'other', workspace: 1 }];
+  assert.deepEqual(desktopVisibilityAction(windows, 1), { type: 'hide', ids: ['sticky', 'other'] });
+});

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight, Clipboard, Copy, Download, FilePlus2, Folder, FolderPlus, Grid2X2, Home, Image, Info, List, Menu, Monitor, Music, Pencil, Search, Scissors, Trash2, Undo2, Video, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Clipboard, Copy, Download, FilePlus2, Folder, FolderPlus, Grid2X2, Home, Image, Info, List, Menu, Monitor, Music, Pencil, Search, Scissors, Terminal, Trash2, Undo2, Video, X } from 'lucide-react';
 import { canDeletePath, DIRECTORY_MARKER, emptyTrash, isDirectory, listDirectory, normalizePath, readTrash, renamePath, restoreFromTrash, ROOT, transferPaths, trashPaths, TRASH_CHANGE_EVENT, writeFiles } from '../../shared/filesystem/virtualFs';
 import { endFileDrag, FILE_CLIPBOARD_EVENT, FILE_DRAG_END_EVENT, fileDragCopies, readFileClipboard, readFileDrag, writeFileClipboard, writeFileDrag } from '../../shared/filesystem/dragDrop';
 import ConfirmationDialog from '../../shared/components/ConfirmationDialog';
@@ -11,7 +11,7 @@ import { fileMetadata } from '../../shared/filesystem/fileMetadata';
 function fileName(path) { return path.split('/').filter(Boolean).pop() || path; }
 const folderLabels = { Desktop: 'Bureau', Documents: 'Documents', Downloads: 'Téléchargements', Music: 'Musique', Pictures: 'Images', Videos: 'Vidéos' };
 
-export default function FileManager({ files, setFiles, onOpenFile, initialLocation, initialDirectory = ROOT, navigationRequest = 0 }) {
+export default function FileManager({ files, setFiles, onOpenFile, onOpenTerminal, initialLocation, initialDirectory = ROOT, navigationRequest = 0 }) {
   const rootRef = useRef(null);
   const gridRef = useRef(null);
   const locationRef = useRef(null);
@@ -353,6 +353,18 @@ export default function FileManager({ files, setFiles, onOpenFile, initialLocati
     focusEntry(result.paths[0] || selectedPath);
   }
 
+  function duplicateSelection() {
+    if (!selection.length || inTrash) return;
+    const result = transferPaths(files, selection, cwd, { copy: true });
+    if (result.changed) {
+      persist(result.files, 'Duplication');
+      select(result.paths);
+    }
+    setContextMenu(null);
+    setNotice(result.message);
+    focusEntry(result.paths[0] || selectedPath);
+  }
+
   function restoreSelection(paths = selection) {
     let next = files;
     paths.forEach((path) => { next = restoreFromTrash(next, path); });
@@ -414,6 +426,7 @@ export default function FileManager({ files, setFiles, onOpenFile, initialLocati
     if (control && key === 'c') { event.preventDefault(); copySelection('copy'); }
     if (control && key === 'x') { event.preventDefault(); copySelection('cut'); }
     if (control && key === 'v') { event.preventDefault(); paste(); }
+    if (control && key === 'd') { event.preventDefault(); duplicateSelection(); }
     if (control && key === 'z') { event.preventDefault(); undoOperation(); }
     if (control && key === 'f') { event.preventDefault(); setSearch(true); }
     if (event.altKey && event.key === 'ArrowLeft') { event.preventDefault(); goHistory(-1); return; }
@@ -634,8 +647,9 @@ export default function FileManager({ files, setFiles, onOpenFile, initialLocati
         <button disabled={!entries.length} onClick={clearTrash}><Trash2 size={15} /> Vider la corbeille</button>
       </> : <>
         {menuPath && <button onClick={() => { selection.forEach((path) => openEntry(path, isDirectory(files, path) ? 'dir' : 'file')); setContextMenu(null); }}><Home size={15} /> Ouvrir{selection.length > 1 ? ` ${selection.length} éléments` : ''}</button>}
-        {!menuPath && <><button onClick={() => createEntry('folder')}><FolderPlus size={15} /> Nouveau dossier</button><button onClick={() => createEntry('file')}><FilePlus2 size={15} /> Nouveau document</button></>}
-        {menuPath && <><span className="ubuntu-files__context-separator" /><button disabled={selection.length !== 1 || !allDeletable} onClick={() => startRename(menuPath)}><Pencil size={15} /> Renommer</button><button onClick={() => copySelection('copy')}><Copy size={15} /> Copier</button><button disabled={!allDeletable} onClick={() => copySelection('cut')}><Scissors size={15} /> Couper</button><button disabled={!clipboard.paths.length} onClick={paste}><Clipboard size={15} /> Coller</button><button disabled={!allDeletable} onClick={() => moveToTrash()}><Trash2 size={15} /> Mettre à la corbeille</button><button onClick={() => openProperties()}><Info size={15} /> Propriétés <kbd>Alt+Entrée</kbd></button></>}
+        {menuPath && isDirectory(files, menuPath) && onOpenTerminal && <button onClick={() => { onOpenTerminal(menuPath); setContextMenu(null); }}><Terminal size={15} /> Ouvrir dans le terminal</button>}
+        {!menuPath && <><button onClick={() => createEntry('folder')}><FolderPlus size={15} /> Nouveau dossier</button><button onClick={() => createEntry('file')}><FilePlus2 size={15} /> Nouveau document</button>{onOpenTerminal && <button onClick={() => { onOpenTerminal(cwd); setContextMenu(null); }}><Terminal size={15} /> Ouvrir dans le terminal</button>}</>}
+        {menuPath && <><span className="ubuntu-files__context-separator" /><button disabled={selection.length !== 1 || !allDeletable} onClick={() => startRename(menuPath)}><Pencil size={15} /> Renommer</button><button onClick={() => copySelection('copy')}><Copy size={15} /> Copier</button><button onClick={duplicateSelection}><Copy size={15} /> Dupliquer <kbd>Ctrl+D</kbd></button><button disabled={!allDeletable} onClick={() => copySelection('cut')}><Scissors size={15} /> Couper</button><button disabled={!clipboard.paths.length} onClick={paste}><Clipboard size={15} /> Coller</button><button disabled={!allDeletable} onClick={() => moveToTrash()}><Trash2 size={15} /> Mettre à la corbeille</button><button onClick={() => openProperties()}><Info size={15} /> Propriétés <kbd>Alt+Entrée</kbd></button></>}
         {!menuPath && <><button disabled={!clipboard.paths.length} onClick={paste}><Clipboard size={15} /> Coller</button><button onClick={() => openProperties([cwd])}><Info size={15} /> Propriétés</button></>}
         <span className="ubuntu-files__context-separator" /><button disabled={!undoCount} onClick={undoOperation}><Undo2 size={15} /> Annuler</button>
         {contextMenu.kind === 'app' && <button onClick={() => { setView((current) => current === 'grid' ? 'list' : 'grid'); setContextMenu(null); }}>{view === 'grid' ? <List size={16} /> : <Grid2X2 size={16} />}{view === 'grid' ? 'Afficher en liste' : 'Afficher en grille'}</button>}

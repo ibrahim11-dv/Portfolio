@@ -1,7 +1,10 @@
-import { canDeletePath, canModifyPath, DIRECTORY_MARKER, isDirectory, listDirectory, normalizePath, removePath, ROOT } from '../../shared/filesystem/virtualFs.js';
+import { canDeletePath, canModifyPath, DIRECTORY_MARKER, displayPath, isDirectory, listDirectory, normalizePath, parentDirectories, removePath, ROOT } from '../../shared/filesystem/virtualFs.js';
+import { formatFileSize, summarizeFiles } from '../../shared/filesystem/fileMetadata.js';
+import { inspectStorage } from '../../shared/filesystem/storageStats.js';
+import { appById } from '../../config/apps.js';
 import { CV_DOCUMENT, PROFILE, PROJECTS } from '../../data/portfolioData.js';
 
-export const SHELL_COMMANDS = ['cat', 'cd', 'clear', 'contact', 'cp', 'cv', 'date', 'echo', 'exit', 'false', 'grep', 'head', 'help', 'ls', 'mkdir', 'mv', 'neofetch', 'open', 'portfolio', 'presentation', 'journey', 'profile', 'projects', 'pwd', 'rm', 'rmdir', 'skills', 'tail', 'touch', 'true', 'wc', 'whoami'];
+export const SHELL_COMMANDS = ['cat', 'cd', 'clear', 'contact', 'cp', 'cv', 'date', 'df', 'du', 'echo', 'exit', 'false', 'find', 'focus', 'grep', 'head', 'help', 'history', 'journey', 'kill', 'ls', 'mkdir', 'mv', 'neofetch', 'open', 'portfolio', 'presentation', 'profile', 'projects', 'ps', 'pwd', 'rm', 'rmdir', 'settings', 'skills', 'sort', 'tail', 'touch', 'tree', 'true', 'uname', 'uniq', 'uptime', 'wc', 'whoami'];
 const operators = ['&&', '||', '>>', '<<', ';', '|', '>', '<', '&', '(', ')'];
 const parentOf = (path) => path.slice(0, path.lastIndexOf('/')) || '/';
 const exists = (files, path) => Object.hasOwn(files, path) || isDirectory(files, path);
@@ -130,7 +133,7 @@ function runCommand(words, context, stdin) {
   try {
     switch (name) {
       case undefined: break;
-      case 'help': print('Applications : presentation, profile, projects, skills, journey, contact, cv, portfolio\nFichiers : ls [-aAF1], cd, pwd, cat, touch, mkdir [-p], cp [-r], mv, rm [-rf], rmdir, open\nTexte : echo [-n], grep [-Finv], head [-n N], tail [-n N], wc [-lwc]\nShell : guillemets, échappements, ~, >, >>, <, |, ;, &&, ||\nSession : whoami, date, clear, exit\nCe terminal utilise les fichiers du bureau. Seuls vos éléments sont modifiables.'); break;
+      case 'help': print('Applications : presentation, profile, projects, skills, journey, contact, cv, portfolio\nFichiers : ls [-aAF1], tree [-a], find, du [-sh], df [-h], cd, pwd, cat, touch, mkdir [-p], cp [-r], mv, rm [-rf], rmdir, open\nTexte : echo [-n], grep [-Finv], sort [-ru], uniq [-c], head [-n N], tail [-n N], wc [-lwc]\nSystème : ps, focus, kill, uname [-a], uptime, history, neofetch, whoami, date, clear, exit\nShell : guillemets, échappements, ~, >, >>, <, |, ;, &&, ||\nCe terminal utilise les fichiers du bureau. Seuls vos éléments sont modifiables.'); break;
       case 'presentation': context.effects.push({ type: 'portfolio', section: 'profile' }); break;
       case 'journey': context.effects.push({ type: 'portfolio', section: 'journey' }); break;
       case 'profile': context.effects.push({ type: 'portfolio', section: 'profile' }); print(`${PROFILE.name}\n${PROFILE.role}\n${PROFILE.location}\n\n${PROFILE.bio}`); break;
@@ -263,15 +266,164 @@ function runCommand(words, context, stdin) {
         }
         if (sources.length > 1) print(format(totals) + ' total'); break;
       }
-      case 'neofetch': print('Ubuntu 26.04 · Bureau portfolio\nInterface : GNOME 50 / Yaru\nTerminal : shell virtuel\nUtilisateur : ibrahim'); break;
+      case 'neofetch': print(`Ubuntu 26.04 · Bureau portfolio\nInterface : GNOME 50 / Yaru\nTerminal : shell virtuel\nUtilisateur : ibrahim\nFenêtres : ${context.windows?.length ?? 1} · Fichiers : ${inspectStorage(files).totalFiles}`); break;
+      case 'uname': {
+        const { flags } = operands(args, 'asnrvmpio');
+        print(flags.size ? 'IbrahimOS ubuntu 6.14.0-ubuntu26 #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux (GNOME 50)' : 'IbrahimOS');
+        break;
+      }
+      case 'uptime': {
+        const elapsedSeconds = Math.max(0, Math.floor(((context.now || Date.now()) - (context.sessionStart || Date.now())) / 1000));
+        const minutes = Math.floor(elapsedSeconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const label = hours > 0 ? `${hours} h ${minutes % 60} min` : `${minutes} min ${elapsedSeconds % 60} s`;
+        print(`up ${label}, 1 user, session: ibrahim (${context.windows?.length ?? 0} fenêtre${(context.windows?.length ?? 0) === 1 ? '' : 's'})`);
+        break;
+      }
+      case 'history': {
+        const list = [...(context.history || [])].reverse();
+        if (list.length) print(list.map((entry, idx) => `${String(idx + 1).padStart(4, ' ')}  ${entry}`).join('\n'));
+        break;
+      }
+      case 'ps': {
+        const rows = (context.windows || []).map((win) => {
+          const app = appById(win.appId);
+          const state = win.minimized ? 'Réduite' : win.onAllWorkspaces ? 'Épinglée' : 'Active';
+          return `${win.id.padEnd(14, ' ')}  B${win.workspace + 1}      ${state.padEnd(9, ' ')}  ${app?.name || 'Corbeille'}`;
+        });
+        print(['ID              BUREAU  ÉTAT       APPLICATION', ...rows].join('\n'));
+        break;
+      }
+      case 'kill': {
+        if (!args.length) { fail('indiquez un identifiant de fenêtre ou d’application'); break; }
+        args.forEach((target) => context.effects.push({ type: 'close-window', target }));
+        break;
+      }
+      case 'focus': {
+        if (args.length !== 1) { fail('indiquez une fenêtre ou une application'); break; }
+        context.effects.push({ type: 'focus-window', target: args[0] });
+        break;
+      }
+      case 'settings': {
+        context.effects.push({ type: 'focus-window', target: 'settings' });
+        break;
+      }
+      case 'tree': {
+        const { flags, values } = operands(args, 'a');
+        const target = path(values[0] || '.');
+        if (!exists(files, target)) { fail(`${values[0] || '.'}: aucun fichier ou dossier de ce nom`); break; }
+        if (!isDirectory(files, target)) { print(values[0] || target.split('/').at(-1)); break; }
+        let dirCount = 0, fileCount = 0;
+        const lines = [displayPath(target)];
+        const walk = (dir, prefix) => {
+          const entries = listDirectory(files, dir).filter(([entry]) => flags.has('a') || !entry.startsWith('.'));
+          entries.forEach(([entry, type], index) => {
+            const last = index === entries.length - 1;
+            lines.push(`${prefix}${last ? '└── ' : '├── '}${entry}${type === 'dir' ? '/' : ''}`);
+            if (type === 'dir') {
+              dirCount += 1;
+              walk(normalizePath(entry, dir), `${prefix}${last ? '    ' : '│   '}`);
+            } else fileCount += 1;
+          });
+        };
+        walk(target, '');
+        lines.push('', `${dirCount} dossier${dirCount === 1 ? '' : 's'}, ${fileCount} fichier${fileCount === 1 ? '' : 's'}`);
+        print(lines.join('\n'));
+        break;
+      }
+      case 'find': {
+        let rootArg = '.', namePattern = null, typeFilter = null;
+        let idx = 0;
+        if (args[0] && !args[0].startsWith('-')) { rootArg = args[0]; idx = 1; }
+        while (idx < args.length) {
+          const flag = args[idx++];
+          if (flag === '-name') {
+            if (args[idx] === undefined) { fail('argument manquant pour -name'); break; }
+            namePattern = args[idx++];
+          } else if (flag === '-type') {
+            if (!['f', 'd'].includes(args[idx])) { fail('utilisez -type f ou -type d'); break; }
+            typeFilter = args[idx++];
+          } else {
+            fail(`option inconnue : ${flag}`);
+            break;
+          }
+        }
+        if (status !== 0) break;
+        const target = path(rootArg);
+        if (!exists(files, target)) { fail(`${rootArg}: aucun fichier ou dossier de ce nom`); break; }
+        const regex = namePattern
+          ? new RegExp('^' + namePattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$', 'i')
+          : null;
+        const allPaths = [...new Set([target, ...Object.keys(files), ...parentDirectories(files)])]
+          .filter((item) => item === target || item.startsWith(target === '/' ? '/' : `${target}/`))
+          .sort((a, b) => a.localeCompare(b, 'fr'));
+        const matched = allPaths.filter((item) => {
+          const dir = isDirectory(files, item);
+          if (typeFilter === 'f' && dir) return false;
+          if (typeFilter === 'd' && !dir) return false;
+          if (regex && !regex.test(item.split('/').at(-1) || '/')) return false;
+          return true;
+        });
+        if (matched.length) print(matched.map((item) => displayPath(item)).join('\n'));
+        break;
+      }
+      case 'du': {
+        const { flags, values } = operands(args, 'sh');
+        const targets = values.length ? values : ['.'];
+        for (const value of targets) {
+          const target = path(value);
+          if (!exists(files, target)) { fail(`${value}: aucun fichier ou dossier de ce nom`); continue; }
+          const summary = summarizeFiles(files, [target]);
+          const size = flags.has('h') ? formatFileSize(summary.totalSize) : String(summary.totalSize);
+          print(`${size}\t${value}`);
+        }
+        break;
+      }
+      case 'df': {
+        const { flags } = operands(args, 'h');
+        const stats = inspectStorage(files);
+        const total = flags.has('h') ? stats.totalSizeLabel : String(stats.totalBytes);
+        const personal = flags.has('h') ? stats.visitorSizeLabel : String(stats.visitorBytes);
+        print([
+          'Système de fichiers  Utilisé      Fichiers  Protégés  Personnel    Monté sur',
+          `ibrahimos-vfs        ${total.padEnd(11, ' ')}  ${String(stats.totalFiles).padEnd(8, ' ')}  ${String(stats.protectedCount).padEnd(8, ' ')}  ${personal.padEnd(11, ' ')}  ${ROOT}`,
+        ].join('\n'));
+        break;
+      }
+      case 'sort': {
+        const { flags, values } = operands(args, 'ru');
+        const text = read(values);
+        if (status !== 0) break;
+        const rows = text.split('\n');
+        if (rows.at(-1) === '') rows.pop();
+        let sorted = [...rows].sort((a, b) => a.localeCompare(b, 'fr'));
+        if (flags.has('r')) sorted.reverse();
+        if (flags.has('u')) sorted = [...new Set(sorted)];
+        if (sorted.length) print(sorted.join('\n'));
+        break;
+      }
+      case 'uniq': {
+        const { flags, values } = operands(args, 'c');
+        const text = read(values);
+        if (status !== 0) break;
+        const rows = text.split('\n');
+        if (rows.at(-1) === '') rows.pop();
+        const groups = [];
+        for (const row of rows) {
+          if (groups.length && groups.at(-1).value === row) groups.at(-1).count += 1;
+          else groups.push({ value: row, count: 1 });
+        }
+        if (groups.length) print(groups.map((item) => flags.has('c') ? `${String(item.count).padStart(4, ' ')} ${item.value}` : item.value).join('\n'));
+        break;
+      }
       default: fail('commande introuvable'); status = 127;
     }
   } catch (error) { fail(error.message); if (name === 'grep') status = 2; }
   return { output, errors, status };
 }
 
-export function executeShell(source, { files, cwd = ROOT, previousDirectory = null, status = 0 }) {
-  const result = { files, cwd, previousDirectory, status, output: '', errors: [], effects: [], clear: false, exit: false };
+export function executeShell(source, { files, cwd = ROOT, previousDirectory = null, status = 0, windows = [], history = [], sessionStart = Date.now(), now = Date.now() }) {
+  const result = { files, cwd, previousDirectory, status, windows, history, sessionStart, now, output: '', errors: [], effects: [], clear: false, exit: false };
   let lists;
   try { lists = parseShell(source); }
   catch (error) { return { ...result, status: 2, errors: [`bash: ${error.message}`] }; }

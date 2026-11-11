@@ -112,7 +112,7 @@ export default function WindowOverview({ open, windows, activeWorkspace, workspa
     }, 180);
     return () => clearTimeout(timer);
   }, [open]);
-  const visible = windows.filter((item) => item.workspace === activeWorkspace && (appById(item.appId)?.name || 'Corbeille').toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+  const visible = windows.filter((item) => (item.workspace === activeWorkspace || item.onAllWorkspaces) && (appById(item.appId)?.name || 'Corbeille').toLocaleLowerCase().includes(query.toLocaleLowerCase()));
   const results = query ? DESKTOP_APPS.filter((app) => app.name.toLocaleLowerCase().includes(query.toLocaleLowerCase())) : [];
   function acceptWorkspaceDrag(event, index) {
     if (!hasAppDrag(event) && ![...event.dataTransfer.types].includes(WINDOW_DRAG)) return;
@@ -134,7 +134,7 @@ export default function WindowOverview({ open, windows, activeWorkspace, workspa
       {Array.from({ length: workspaceCount }, (_, index) => <button key={index} className={`ubuntu-window-overview__workspace ${index === activeWorkspace ? 'is-current' : ''} ${dropWorkspace === index ? 'is-drop-target' : ''}`} aria-label={`Bureau ${index + 1}`} aria-pressed={index === activeWorkspace} onClick={() => onWorkspace(index)}
         onDragEnter={(event) => acceptWorkspaceDrag(event, index)} onDragOver={(event) => acceptWorkspaceDrag(event, index)}
         onDragLeave={() => setDropWorkspace(null)} onDrop={(event) => { event.preventDefault(); setDropWorkspace(null); const id = readWindowDrag(event); if (id) onMoveWindow(id, index); else { const app = readAppDrag(event); if (app) { onOpen(app.id, { workspace: index, newWindow: true }); endAppDrag(); } } }}>
-        <WorkspacePreview windows={windows.filter((item) => item.workspace === index)} revision={revision} /><span>{index + 1}</span>
+        <WorkspacePreview windows={windows.filter((item) => item.workspace === index || item.onAllWorkspaces)} revision={revision} /><span>{index + 1}</span>
       </button>)}
     </nav>
     <div className="ubuntu-window-overview__windows">

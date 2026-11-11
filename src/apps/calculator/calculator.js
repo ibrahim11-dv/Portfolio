@@ -2,7 +2,7 @@
 export function calculate(expression) {
   const source = expression.replaceAll(',', '.').replaceAll('×', '*').replaceAll('÷', '/').replaceAll('−', '-').replace(/\s/g, '');
   if (!source || source.length > 200) throw new Error('Saisissez un calcul de 200 caractères maximum.');
-  const tokens = source.match(/(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[()+*/%\-]/g) || [];
+  const tokens = source.match(/(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[()+*/%-]/g) || [];
   if (tokens.join('') !== source) throw new Error('Utilisez uniquement des nombres, parenthèses et opérateurs.');
   let cursor = 0;
   function primary() {

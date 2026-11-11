@@ -10,13 +10,14 @@ export default function VirtualTerminal(props) {
   return <TerminalWindow {...props} Session={TerminalSession} />;
 }
 
-function TerminalSession({ ref, files, setFiles, onOpenFile, active, search, searchIndex = 0, onSearchCount, onExit, onDirectoryChange, onOpenPortfolio, onOpenCV, initialSession, initialDirectory = ROOT, navigationRequest = 0 }) {
+function TerminalSession({ ref, files, setFiles, windows = [], onOpenFile, onWindowEffect, active, search, searchIndex = 0, onSearchCount, onExit, onDirectoryChange, onOpenPortfolio, onOpenCV, initialSession, initialDirectory = ROOT, navigationRequest = 0 }) {
   const [cwd, setCwd] = useState(initialSession?.cwd || initialDirectory);
   const [lines, setLines] = useState(initialSession?.lines || [`${PROFILE.name} — ${PROFILE.role}`, 'Bienvenue sur mon bureau. Tapez projects, skills, contact ou help.', '']);
   const [command, setCommand] = useState(initialSession?.command || '');
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
   const historyRef = useRef(initialSession?.history || []);
+  const [sessionStart] = useState(() => Date.now());
   const historyIndex = useRef(-1);
   const historyDraft = useRef('');
   const completionRef = useRef(null);
@@ -70,7 +71,7 @@ function TerminalSession({ ref, files, setFiles, onOpenFile, active, search, sea
     historyRef.current = [trimmed, ...historyRef.current.filter((item) => item !== trimmed)].slice(0, 100);
     historyIndex.current = -1;
     historyDraft.current = '';
-    const result = executeShell(raw, { files, cwd, ...shellRef.current });
+    const result = executeShell(raw, { files, cwd, windows, history: historyRef.current, sessionStart, ...shellRef.current });
     shellRef.current = { previousDirectory: result.previousDirectory, status: result.status };
     if (result.files !== files) setFiles(writeFiles(result.files));
     if (result.cwd !== cwd) { setCwd(result.cwd); onDirectoryChange(result.cwd); }
@@ -81,6 +82,7 @@ function TerminalSession({ ref, files, setFiles, onOpenFile, active, search, sea
       if (effect.type === 'open') onOpenFile(effect.path);
       if (effect.type === 'cv') onOpenCV?.();
       if (effect.type === 'portfolio') onOpenPortfolio?.(effect.section || 'profile');
+      if (effect.type === 'close-window' || effect.type === 'focus-window') onWindowEffect?.(effect);
     });
     if (result.exit) onExit();
   }

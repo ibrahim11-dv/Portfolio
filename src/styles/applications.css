@@ -129,3 +129,21 @@ html[data-desktop-theme="dark"] .ubuntu-file.is-selected { color: #f3ffff; backg
   .ubuntu-help-topics { grid-template-columns: 1fr; }
 }
 html[data-desktop-theme="dark"] .ubuntu-editor-save-dialog button.is-destructive { color: var(--app-danger); }
+
+.ubuntu-simple-app__header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.ubuntu-simple-app__header h2 { margin: 0 0 4px; }
+.ubuntu-simple-app__header p { margin: 0; }
+.ubuntu-simple-app__search { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--app-line, #d5cfc8); border-radius: 9px; background: var(--app-surface, #fff); margin-bottom: 16px; }
+.ubuntu-simple-app__search input { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; font: inherit; outline: none; }
+.ubuntu-store-controls { display: grid; gap: 10px; margin-bottom: 16px; }
+.ubuntu-store-controls .ubuntu-simple-app__search { margin-bottom: 0; }
+.ubuntu-store-categories { display: flex; flex-wrap: wrap; gap: 8px; }
+.ubuntu-store-categories button { padding: 6px 12px; border: 1px solid var(--app-line, #d4cec7); border-radius: 99px; background: var(--app-surface, #fff); color: inherit; font: 12px var(--font-ubuntu); cursor: pointer; }
+.ubuntu-store-categories button[aria-pressed="true"] { background: var(--brand-action); border-color: var(--brand-action); color: var(--brand-on-action, #fff); font-weight: 500; }
+.ubuntu-store-grid { display: grid; gap: 10px; }
+.ubuntu-store-card { display: flex; align-items: center; }
+.ubuntu-store-card kbd { margin-left: 6px; padding: 2px 6px; border: 1px solid var(--app-line, #d4cec7); border-radius: 4px; font-size: 11px; color: var(--app-muted, #827970); }
+.ubuntu-store-card__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ubuntu-store-card__actions button { display: inline-flex; align-items: center; gap: 6px; }
+.ubuntu-store-card__actions button[aria-pressed="true"], .ubuntu-store-card__actions button.is-primary { background: var(--brand-action); border-color: var(--brand-action); color: var(--brand-on-action, #fff); }
+html[data-desktop-theme="dark"] :is(.ubuntu-simple-app__search, .ubuntu-store-categories button:not([aria-pressed="true"]), .ubuntu-store-card, .ubuntu-help-topics article) { background: var(--theme-surface-muted); border-color: var(--theme-line); color: var(--theme-ink); }

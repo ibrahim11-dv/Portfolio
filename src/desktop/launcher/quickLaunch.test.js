@@ -51,3 +51,14 @@ test('window manager is reusable through the standard app launch path', () => {
   const existing = { id: 'windows', appId: 'windows', minimized: true, workspace: 2 };
   assert.equal(findReusableWindow([existing], results[0].appId), existing);
 });
+
+test('quick launch evaluates arithmetic expressions directly and reports sticky windows', () => {
+  const calcResults = quickLaunchResults('15 * 24', []);
+  assert.equal(calcResults[0].appId, 'calculator');
+  assert.equal(calcResults[0].calculation.result, '360');
+  assert.equal(calcResults[0].name, '15 * 24 = 360');
+
+  const sticky = [{ id: 'clock', appId: 'clock', workspace: 0, onAllWorkspaces: true, zIndex: 5 }];
+  const stickyResults = quickLaunchResults('tous les bureaux', sticky);
+  assert.equal(stickyResults[0].windowId, 'clock');
+});

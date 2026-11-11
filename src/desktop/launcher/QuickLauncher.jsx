@@ -19,7 +19,10 @@ export default function QuickLauncher({ windows, files, recent, commands, onOpen
   }
   function launch(item) {
     onClose();
-    if (item.windowId) onFocus(item.windowId);
+    if (item.calculation) {
+      navigator.clipboard?.writeText?.(item.calculation.result).catch(() => {});
+      onOpen('calculator', { calculation: item.calculation });
+    } else if (item.windowId) onFocus(item.windowId);
     else if (item.path) onOpenPath(item.path);
     else if (item.command) onCommand(item.command);
     else onOpen(item.appId);

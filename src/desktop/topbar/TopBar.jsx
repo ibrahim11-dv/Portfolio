@@ -10,11 +10,12 @@ import {
   Lock,
   Camera,
   Search,
+  Settings,
   ChevronRight,
 } from "lucide-react";
 import "./TopBar.css";
 import DesktopDialog from './DesktopDialog';
-import { PREFERENCES_KEY, readPreferences } from './preferences';
+import { PREFERENCES_CHANGE_EVENT, PREFERENCES_KEY, readPreferences } from './preferences';
 import { captureDesktop, captureScreen } from './captureScreen';
 import { observeBattery } from './battery';
 import BatteryIndicator from './BatteryIndicator';
@@ -28,7 +29,7 @@ function SymbolicIcon({ name }) {
   return <span aria-hidden="true" className="ubuntu-symbolic-icon" style={{ '--icon': `url("${import.meta.env.BASE_URL}ubuntu-icons/${name}-symbolic.svg")` }} />;
 }
 
-export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, onOpenClock, onQuickLaunch, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
+export default function TopBar({ appName, activeWindow, onWindowAction, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, onOpenSettings, onOpenClock, onQuickLaunch, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
   const { effectiveTheme, setTheme } = useAppearance();
   const [now, setNow] = useState(new Date());
   const [openMenu, setOpenMenu] = useState(null); // "clock" | "system" | null
@@ -60,6 +61,15 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
     root.dataset.desktopSaver = String(preferences.saver);
     document.querySelectorAll('audio, video').forEach((media) => { media.volume = preferences.volume / 100; });
   }, [preferences]);
+
+  useEffect(() => {
+    function syncExternalPreferences(event) {
+      const next = event?.detail || readPreferences();
+      setPreferences((current) => JSON.stringify(current) === JSON.stringify(next) ? current : next);
+    }
+    window.addEventListener(PREFERENCES_CHANGE_EVENT, syncExternalPreferences);
+    return () => window.removeEventListener(PREFERENCES_CHANGE_EVENT, syncExternalPreferences);
+  }, []);
 
   useEffect(() => () => {
     delete document.documentElement.dataset.desktopSaver;
@@ -101,6 +111,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
   }
 
   const containerRef = useRef(null);
+  const appMenuRef = useRef(null);
   const clockRef = useRef(null);
   const systemRef = useRef(null);
   const trackRef = useRef(null);
@@ -132,8 +143,17 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
         setSession(event.metaKey ? 'lock' : 'power');
       }
     }
+    function handleSessionAction(event) {
+      const mode = event.detail?.mode;
+      if (mode === 'screenshot') { takeScreenshot(); return; }
+      if (mode) openSession(mode);
+    }
     document.addEventListener('keydown', shellShortcut);
-    return () => document.removeEventListener('keydown', shellShortcut);
+    window.addEventListener('portfolio:session-action', handleSessionAction);
+    return () => {
+      document.removeEventListener('keydown', shellShortcut);
+      window.removeEventListener('portfolio:session-action', handleSessionAction);
+    };
   }, []);
 
   useEffect(() => {
@@ -144,7 +164,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
           containerRef.current?.querySelector('[aria-expanded="true"].ubuntu-qs-detail-btn, [aria-expanded="true"].ubuntu-qs-footer__btn')?.focus();
           setDetail(null);
         } else {
-          (openMenu === "clock" ? clockRef : systemRef).current?.focus();
+          (openMenu === "clock" ? clockRef : openMenu === "app" ? appMenuRef : systemRef).current?.focus();
           setOpenMenu(null);
         }
       }
@@ -210,7 +230,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
     <div ref={containerRef} className="ubuntu-topbar" onBlur={(event) => {
       if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) { setOpenMenu(null); setDetail(null); }
     }} onKeyDown={(event) => {
-      if (event.key === 'ArrowDown' && [clockRef.current, systemRef.current].includes(event.target)) {
+      if (event.key === 'ArrowDown' && [appMenuRef.current, clockRef.current, systemRef.current].includes(event.target)) {
         event.preventDefault();
         containerRef.current.querySelector('.ubuntu-topbar__dropdown button:not(:disabled)')?.focus();
       }
@@ -237,7 +257,33 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
           ))}
         </button>
         <button className="ubuntu-topbar__quick-launch" aria-label="Lancement rapide" title="Lancement rapide (Alt+F2)" onClick={() => { setOpenMenu(null); onQuickLaunch?.(); }}><Search size={16} aria-hidden="true" /></button>
-        {appName && <span className="ubuntu-topbar__app-name">{appName}</span>}
+        {activeWindow ? (
+          <div className="ubuntu-topbar__app-menu-wrap">
+            <button
+              ref={appMenuRef}
+              className={"ubuntu-topbar__app-btn" + (openMenu === "app" ? " ubuntu-topbar__app-btn--open" : "")}
+              aria-label={`Menu de l’application ${activeWindow.name}`}
+              aria-expanded={openMenu === "app"}
+              onClick={() => setOpenMenu(openMenu === "app" ? null : "app")}
+            >
+              <img src={activeWindow.icon} alt="" className="ubuntu-topbar__app-icon" />
+              <span className="ubuntu-topbar__app-name">{activeWindow.name}</span>
+            </button>
+            {openMenu === "app" && (
+              <div role="menu" aria-label={`Actions pour ${activeWindow.name}`} className="ubuntu-topbar__dropdown ubuntu-topbar__dropdown--app">
+                <button role="menuitem" onClick={() => { setOpenMenu(null); onWindowAction?.('toggle-maximize', activeWindow.id); }}>Agrandir ou restaurer <kbd>Alt+F10</kbd></button>
+                <button role="menuitem" onClick={() => { setOpenMenu(null); onWindowAction?.('tile-left', activeWindow.id); }}>Ancrer à gauche <kbd>Super+←</kbd></button>
+                <button role="menuitem" onClick={() => { setOpenMenu(null); onWindowAction?.('tile-right', activeWindow.id); }}>Ancrer à droite <kbd>Super+→</kbd></button>
+                <button role="menuitem" onClick={() => { setOpenMenu(null); onWindowAction?.('minimize', activeWindow.id); }}>Masquer la fenêtre <kbd>Super+H</kbd></button>
+                <hr />
+                <button role="menuitemcheckbox" aria-checked={Boolean(activeWindow.alwaysOnTop)} onClick={() => { setOpenMenu(null); onWindowAction?.('toggle-above', activeWindow.id); }}>Toujours au premier plan <span>{activeWindow.alwaysOnTop ? '✓' : ''}</span></button>
+                <button role="menuitemcheckbox" aria-checked={Boolean(activeWindow.onAllWorkspaces)} onClick={() => { setOpenMenu(null); onWindowAction?.('toggle-sticky', activeWindow.id); }}>Toujours sur le bureau visible <span>{activeWindow.onAllWorkspaces ? '✓' : ''}</span></button>
+                <hr />
+                <button role="menuitem" onClick={() => { setOpenMenu(null); onWindowAction?.('close', activeWindow.id); }}>Fermer <kbd>Alt+F4</kbd></button>
+              </div>
+            )}
+          </div>
+        ) : appName ? <span className="ubuntu-topbar__app-name">{appName}</span> : null}
       </div>
 
       {/* --- Center: clock + calendar --- */}
@@ -289,6 +335,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
               </div>
               <div className="ubuntu-qs-footer__right">
                 <button className="ubuntu-qs-footer__btn ubuntu-qs-appearance" aria-label="Ouvrir les réglages d’apparence" onClick={() => { setOpenMenu(null); onOpenAppearance?.(); }}><Sun size={16} /></button>
+                <button className="ubuntu-qs-footer__btn" aria-label="Ouvrir les paramètres" onClick={() => { setOpenMenu(null); onOpenSettings?.(); }}><Settings size={16} /></button>
                 <button className="ubuntu-qs-footer__btn" aria-label={capturing ? 'Préparation de la capture' : "Capture d'écran"} disabled={capturing} onClick={() => takeScreenshot()}><Camera size={16} /></button>
                 <button className="ubuntu-qs-footer__btn" aria-label="Verrouiller" onClick={() => openSession('lock')}><Lock size={16} /></button>
                 <button className="ubuntu-qs-footer__btn" aria-label="Éteindre ou se déconnecter" aria-expanded={detail === 'power'} onClick={() => setDetail(detail === 'power' ? null : 'power')}><Power size={16} /></button>

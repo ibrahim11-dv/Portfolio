@@ -8,6 +8,7 @@ import QuickLauncher from './launcher/QuickLauncher';
 import { desktopVisibilityAction } from './windows/desktopVisibility';
 import { rememberDocument } from '../shared/filesystem/recentDocuments';
 import AppearanceApp from '../apps/appearance/AppearanceApp';
+import SettingsApp from '../apps/settings/SettingsApp';
 import TopBar from './topbar/TopBar';
 import DesktopDock from './launcher/DesktopDock';
 import DesktopWindow from './windows/DesktopWindow';
@@ -123,15 +124,71 @@ export default function DesktopShell() {
     zIndex.current += 1;
     const layer = zIndex.current;
     const target = windows.find((item) => item.id === id);
-    if (target && target.workspace !== workspace) switchWorkspace(target.workspace);
+    if (target && !target.onAllWorkspaces && target.workspace !== workspace) switchWorkspace(target.workspace);
     setShowOverview(false);
     setShowApps(false);
     setActiveApp(id);
     setWindows((current) => current.map((window) => window.id === id ? { ...window, minimized: false, zIndex: layer } : window));
   }
 
+  function toggleWindowSticky(id) {
+    setWindows((current) => current.map((item) => item.id === id ? { ...item, onAllWorkspaces: !item.onAllWorkspaces, workspace } : item));
+  }
+
+  function handleWindowAction(action, id) {
+    if (!id) return;
+    if (action === 'toggle-maximize') window.dispatchEvent(new CustomEvent('portfolio:window-placement', { detail: { id, mode: 'toggle' } }));
+    else if (action === 'tile-left') window.dispatchEvent(new CustomEvent('portfolio:window-placement', { detail: { id, mode: 'left' } }));
+    else if (action === 'tile-right') window.dispatchEvent(new CustomEvent('portfolio:window-placement', { detail: { id, mode: 'right' } }));
+    else if (action === 'minimize') window.dispatchEvent(new CustomEvent('portfolio:window-minimize', { detail: { id } }));
+    else if (action === 'toggle-above') setWindows((current) => current.map((item) => item.id === id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item));
+    else if (action === 'toggle-sticky') toggleWindowSticky(id);
+    else if (action === 'close') window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }));
+  }
+
+  function handleTerminalWindowEffect(effect) {
+    const resolved = resolveAppId(effect.target);
+    if (effect.type === 'close-window') {
+      const targets = windows.filter((item) => item.id === effect.target || item.appId === resolved);
+      if (!targets.length) setDesktopNotice(`Aucune fenêtre ouverte pour « ${effect.target} ».`);
+      else targets.forEach((item) => window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: item.id } })));
+    } else if (effect.type === 'focus-window') {
+      const target = windows.find((item) => item.id === effect.target || item.appId === resolved);
+      if (target) focusApp(target.id);
+      else if (appById(resolved)) openApp(resolved);
+      else setDesktopNotice(`Application ou fenêtre « ${effect.target} » introuvable.`);
+    }
+  }
+
+  function runSystemCommand(command) {
+    if (command === 'desktop' || command === 'show-desktop') toggleDesktop();
+    else if (command === 'overview') { setShowApps(false); setShowOverview(true); }
+    else if (command === 'app-grid') { setShowOverview(false); setShowApps(true); }
+    else if (command === 'quick-launch') openQuickLauncher();
+    else if (command === 'storage') openApp('windows', { initialTab: 'storage' });
+    else if (command === 'shortcuts') openApp('windows', { initialTab: 'shortcuts' });
+    else if (command === 'lock' || command === 'lock-session') window.dispatchEvent(new CustomEvent('portfolio:session-action', { detail: { mode: 'lock' } }));
+    else if (command === 'screenshot') window.dispatchEvent(new CustomEvent('portfolio:session-action', { detail: { mode: 'screenshot' } }));
+    else if (command === 'workspace-switch') switchWorkspace((workspace + 1) % workspaceCount);
+    else if (command === 'open-terminal') openApp('terminal');
+    else if (command === 'open-files') openApp('files');
+    else if (command === 'open-calculator') openApp('calculator');
+    else if (command === 'open-clock') openApp('clock');
+  }
+
   function openApp(appId, payload = {}) {
     appId = resolveAppId(appId, payload.section);
+    if (appId === 'calculator' && payload.calculation) {
+      const { expression, result } = payload.calculation;
+      setAppSessions((current) => ({
+        ...current,
+        calculator: {
+          expression: result,
+          history: [{ expression, result }, ...(current.calculator?.history || [])].slice(0, 20),
+        },
+      }));
+      setDesktopNotice(`Résultat : ${result}`);
+    }
     const documentPath = payload.filePath || (appId === 'cv' ? `${ROOT}/Documents/CV.pdf` : null);
     if (documentPath && Object.hasOwn(files, documentPath) && files[documentPath] !== null && !readAppShortcut(files[documentPath])) {
       setRecentDocuments((current) => rememberDocument(current, documentPath));
@@ -146,7 +203,7 @@ export default function DesktopShell() {
     if (existing) {
       zIndex.current += 1;
       const layer = zIndex.current;
-      const navigation = options.directory || PORTFOLIO_APP_IDS.includes(appId) && (options.projectId !== undefined || options.restoreContext) || appId === 'trash' || (appId === 'editor' || appId === 'images') && options.filePath ? { navigationRequest: layer, restoreContext: options.restoreContext || null } : {};
+      const navigation = options.directory || options.initialTab || PORTFOLIO_APP_IDS.includes(appId) && (options.projectId !== undefined || options.restoreContext) || appId === 'trash' || (appId === 'editor' || appId === 'images') && options.filePath ? { navigationRequest: layer, restoreContext: options.restoreContext || null } : {};
       const targetWorkspace = requestedWorkspace ?? existing.workspace;
       if (targetWorkspace !== workspace) switchWorkspace(targetWorkspace);
       setActiveApp(existing.id);
@@ -291,6 +348,7 @@ export default function DesktopShell() {
       if (document.querySelector('dialog[open]')) return;
       if (event.altKey && event.key === 'F2') { event.preventDefault(); openQuickLauncher(); return; }
       if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'm') { event.preventDefault(); openApp('windows'); return; }
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 's') { event.preventDefault(); openApp('settings'); return; }
       if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'c') { event.preventDefault(); openApp('calculator'); return; }
       if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'h') { event.preventDefault(); openApp('clock'); return; }
       if (event.key === 'Meta') metaChord.current = false;
@@ -343,8 +401,18 @@ export default function DesktopShell() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase, hiddenByDesktop]);
 
+  const activeWindowItem = windows.find((item) => item.id === activeApp && !item.minimized && (item.workspace === workspace || item.onAllWorkspaces));
+  const activeTopBarWindow = activeWindowItem ? {
+    id: activeWindowItem.id,
+    appId: activeWindowItem.appId,
+    name: activeWindowItem.appId === 'trash' ? 'Corbeille' : appById(activeWindowItem.appId)?.name || 'Application',
+    icon: appById(activeWindowItem.appId)?.icon || '/ubuntu-apps/trash.png',
+    alwaysOnTop: activeWindowItem.alwaysOnTop,
+    onAllWorkspaces: activeWindowItem.onAllWorkspaces,
+  } : null;
+
   return <div className="desktop-shell">
-    <TopBar notifications={notifications} quiet={quiet} onQuiet={setQuiet} onClearNotifications={() => setNotifications([])} onDismissNotification={(id) => setNotifications(current => current.filter(item => item.id !== id))} appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} onQuickLaunch={openQuickLauncher} onOpenClock={() => openApp('clock')} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
+    <TopBar notifications={notifications} quiet={quiet} onQuiet={setQuiet} onClearNotifications={() => setNotifications([])} onDismissNotification={(id) => setNotifications(current => current.filter(item => item.id !== id))} appName="" activeWindow={activeTopBarWindow} onWindowAction={handleWindowAction} workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} onOpenSettings={() => openApp('settings')} onQuickLaunch={openQuickLauncher} onOpenClock={() => openApp('clock')} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
     <DesktopDock openApps={[...new Set(windows.map((item) => item.appId))]} activeApp={windows.find((item) => item.id === activeApp)?.appId} onOpen={dockAction} onLaunch={openApp} onQuit={quitApp} onTrashPaths={trashDrop} isFileProtected={(path) => !canDeletePath(files, path)} onShowApps={() => { setShowOverview(false); setShowApps((value) => !value); }} />
     <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onOpenExternal={(url, label) => { window.open(url, '_blank', 'noopener,noreferrer'); setDesktopNotice(`${label} ouvert dans un nouvel onglet.`); }} onOpenAppearance={() => openApp('appearance')} onFocusDesktop={() => setActiveApp(null)} />
     <main className="desktop-shell__workspace" aria-label="Espace de travail">
@@ -359,21 +427,25 @@ export default function DesktopShell() {
         else if (kind === 'calculator') content = <CalculatorApp session={appSessions.calculator} onSaveSession={saveAppSession} onNotify={setDesktopNotice} />;
         else if (kind === 'clock') content = <ClockApp state={clockState} onAction={clockAction} />;
         else if (kind === 'chess') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture de l’échiquier…</div>}><ChessApp session={appSessions.chess} onSaveSession={saveAppSession} /></Suspense>;
-        else if (kind === 'windows') content = <WindowManager windows={windows} workspaceCount={workspaceCount} onFocus={focusApp} onMinimize={(id) => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-minimize', { detail: { id } }))} onClose={(id) => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }))} onMove={moveWindowToWorkspace} />;
+        else if (kind === 'windows') content = <WindowManager windows={windows} workspaceCount={workspaceCount} files={files} setFiles={setFiles} initialTab={window.initialTab} navigationRequest={window.navigationRequest} onFocus={focusApp} onMinimize={(id) => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-minimize', { detail: { id } }))} onClose={(id) => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }))} onMove={moveWindowToWorkspace} onToggleSticky={toggleWindowSticky} onOpenApp={openApp} onOpenFile={openFile} onSystemCommand={runSystemCommand} onNotify={setDesktopNotice} />;
         else if (kind === 'appearance') content = <AppearanceApp onNotify={setDesktopNotice} />;
+        else if (kind === 'settings') content = <SettingsApp files={files} windows={windows} quiet={quiet} onQuiet={setQuiet} onOpenApp={openApp} onNotify={setDesktopNotice} />;
         else if (kind === 'cv') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture du document…<a href={PROFILE.cvUrl} download>Télécharger le CV</a></div>}><DocumentViewer filename={window.filePath?.split('/').at(-1) || 'CV.pdf'} initialReadingState={cvReadingState} onReadingState={setCVReadingState} onBack={returnFromCV} backLabel={cvBackLabel} onContact={() => openApp('contact')} onNotify={setDesktopNotice} onOpenCopy={() => openApp('cv', { newWindow: true, filePath: window.filePath })} onOpenFiles={() => openApp('files', { directory: `${ROOT}/Documents` })} /></Suspense>;
-        else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;
-        else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} />;
+        else if (kind === 'terminal') content = <VirtualTerminal initialDirectory={window.directory} initialTerminal={window.terminalSession} navigationRequest={window.navigationRequest} files={files} setFiles={setFiles} windows={windows} onWindowEffect={handleTerminalWindowEffect} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} onNewWindow={(terminalSession) => openApp('terminal', { newWindow: true, terminalSession })} onOpenFile={openFile} onOpenPortfolio={(section) => openApp('portfolio', { section })} onOpenCV={() => openApp('cv')} />;
+        else if (kind === 'files' || kind === 'trash') content = <FileManager initialDirectory={window.directory} navigationRequest={window.navigationRequest} initialLocation={kind === 'trash' ? 'trash' : undefined} files={files} setFiles={setFiles} onOpenFile={openFile} onOpenTerminal={(directory) => openApp('terminal', { directory })} />;
         else if (kind === 'editor') content = <TextEditor key={window.id} windowId={window.id} files={files} filePath={window.filePath} navigationRequest={window.navigationRequest} openRequests={window.editorRequests} initialDocument={window.editorDocument} setFiles={setFiles} onNewWindow={(editorDocument) => openApp('editor', { newWindow: true, editorDocument: editorDocument || createDocument(files, uniquePath(files, `${ROOT}/Documents`, 'Sans titre.txt'), 0, true) })} onOpenDirectory={(directory) => openApp('files', { directory })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
         else if (kind === 'images') content = <ImageViewer key={`${window.id}-${window.navigationRequest || 0}`} files={files} setFiles={setFiles} filePath={window.filePath} onNavigate={(filePath) => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, filePath: filePath || undefined } : item))} onOpenDirectory={(directory) => openApp('files', { directory })} onNewWindow={() => openApp('images', { newWindow: true })} onClose={() => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id: window.id } }))} />;
         else content = <SystemApp kind={kind} onOpen={openApp} onReplayIntroduction={replayIntroduction} onQuickLaunch={openQuickLauncher} />;
-        return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} initialMaximized={window.initialMaximized} minimized={window.minimized} workspaceHidden={window.workspace !== workspace} isActive={activeApp === window.id && window.workspace === workspace && !showOverview && !showApps && !showLauncher} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
+        return <DesktopWindow key={window.id} windowId={window.id} appId={kind} title={title} icon={icon} initialPosition={window.initialPosition} initialMaximized={window.initialMaximized} minimized={window.minimized} workspaceHidden={!window.onAllWorkspaces && window.workspace !== workspace} isActive={activeApp === window.id && (window.workspace === workspace || window.onAllWorkspaces) && !showOverview && !showApps && !showLauncher} zIndex={(window.zIndex || 10) + (window.alwaysOnTop ? 2000 : 0)} alwaysOnTop={window.alwaysOnTop} onToggleAbove={() => setWindows((current) => current.map((item) => item.id === window.id ? { ...item, alwaysOnTop: !item.alwaysOnTop } : item))} onAllWorkspaces={Boolean(window.onAllWorkspaces)} onToggleAllWorkspaces={() => toggleWindowSticky(window.id)} workspace={window.workspace} workspaceCount={workspaceCount} onMoveWorkspace={(index) => moveWindowToWorkspace(window.id, index)} onFocus={(reason) => focusApp(window.id, reason)} onClose={() => closeApp(window.id)}>{content}</DesktopWindow>;
       })}
     </main>
     {showLauncher && <QuickLauncher windows={windows} files={files} recent={recentDocuments} commands={[
       { command: 'desktop', name: desktopVisibilityAction(windows, workspace, hiddenByDesktop[workspace]).type === 'restore' ? 'Restaurer les fenêtres' : 'Afficher le bureau' },
       { command: 'overview', name: 'Vue des bureaux' },
-    ]} onOpen={openApp} onOpenPath={openSearchPath} onCommand={(command) => { if (command === 'desktop') toggleDesktop(); else { setShowApps(false); setShowOverview(true); } }} onClearRecent={() => { setRecentDocuments([]); setDesktopNotice('Liste des documents récents effacée. Les fichiers sont conservés.'); }} onFocus={focusApp} onClose={() => setShowLauncher(false)} />}
+      { command: 'storage', name: 'Inspecter le stockage virtuel' },
+      { command: 'shortcuts', name: 'Raccourcis clavier du système' },
+      { command: 'lock', name: 'Verrouiller la session' },
+    ]} onOpen={openApp} onOpenPath={openSearchPath} onCommand={runSystemCommand} onClearRecent={() => { setRecentDocuments([]); setDesktopNotice('Liste des documents récents effacée. Les fichiers sont conservés.'); }} onFocus={focusApp} onClose={() => setShowLauncher(false)} />}
     <WorkspaceTransition ref={workspaceTransition} />
     {switcher && <div className="ubuntu-app-switcher" role="dialog" aria-label="Changer d’application"><div className="ubuntu-app-switcher__apps">{switcher.ids.map((id, index) => { const item = windows.find((candidate) => candidate.id === id); const app = appById(item?.appId); return <button key={id} className={switcher.index === index ? 'is-selected' : ''} aria-pressed={switcher.index === index} onClick={() => { focusApp(id); setSwitcher(null); }}><img src={app?.icon || '/ubuntu-apps/trash.png'} alt="" /><span>{app?.name || 'Corbeille'}</span></button>; })}</div></div>}
     {workspaceNotice !== null && !showOverview && <div className="ubuntu-workspace-osd" role="status">{Array.from({ length: workspaceCount }, (_, index) => <span key={index} className={workspaceNotice === index ? 'is-current' : ''}>{index + 1}</span>)}</div>}

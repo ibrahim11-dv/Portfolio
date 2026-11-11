@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { clockReducer, INITIAL_CLOCK, timerRemaining, stopwatchElapsed, formatDuration } from './clockState.js';
+import { clockReducer, INITIAL_CLOCK, timerRemaining, stopwatchElapsed, formatDuration, WORLD_CITIES, formatWorldCity } from './clockState.js';
 
 test('timer uses a deadline and completes once even after a long background delay', () => {
   const started = clockReducer(INITIAL_CLOCK, { type: 'start-timer', now: 1000, duration: 5000 });
@@ -48,4 +48,12 @@ test('stopwatch supports pause, resume, laps and bounded history without losing 
 test('duration formatting handles hours, fractions and zero', () => {
   assert.equal(formatDuration(3661230, true), '01:01:01.23');
   assert.equal(formatDuration(-1), '00:00:00');
+});
+
+test('world clocks tab and city formatting return localized time and period', () => {
+  const switched = clockReducer(INITIAL_CLOCK, { type: 'tab', tab: 'world' });
+  assert.equal(switched.tab, 'world');
+  const city = formatWorldCity(WORLD_CITIES[0], Date.UTC(2026, 4, 15, 12, 0, 0));
+  assert.ok(city.time.includes(':'));
+  assert.equal(city.period, 'Jour');
 });

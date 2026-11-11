@@ -76,19 +76,38 @@ function initialLayout(appId, position, initialMaximized = false) {
 function snappedRect(mode, area = workArea()) {
   if (mode === 'maximized') return { x: area.x, y: area.y, width: area.width, height: area.height };
   const width = Math.floor(area.width / 2);
+  const height = Math.floor(area.height / 2);
+  const rightX = area.x + width;
+  const rightWidth = area.width - width;
+  const bottomY = area.y + height;
+  const bottomHeight = area.height - height;
+  if (mode === 'top-left') return { x: area.x, y: area.y, width, height };
+  if (mode === 'top-right') return { x: rightX, y: area.y, width: rightWidth, height };
+  if (mode === 'bottom-left') return { x: area.x, y: bottomY, width, height: bottomHeight };
+  if (mode === 'bottom-right') return { x: rightX, y: bottomY, width: rightWidth, height: bottomHeight };
   return {
-    x: mode === 'right' ? area.x + width : area.x,
+    x: mode === 'right' ? rightX : area.x,
     y: area.y,
-    width: mode === 'right' ? area.width - width : width,
+    width: mode === 'right' ? rightWidth : width,
     height: area.height,
   };
 }
 
 function snapAtPointer(event, area, minimum = MINIMUM_WINDOW_SIZE) {
+  const canTileHalf = !area.mobile && Math.floor(area.width / 2) >= minimum[0];
+  const canTileQuarter = canTileHalf && Math.floor(area.height / 2) >= minimum[1];
+  const nearLeft = event.clientX <= area.x + 16;
+  const nearRight = event.clientX >= area.x + area.width - 16;
+  const nearTop = event.clientY <= TOP_BAR_HEIGHT + 24;
+  const nearBottom = event.clientY >= TOP_BAR_HEIGHT + area.height - 24;
+  if (canTileQuarter && nearLeft && nearTop) return 'top-left';
+  if (canTileQuarter && nearRight && nearTop) return 'top-right';
+  if (canTileQuarter && nearLeft && nearBottom) return 'bottom-left';
+  if (canTileQuarter && nearRight && nearBottom) return 'bottom-right';
   if (event.clientY <= TOP_BAR_HEIGHT + 16) return 'maximized';
-  if (area.mobile || Math.floor(area.width / 2) < minimum[0]) return null;
-  if (event.clientX <= area.x + 16) return 'left';
-  if (event.clientX >= area.x + area.width - 16) return 'right';
+  if (!canTileHalf) return null;
+  if (nearLeft) return 'left';
+  if (nearRight) return 'right';
   return null;
 }
 
@@ -118,7 +137,7 @@ function resizedRect(origin, direction, dx, dy, area, minimum = MINIMUM_WINDOW_S
   return { x, y, width, height };
 }
 
-export default function DesktopWindow({ title, icon, children, appId, windowId = appId, initialPosition, initialMaximized = false, onClose, onFocus, zIndex, minimized = false, workspaceHidden = false, isActive = true, alwaysOnTop = false, onToggleAbove, workspace = 0, workspaceCount = 2, onMoveWorkspace }) {
+export default function DesktopWindow({ title, icon, children, appId, windowId = appId, initialPosition, initialMaximized = false, onClose, onFocus, zIndex, minimized = false, workspaceHidden = false, isActive = true, alwaysOnTop = false, onToggleAbove, onAllWorkspaces = false, onToggleAllWorkspaces, workspace = 0, workspaceCount = 2, onMoveWorkspace }) {
   const [layout, setLayout] = useState(() => initialLayout(appId, initialPosition, initialMaximized));
   const [animatedGeometry, setAnimatedGeometry] = useState(false);
   const [gestureKind, setGestureKind] = useState(null);
@@ -199,7 +218,11 @@ export default function DesktopWindow({ title, icon, children, appId, windowId =
   if (appearance.minimized !== minimized) setAppearance({ minimized, restoring: !minimized, opening: false });
 
   const changePlacement = useCallback((mode) => {
-    if (['left', 'right'].includes(mode) && Math.floor(workArea().width / 2) < minimumSize[0]) return;
+    const area = workArea();
+    const isTile = ['left', 'right', 'top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(mode);
+    const isQuarter = ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(mode);
+    if (isTile && Math.floor(area.width / 2) < minimumSize[0]) return;
+    if (isQuarter && Math.floor(area.height / 2) < minimumSize[1]) return;
     setAppearance((current) => ({ ...current, opening: false, restoring: false }));
     setAnimatedGeometry(true);
     setSnapTarget(null);
@@ -258,9 +281,14 @@ export default function DesktopWindow({ title, icon, children, appId, windowId =
 
   useEffect(() => {
     function closeFromShell(event) { if (event.detail?.id === windowId) requestClose(); }
+    function placeFromShell(event) { if (event.detail?.id === windowId && event.detail?.mode) changePlacement(event.detail.mode); }
     window.addEventListener('portfolio:window-close', closeFromShell);
-    return () => window.removeEventListener('portfolio:window-close', closeFromShell);
-  }, [windowId, requestClose]);
+    window.addEventListener('portfolio:window-placement', placeFromShell);
+    return () => {
+      window.removeEventListener('portfolio:window-close', closeFromShell);
+      window.removeEventListener('portfolio:window-placement', placeFromShell);
+    };
+  }, [windowId, requestClose, changePlacement]);
 
   useEffect(() => {
     const element = sectionRef.current;
@@ -523,11 +551,16 @@ export default function DesktopWindow({ title, icon, children, appId, windowId =
     }}>
       <button role="menuitem" onClick={() => { setWindowMenu(null); requestMinimize(); }}>Masquer <kbd>Super+H</kbd></button>
       <button role="menuitem" onClick={() => { setWindowMenu(null); changePlacement('toggle'); }}>{maximized ? 'Restaurer' : 'Agrandir'}<kbd>Alt+F10</kbd></button>
+      {Math.floor(workArea().width / 2) >= minimumSize[0] && <>
+        <button role="menuitem" onClick={() => { setWindowMenu(null); changePlacement('left'); }}>Ancrer à gauche <kbd>Super+←</kbd></button>
+        <button role="menuitem" onClick={() => { setWindowMenu(null); changePlacement('right'); }}>Ancrer à droite <kbd>Super+→</kbd></button>
+      </>}
       <button role="menuitem" onClick={() => startKeyboardGesture('move')}>Déplacer <kbd>Alt+F7</kbd></button>
       <button role="menuitem" disabled={maximized} onClick={() => startKeyboardGesture('resize')}>Redimensionner <kbd>Alt+F8</kbd></button>
       {onToggleAbove && <button role="menuitemcheckbox" aria-checked={alwaysOnTop} disabled={maximized} onClick={() => { setWindowMenu(null); onToggleAbove(); restoreAppFocus(); }}>Toujours au premier plan <span>{alwaysOnTop ? '✓' : ''}</span></button>}
-      {onMoveWorkspace && workspace > 0 && <button role="menuitem" onClick={() => { setWindowMenu(null); onMoveWorkspace(workspace - 1); }}>Déplacer vers le bureau à gauche</button>}
-      {onMoveWorkspace && workspace < workspaceCount - 1 && <button role="menuitem" onClick={() => { setWindowMenu(null); onMoveWorkspace(workspace + 1); }}>Déplacer vers le bureau à droite</button>}
+      {onToggleAllWorkspaces && <button role="menuitemcheckbox" aria-checked={onAllWorkspaces} onClick={() => { setWindowMenu(null); onToggleAllWorkspaces(); restoreAppFocus(); }}>Toujours sur l’espace de travail visible <span>{onAllWorkspaces ? '✓' : ''}</span></button>}
+      {onMoveWorkspace && !onAllWorkspaces && workspace > 0 && <button role="menuitem" onClick={() => { setWindowMenu(null); onMoveWorkspace(workspace - 1); }}>Déplacer vers le bureau à gauche</button>}
+      {onMoveWorkspace && !onAllWorkspaces && workspace < workspaceCount - 1 && <button role="menuitem" onClick={() => { setWindowMenu(null); onMoveWorkspace(workspace + 1); }}>Déplacer vers le bureau à droite</button>}
       <div role="separator" />
       <button role="menuitem" onClick={() => { setWindowMenu(null); requestClose(); }}>Fermer <kbd>Alt+F4</kbd></button>
     </div>, document.body)}

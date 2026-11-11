@@ -4,6 +4,39 @@ export const INITIAL_CLOCK = {
   stopwatch: { elapsed: 0, startedAt: null, laps: [] },
 };
 
+export const WORLD_CITIES = [
+  { id: 'perpignan', name: 'Perpignan / Paris', country: 'France', timeZone: 'Europe/Paris' },
+  { id: 'oujda', name: 'Oujda / Casablanca', country: 'Maroc', timeZone: 'Africa/Casablanca' },
+  { id: 'utc', name: 'UTC', country: 'Temps universel', timeZone: 'UTC' },
+  { id: 'london', name: 'Londres', country: 'Royaume-Uni', timeZone: 'Europe/London' },
+  { id: 'montreal', name: 'Montréal', country: 'Canada', timeZone: 'America/Toronto' },
+  { id: 'new_york', name: 'New York', country: 'États-Unis', timeZone: 'America/New_York' },
+  { id: 'tokyo', name: 'Tokyo', country: 'Japon', timeZone: 'Asia/Tokyo' },
+];
+
+export function formatWorldCity(city, now = Date.now()) {
+  const date = new Date(now);
+  const time = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: city.timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date);
+  const dayLabel = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: city.timeZone,
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  }).format(date);
+  const hour24 = Number(new Intl.DateTimeFormat('en-GB', {
+    timeZone: city.timeZone,
+    hour: '2-digit',
+    hour12: false,
+  }).format(date));
+  const period = hour24 >= 6 && hour24 < 19 ? 'Jour' : 'Nuit';
+  return { ...city, time, dayLabel, period };
+}
+
 export function timerRemaining(timer, now) { return timer.status === 'running' ? Math.max(0, timer.endsAt - now) : timer.remaining; }
 export function stopwatchElapsed(watch, now) { return watch.elapsed + (watch.startedAt === null ? 0 : Math.max(0, now - watch.startedAt)); }
 export function formatDuration(ms, fractions = false) {
@@ -16,7 +49,7 @@ export function clockReducer(state, action) {
   const { timer, stopwatch } = state;
   const now = action.now;
   switch (action.type) {
-    case 'tab': return ['timer', 'stopwatch'].includes(action.tab) ? { ...state, tab: action.tab } : state;
+    case 'tab': return ['timer', 'stopwatch', 'world'].includes(action.tab) ? { ...state, tab: action.tab } : state;
     case 'start-timer': {
       if (!Number.isInteger(action.duration) || action.duration < 1000 || action.duration > 86400000 || timer.status === 'running') return state;
       return { ...state, timer: { status: 'running', duration: action.duration, remaining: action.duration, endsAt: now + action.duration, run: timer.run + 1 } };
