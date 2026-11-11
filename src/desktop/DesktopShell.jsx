@@ -1,6 +1,9 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import SystemApp from '../apps/system/SystemApp';
 import WindowManager from '../apps/system/WindowManager';
+import CalculatorApp from '../apps/calculator/CalculatorApp';
+import ClockApp from '../apps/clock/ClockApp';
+import { useClock } from '../apps/clock/useClock';
 import QuickLauncher from './launcher/QuickLauncher';
 import { desktopVisibilityAction } from './windows/desktopVisibility';
 import { rememberDocument } from '../shared/filesystem/recentDocuments';
@@ -68,6 +71,7 @@ export default function DesktopShell() {
     if (text) setNotifications(current => [{ id: Math.max(Date.now(), (current[0]?.id || 0) + 1), text }, ...current].slice(0, 30));
   }, []);
   const [introduction, setIntroduction] = useState(() => initialProjectRoute ? { phase: 'done', step: 0 } : initialIntroductionState());
+  const [clockState, clockAction] = useClock(setDesktopNotice);
   const zIndex = useRef(initialProjectRoute ? 11 : 10);
   const nextInstance = useRef(1);
   const pendingLaunches = useRef(new Map());
@@ -138,7 +142,7 @@ export default function DesktopShell() {
     const { newWindow = false, workspace: requestedWorkspace, ...options } = payload;
     const pendingLaunch = pendingLaunches.current.get(appId);
     const candidates = [...windows.filter((item) => item.appId === appId), ...(pendingLaunch && !windows.some((item) => item.id === pendingLaunch.id) ? [pendingLaunch] : [])].sort((a, b) => b.zIndex - a.zIndex);
-    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow && !PORTFOLIO_APP_IDS.includes(appId) && appId !== 'chess');
+    const existing = findReusableWindow(candidates, appId, options.filePath, newWindow && !PORTFOLIO_APP_IDS.includes(appId) && !['chess', 'calculator', 'clock'].includes(appId));
     if (existing) {
       zIndex.current += 1;
       const layer = zIndex.current;
@@ -287,6 +291,8 @@ export default function DesktopShell() {
       if (document.querySelector('dialog[open]')) return;
       if (event.altKey && event.key === 'F2') { event.preventDefault(); openQuickLauncher(); return; }
       if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'm') { event.preventDefault(); openApp('windows'); return; }
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'c') { event.preventDefault(); openApp('calculator'); return; }
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'h') { event.preventDefault(); openApp('clock'); return; }
       if (event.key === 'Meta') metaChord.current = false;
       else if (event.metaKey) metaChord.current = true;
       if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 't') { event.preventDefault(); openApp('terminal'); }
@@ -338,7 +344,7 @@ export default function DesktopShell() {
   }, [showApps, windows, activeApp, switcher, workspace, workspaceCount, introduction.phase, hiddenByDesktop]);
 
   return <div className="desktop-shell">
-    <TopBar notifications={notifications} quiet={quiet} onQuiet={setQuiet} onClearNotifications={() => setNotifications([])} onDismissNotification={(id) => setNotifications(current => current.filter(item => item.id !== id))} appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} onQuickLaunch={openQuickLauncher} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
+    <TopBar notifications={notifications} quiet={quiet} onQuiet={setQuiet} onClearNotifications={() => setNotifications([])} onDismissNotification={(id) => setNotifications(current => current.filter(item => item.id !== id))} appName="" workspaceCount={workspaceCount} workspace={workspace} onWorkspaceChange={switchWorkspace} onOpenAppearance={() => openApp('appearance')} onQuickLaunch={openQuickLauncher} onOpenClock={() => openApp('clock')} overviewOpen={showOverview} onOverview={() => { setShowApps(false); setShowOverview((value) => !value); }} />
     <DesktopDock openApps={[...new Set(windows.map((item) => item.appId))]} activeApp={windows.find((item) => item.id === activeApp)?.appId} onOpen={dockAction} onLaunch={openApp} onQuit={quitApp} onTrashPaths={trashDrop} isFileProtected={(path) => !canDeletePath(files, path)} onShowApps={() => { setShowOverview(false); setShowApps((value) => !value); }} />
     <DesktopItems files={files} setFiles={setFiles} onOpen={openApp} onOpenFile={openFile} onOpenExternal={(url, label) => { window.open(url, '_blank', 'noopener,noreferrer'); setDesktopNotice(`${label} ouvert dans un nouvel onglet.`); }} onOpenAppearance={() => openApp('appearance')} onFocusDesktop={() => setActiveApp(null)} />
     <main className="desktop-shell__workspace" aria-label="Espace de travail">
@@ -350,6 +356,8 @@ export default function DesktopShell() {
         let content;
         if (PORTFOLIO_APP_IDS.includes(kind)) content = <PortfolioApp appId={kind} session={appSessions[kind]} onSaveSession={saveAppSession} projectRequest={window.projectId} onOpenApp={openApp} onProjectRouteChange={syncProjectRoute} navigationRequest={window.navigationRequest} restoreContext={window.restoreContext} onOpenCV={(trigger, context) => openCV(window.id, trigger, context)} onNotify={setDesktopNotice} />;
         else if (kind === 'circuit') content = <CircuitApp session={appSessions.circuit} onSaveSession={saveAppSession} />;
+        else if (kind === 'calculator') content = <CalculatorApp session={appSessions.calculator} onSaveSession={saveAppSession} onNotify={setDesktopNotice} />;
+        else if (kind === 'clock') content = <ClockApp state={clockState} onAction={clockAction} />;
         else if (kind === 'chess') content = <Suspense fallback={<div className="ubuntu-simple-app" role="status">Ouverture de l’échiquier…</div>}><ChessApp session={appSessions.chess} onSaveSession={saveAppSession} /></Suspense>;
         else if (kind === 'windows') content = <WindowManager windows={windows} workspaceCount={workspaceCount} onFocus={focusApp} onMinimize={(id) => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-minimize', { detail: { id } }))} onClose={(id) => globalThis.window.dispatchEvent(new CustomEvent('portfolio:window-close', { detail: { id } }))} onMove={moveWindowToWorkspace} />;
         else if (kind === 'appearance') content = <AppearanceApp onNotify={setDesktopNotice} />;

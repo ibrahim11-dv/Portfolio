@@ -28,7 +28,7 @@ function SymbolicIcon({ name }) {
   return <span aria-hidden="true" className="ubuntu-symbolic-icon" style={{ '--icon': `url("${import.meta.env.BASE_URL}ubuntu-icons/${name}-symbolic.svg")` }} />;
 }
 
-export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, onQuickLaunch, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
+export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange, workspace, onOverview, onOpenAppearance, onOpenClock, onQuickLaunch, overviewOpen = false, notifications = [], onClearNotifications, onDismissNotification, quiet = false, onQuiet }) {
   const { effectiveTheme, setTheme } = useAppearance();
   const [now, setNow] = useState(new Date());
   const [openMenu, setOpenMenu] = useState(null); // "clock" | "system" | null
@@ -258,7 +258,7 @@ export default function TopBar({ appName, workspaceCount = 4, onWorkspaceChange,
           <span>{barDate}</span><span>{timeStr}</span>{quiet && <Moon size={12} aria-label="Ne pas déranger" />}{notifications.length > 0 && <span className="ubuntu-topbar__notification-dot" aria-label={`${notifications.length} notifications`} />}
         </button>
 
-        {openMenu === "clock" && <ClockMenu now={now} notifications={notifications} onClear={onClearNotifications} onDismiss={onDismissNotification} quiet={quiet} onQuiet={onQuiet} />}
+        {openMenu === "clock" && <ClockMenu now={now} notifications={notifications} onClear={onClearNotifications} onDismiss={onDismissNotification} quiet={quiet} onQuiet={onQuiet} onOpenClock={() => { setOpenMenu(null); onOpenClock?.(); }} />}
       </div>
 
       {/* --- Right: system menu --- */}

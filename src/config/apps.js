@@ -13,6 +13,8 @@ export const DESKTOP_APPS = [
   { id: 'images', name: 'Visionneur d’images', icon: '/ubuntu-apps/loupe.svg' },
   { id: 'appearance', name: 'Apparence', icon: '/ubuntu-apps/appearance.svg' },
   { id: 'windows', name: 'Gestionnaire de fenêtres', icon: '/ubuntu-apps/windows.svg' },
+  { id: 'calculator', name: 'Calculatrice', icon: '/ubuntu-apps/calculator.svg' },
+  { id: 'clock', name: 'Horloge', icon: '/ubuntu-apps/clock.svg' },
   { id: 'help', name: 'Aide', icon: '/ubuntu-apps/help.png' },
   { id: 'store', name: 'App Center', icon: '/ubuntu-apps/store.png' },
 ];

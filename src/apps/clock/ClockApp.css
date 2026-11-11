@@ -1,0 +1,21 @@
+.clock-app { container-type: inline-size; height: 100%; box-sizing: border-box; overflow: auto; padding: 22px; background: var(--theme-surface); color: var(--theme-ink); font: 16px/1.5 var(--font-ubuntu); }
+.clock-app nav, .clock-app__actions, .clock-app__presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.clock-app nav button { flex: 1; }
+.clock-app button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--theme-line); border-radius: 6px; color: inherit; background: var(--theme-surface-muted); font: inherit; cursor: pointer; }
+.clock-app button[aria-pressed="true"], .clock-app .is-primary { background: var(--brand-action); color: var(--brand-on-action); }
+.clock-app button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 4px; }
+.clock-app button:disabled, .clock-app fieldset:disabled { opacity: .65; }
+.clock-app h1 { font-size: 24px; margin: 22px 0 8px; }
+.clock-app__display { font-size: clamp(27px, 9cqi, 48px); font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
+.clock-app [role="status"] { margin: 6px 0 20px; }
+.clock-app fieldset { min-width: 0; padding: 0; border: 0; margin: 0 0 18px; }
+.clock-app legend { margin-bottom: 10px; }
+.clock-app__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.clock-app label { display: grid; gap: 6px; }
+.clock-app input { width: 100%; min-width: 0; box-sizing: border-box; min-height: 44px; padding: 8px; font: inherit; border: 1px solid var(--theme-line); border-radius: 6px; color: inherit; background: var(--theme-surface-muted); }
+.clock-app__presets { margin-top: 12px; }
+.clock-app :focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
+.clock-app__note { color: var(--theme-muted); font-size: 14px; margin-top: 22px; }
+.clock-app__laps { padding: 0; list-style: none; margin-top: 22px; }
+.clock-app__laps li { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; padding-block: 10px; border-bottom: 1px solid var(--theme-line); font-variant-numeric: tabular-nums; }
+.clock-app__laps small { color: var(--theme-muted); }

@@ -4,7 +4,7 @@ import { Bell, ChevronLeft, ChevronRight, X } from 'lucide-react';
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
 const fullDate = (date) => date.toLocaleDateString('fr-FR', { dateStyle: 'full' });
 
-export default function ClockMenu({ now, notifications, onClear, onDismiss, quiet, onQuiet }) {
+export default function ClockMenu({ now, notifications, onClear, onDismiss, quiet, onQuiet, onOpenClock }) {
   const [selected, setSelected] = useState(now);
   const [month, setMonth] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
   const grid = useRef(null);
@@ -41,6 +41,7 @@ export default function ClockMenu({ now, notifications, onClear, onDismiss, quie
         {days.map(date => <button key={date.toISOString()} tabIndex={sameDay(date, selected) ? 0 : -1} aria-label={fullDate(date)} aria-pressed={sameDay(date, selected)} aria-current={sameDay(date, now) ? 'date' : undefined} onKeyDown={event => navigate(event, date)} onClick={() => choose(date)} className={`ubuntu-calendar__day${sameDay(date, now) ? ' ubuntu-calendar__day--today' : ''}${date.getMonth() !== month.getMonth() ? ' is-other-month' : ''}`}>{date.getDate()}</button>)}
       </div>
       <div className="ubuntu-calendar__agenda"><strong>{sameDay(selected, now) ? 'Aujourd’hui' : fullDate(selected)}</strong><p>Aucun événement</p></div>
+      <button className="desktop-action" onClick={onOpenClock}>Ouvrir Horloge</button>
     </section>
   </div>;
 }

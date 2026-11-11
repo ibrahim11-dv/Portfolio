@@ -1,0 +1,17 @@
+.calculator-app { height: 100%; overflow: auto; box-sizing: border-box; padding: 18px; background: var(--theme-surface); color: var(--theme-ink); font: 16px/1.5 var(--font-ubuntu); }
+.calculator-app label { display: grid; gap: 6px; }
+.calculator-app input { box-sizing: border-box; width: 100%; min-width: 0; padding: 12px; border: 1px solid var(--theme-line); background: var(--theme-surface-muted); color: inherit; font: 28px var(--font-ubuntu); text-align: right; border-radius: 6px; }
+.calculator-app__feedback { min-height: 48px; padding-block: 8px; font-size: 14px; }
+.calculator-app__keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.calculator-app button { min-height: 44px; padding: 8px; border: 1px solid var(--theme-line); border-radius: 6px; color: inherit; background: var(--theme-surface-muted); font: inherit; cursor: pointer; }
+.calculator-app__keys button { min-height: 50px; font-size: 22px; }
+.calculator-app button.is-primary { background: var(--brand-action); color: var(--brand-on-action); }
+.calculator-app button:hover { border-color: var(--app-accent); }
+.calculator-app button:disabled { opacity: .5; cursor: default; }
+.calculator-app :focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
+.calculator-app__actions { display: flex; gap: 8px; margin-top: 12px; }
+.calculator-app__actions button { flex: 1; }
+.calculator-app p { font-size: 14px; color: var(--theme-muted); margin-block: 12px; }
+.calculator-app summary { min-height: 44px; cursor: pointer; padding-block: 8px; }
+.calculator-app ol { list-style: none; padding: 0; display: grid; gap: 8px; margin-block: 12px; }
+.calculator-app li button { display: grid; width: 100%; text-align: left; overflow-wrap: anywhere; }
