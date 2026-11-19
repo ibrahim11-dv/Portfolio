@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { formatDuration, formatWorldCity, stopwatchElapsed, timerRemaining, WORLD_CITIES } from './clockState';
 import './ClockApp.css';
+import AlarmPanel from './AlarmPanel';
 
 export default function ClockApp({ state, onAction }) {
   const [now, setNow] = useState(() => Date.now());
@@ -30,6 +31,7 @@ export default function ClockApp({ state, onAction }) {
       <button aria-pressed={tab === 'timer'} onClick={() => act('tab', { tab: 'timer' })}>Minuteur</button>
       <button aria-pressed={tab === 'stopwatch'} onClick={() => act('tab', { tab: 'stopwatch' })}>Chronomètre</button>
       <button aria-pressed={tab === 'world'} onClick={() => act('tab', { tab: 'world' })}>Monde</button>
+      <button aria-pressed={tab === 'alarms'} onClick={() => act('tab', { tab: 'alarms' })}>Alarmes{state.alarms.some((alarm) => alarm.status === 'ringing') ? ' · Rappel' : ''}</button>
     </nav>
     {tab === 'timer' ? <>
       <h1>Minuteur</h1><div className="clock-app__display" role="timer" aria-label="Temps restant">{formatDuration(Math.ceil(timerRemaining(timer, now) / 1000) * 1000)}</div><p role="status">{statuses[timer.status]}</p>
@@ -42,7 +44,7 @@ export default function ClockApp({ state, onAction }) {
       <div className="clock-app__actions"><button className="is-primary" onClick={() => act(stopwatch.startedAt === null ? 'start-watch' : 'pause-watch')}>{stopwatch.startedAt === null ? stopwatch.elapsed ? 'Reprendre' : 'Démarrer' : 'Pause'}</button><button disabled={stopwatch.startedAt === null || stopwatch.laps.length >= 50} onClick={() => act('lap')}>Tour</button><button onClick={() => act('reset-watch')}>Réinitialiser</button></div>
       <ol className="clock-app__laps" aria-label="Temps intermédiaires">{stopwatch.laps.map((elapsed, index) => <li key={index}><span>Tour {index + 1}</span><strong>{formatDuration(elapsed, true)}</strong><small>+ {formatDuration(elapsed - (stopwatch.laps[index - 1] || 0), true)}</small></li>)}</ol>
       <p className="clock-app__note">Jusqu’à 50 tours. Le chronomètre continue lorsque cette fenêtre est fermée, jusqu’au rechargement de la page.</p>
-    </> : <>
+    </> : tab === 'alarms' ? <AlarmPanel alarms={state.alarms} onAction={onAction} /> : <>
       <h1>Horloges mondiales</h1>
       <label className="clock-app__world-search">Filtrer une ville
         <input type="search" value={cityFilter} onChange={(event) => setCityFilter(event.target.value)} placeholder="Perpignan, Oujda, Montréal, Tokyo…" />

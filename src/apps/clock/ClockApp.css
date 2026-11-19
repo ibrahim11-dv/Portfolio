@@ -28,3 +28,12 @@
 .clock-app__world-time { text-align: right; font-variant-numeric: tabular-nums; }
 .clock-app__world-time > span { display: block; font-size: 20px; font-weight: 600; }
 .clock-app__badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; border: 1px solid var(--theme-line); }
+
+.clock-app__alarm-form { display: grid; gap: 14px; }
+.clock-app__alarm-list { list-style: none; padding: 0; display: grid; gap: 16px; }
+.clock-app__alarm-list li { min-width: 0; padding: 16px; border: 1px solid var(--theme-line); border-radius: 8px; background: var(--theme-surface-muted); }
+.clock-app__alarm-list .is-ringing { border: 2px solid var(--app-accent); }
+.clock-app__alarm-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; overflow-wrap: anywhere; }
+.clock-app__alarm-heading span { font-size: 24px; font-variant-numeric: tabular-nums; }
+.clock-app__alarm-list p { color: var(--theme-muted); }
+.clock-app [role="switch"][aria-checked="true"] { border-color: var(--app-accent); font-weight: 700; }

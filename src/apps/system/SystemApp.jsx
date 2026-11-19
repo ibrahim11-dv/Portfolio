@@ -13,7 +13,7 @@ const APP_META = {
   editor: { category: 'office', desc: 'Éditeur de texte multi-onglets avec recherche regex et aperçu Markdown (Alt+P).' },
   images: { category: 'office', desc: 'Visionneur d’images avec zoom, rotation et métadonnées.' },
   calculator: { category: 'office', desc: 'Calculatrice arithmétique avec mémoire, historique et copie rapide.' },
-  clock: { category: 'office', desc: 'Minuteur persistant, chronomètre à tours et horloges mondiales.' },
+  clock: { category: 'office', desc: 'Minuteur, alarmes de session, chronomètre à tours et horloges mondiales.' },
   terminal: { category: 'system', desc: 'Terminal bash simulé (ps, kill, focus, tree, find, du, df, grep, neofetch).' },
   windows: { category: 'system', desc: 'Gestionnaire de fenêtres, inspecteur de stockage JSON et catalogue de raccourcis.' },
   appearance: { category: 'system', desc: 'Personnalisation du thème clair/sombre et des fonds d’écran Ubuntu.' },
@@ -30,7 +30,7 @@ const HELP_TOPICS = [
   { title: 'Éditeur & Aperçu Markdown', body: 'Ouvrez n’importe quel fichier .md (À propos.md, README.md des projets) dans l’Éditeur de texte et cliquez sur l’icône d’œil (Alt+P) pour basculer entre le code source et l’aperçu Markdown formaté.' },
   { title: 'Lancement rapide & Calcul direct', body: 'Alt+F2 recherche applications, fenêtres, fichiers, récents et actions système. Saisissez directement une expression mathématique (ex. 15 * 24 ou = 120 / 4) pour obtenir et copier le résultat instantanément.' },
   { title: 'Gestionnaire système & Sauvegarde', body: 'Ctrl+Alt+M ouvre le Gestionnaire de fenêtres avec ses 3 onglets : Fenêtres (bureaux, épinglage sur tous les bureaux), Stockage (répartition par type et export/import JSON de vos fichiers) et Raccourcis.' },
-  { title: 'Horloge, Minuteur & Agenda', body: 'Ctrl+Alt+H ouvre le minuteur persistant, le chronomètre et les horloges mondiales. Cliquez sur la date en haut de l’écran pour ajouter des notes personnelles sur n’importe quel jour du calendrier.' },
+  { title: 'Horloge, Minuteur & Agenda', body: 'Ctrl+Alt+H ouvre le minuteur, les alarmes, le chronomètre et les horloges mondiales. Les alarmes proposent un report de cinq minutes et restent actives fenêtre fermée, tant que la page est ouverte. Cliquez sur la date en haut de l’écran pour lire les notifications ou ajouter des notes au calendrier.' },
 ];
 
 export default function SystemApp({ kind, onOpen, onReplayIntroduction, onQuickLaunch }) {

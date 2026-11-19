@@ -1,5 +1,8 @@
+import { updateAlarms } from './alarms.js';
+
 export const INITIAL_CLOCK = {
   tab: 'timer',
+  alarms: [],
   timer: { status: 'idle', duration: 300000, remaining: 300000, endsAt: null, run: 0 },
   stopwatch: { elapsed: 0, startedAt: null, laps: [] },
 };
@@ -46,10 +49,12 @@ export function formatDuration(ms, fractions = false) {
 }
 
 export function clockReducer(state, action) {
+  const alarms = updateAlarms(state.alarms, action);
+  if (alarms !== state.alarms) state = { ...state, alarms };
   const { timer, stopwatch } = state;
   const now = action.now;
   switch (action.type) {
-    case 'tab': return ['timer', 'stopwatch', 'world'].includes(action.tab) ? { ...state, tab: action.tab } : state;
+    case 'tab': return ['timer', 'stopwatch', 'world', 'alarms'].includes(action.tab) ? { ...state, tab: action.tab } : state;
     case 'start-timer': {
       if (!Number.isInteger(action.duration) || action.duration < 1000 || action.duration > 86400000 || timer.status === 'running') return state;
       return { ...state, timer: { status: 'running', duration: action.duration, remaining: action.duration, endsAt: now + action.duration, run: timer.run + 1 } };

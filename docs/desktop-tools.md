@@ -1,5 +1,15 @@
 # Outils du bureau
 
+## Alarmes de session
+
+Dans **Horloge → Alarmes**, programmez jusqu’à dix rappels avec un nom et une heure locale. Chaque alarme vise la prochaine occurrence de cette heure (aujourd’hui ou demain), sans répétition quotidienne automatique. Elle peut être désactivée, réactivée ou supprimée. Lorsqu’elle arrive à échéance, elle propose **Arrêter** ou **Reporter de 5 min**.
+
+Le calendrier conserve la notification visuelle ; aucune autorisation de notification système ni son n’est requis. Le mode Ne pas déranger masque la bannière mais conserve l’historique. Le minuteur et plusieurs alarmes arrivant simultanément produisent un message groupé. Chaque occurrence n’est annoncée qu’une fois.
+
+La fermeture de la fenêtre Horloge ne supprime pas les alarmes. Elles restent en mémoire de session tant que la page est ouverte, mais un rechargement les efface. Un navigateur suspendu ne peut pas afficher de rappel à l’heure exacte : les échéances sont vérifiées à son réveil. Aucun accès aux alarmes de l’ordinateur, aucune synchronisation externe.
+
+Validation de cette extension : tests unitaires des échéances locales, limites, désactivation, report, suppression et déclenchement simultané avec le minuteur ; contrôle dans le navigateur du rappel fenêtre fermée, de l’historique en mode Ne pas déranger, de l’arrêt et du retour du focus. Contrôle des thèmes clair/sombre et des largeurs 319, 390, 900 et 1280 px sans débordement horizontal. Le report a été vérifié dans l’interface et son second déclenchement par test unitaire, sans attendre cinq minutes dans le navigateur. Les changements d’heure d’été/hiver et la suspension réelle de l’appareil n’ont pas été testés manuellement.
+
 ## Lancement rapide
 
 La loupe de la barre supérieure, Alt+F2 et l’application Aide ouvrent le même dialogue. La recherche accepte plusieurs mots, sans distinction de casse ou d’accents. Les fenêtres déjà ouvertes apparaissent avant le catalogue des applications, avec leur bureau et leur état. Entrée ouvre le premier résultat ; les flèches permettent de choisir une autre entrée. Échap ferme le dialogue et rend le focus au contrôle précédent.
