@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight, Clipboard, Copy, Download, FilePlus2, Folder, FolderPlus, Grid2X2, Home, Image, Info, List, Menu, Monitor, Music, Pencil, Search, Scissors, Terminal, Trash2, Undo2, Video, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Clipboard, Copy, Download, FilePlus2, Folder, FolderPlus, Grid2X2, Home, Image, Info, List, Menu, Monitor, Music, Pencil, Search, Scissors, Star, Terminal, Trash2, Undo2, Video, X } from 'lucide-react';
 import { canDeletePath, DIRECTORY_MARKER, emptyTrash, isDirectory, listDirectory, normalizePath, readTrash, renamePath, restoreFromTrash, ROOT, transferPaths, trashPaths, TRASH_CHANGE_EVENT, writeFiles } from '../../shared/filesystem/virtualFs';
 import { endFileDrag, FILE_CLIPBOARD_EVENT, FILE_DRAG_END_EVENT, fileDragCopies, readFileClipboard, readFileDrag, writeFileClipboard, writeFileDrag } from '../../shared/filesystem/dragDrop';
 import ConfirmationDialog from '../../shared/components/ConfirmationDialog';
 import FileNameDialog from '../../shared/components/FileNameDialog';
 import FileProperties from '../../shared/components/FileProperties';
 import LocationEntry from './LocationEntry';
+import FolderBookmarks from './FolderBookmarksPanel.jsx';
+import { addBookmark, BOOKMARKS_EVENT, BOOKMARKS_KEY, folderBookmarks } from './folderBookmarks';
 import { fileMetadata } from '../../shared/filesystem/fileMetadata';
 
 function fileName(path) { return path.split('/').filter(Boolean).pop() || path; }
@@ -40,6 +42,7 @@ export default function FileManager({ files, setFiles, onOpenFile, onOpenTermina
   const [nameOperation, setNameOperation] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [clipboard, setClipboard] = useState(readFileClipboard);
+  const [bookmarks, setBookmarks] = useState(() => folderBookmarks.read());
   const [infoPaths, setInfoPaths] = useState(null);
   const [notice, setNotice] = useState('');
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -51,6 +54,13 @@ export default function FileManager({ files, setFiles, onOpenFile, onOpenTermina
   const [undoCount, setUndoCount] = useState(0);
   const [confirmEmpty, setConfirmEmpty] = useState(false);
   const [, refreshTrash] = useReducer((value) => value + 1, 0);
+  useEffect(() => {
+    const sync = () => setBookmarks(folderBookmarks.read());
+    const syncStorage = (event) => { if (event.key === BOOKMARKS_KEY || event.key === null) sync(); };
+    window.addEventListener(BOOKMARKS_EVENT, sync);
+    window.addEventListener('storage', syncStorage);
+    return () => { window.removeEventListener(BOOKMARKS_EVENT, sync); window.removeEventListener('storage', syncStorage); };
+  }, []);
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) => setCompactSidebar(entry.contentRect.width < 640));
     if (rootRef.current) observer.observe(rootRef.current);
@@ -130,6 +140,22 @@ export default function FileManager({ files, setFiles, onOpenFile, onOpenTermina
   const selection = selectedPaths.filter((path) => visiblePaths.includes(path));
   const selectedPath = selection.includes(focusedPath) ? focusedPath : selection.at(-1);
   const allDeletable = selection.length > 0 && selection.every((path) => canDeletePath(files, path));
+
+  function bookmarkLabel(path) { return path === ROOT ? 'Dossier personnel' : path === '/' ? 'Ordinateur' : folderLabels[fileName(path)] || fileName(path); }
+
+  function toggleBookmark(path) {
+    const current = folderBookmarks.read();
+    const removing = current.includes(path);
+    const result = removing ? { paths: current.filter((item) => item !== path) } : addBookmark(current, path, files);
+    if (result.error) setNotice(result.error);
+    else {
+      const saved = folderBookmarks.write(result.paths);
+      setBookmarks(saved.paths);
+      setNotice(`${bookmarkLabel(path)} ${removing ? 'retiré des' : 'ajouté aux'} favoris.${saved.persisted ? '' : ' Conservé pour cette session uniquement.'}`);
+    }
+    setContextMenu(null);
+    rootRef.current?.focus({ preventScroll: true });
+  }
 
   function select(paths, focus = paths.at(-1)) {
     setSelectedPaths(paths);
@@ -590,6 +616,7 @@ export default function FileManager({ files, setFiles, onOpenFile, onOpenTermina
       </div>}
       <span className="ubuntu-files__toolbar-spacer" />
       {inTrash && <button aria-label="Vider la corbeille" disabled={!entries.length} onClick={clearTrash}><Trash2 size={17} /></button>}
+      {!inTrash && <button aria-label={bookmarks.includes(cwd) ? 'Retirer ce dossier des favoris' : 'Ajouter ce dossier aux favoris'} title={bookmarks.includes(cwd) ? 'Retirer ce dossier des favoris' : 'Ajouter ce dossier aux favoris'} aria-pressed={bookmarks.includes(cwd)} onClick={() => toggleBookmark(cwd)}><Star size={17} fill={bookmarks.includes(cwd) ? 'currentColor' : 'none'} /></button>}
       {!inTrash && <button aria-label="Créer un fichier ou un dossier" title="Créer un fichier ou un dossier" onClick={(event) => openContextMenu(event, null, 'create')}><FilePlus2 size={17} /></button>}
       <button aria-label="Rechercher" className={search ? 'is-selected' : ''} onClick={() => setSearch((value) => !value)}><Search size={17} /></button>
       <div className="ubuntu-files__view-switch"><button aria-label={view === 'grid' ? 'Afficher en liste' : 'Afficher en grille'} onClick={() => setView(view === 'grid' ? 'list' : 'grid')}>{view === 'grid' ? <Grid2X2 size={17} /> : <List size={18} />}</button><button aria-label="Options d’affichage" onClick={(event) => openContextMenu(event, null, 'view')}><ChevronDown size={14} /></button></div>
@@ -601,6 +628,8 @@ export default function FileManager({ files, setFiles, onOpenFile, onOpenTermina
       <nav className="ubuntu-files__sidebar" aria-label="Emplacements" aria-hidden={compactSidebar && !sidebarOverlay || !compactSidebar && !sidebarVisible} inert={compactSidebar && !sidebarOverlay || !compactSidebar && !sidebarVisible ? true : undefined} onClick={(event) => event.stopPropagation()}>
         <button className={pathClass(ROOT)} {...dropHandlers(ROOT)} onDrop={(event) => handleFileDrop(event, ROOT)} onClick={() => go(ROOT)}><Home size={17} /> Dossier personnel</button>
         {[['Projets', 'Mes projets', Folder], ['Desktop', 'Bureau', Monitor], ['Documents', 'Documents', Folder], ['Downloads', 'Téléchargements', Download], ['Music', 'Musique', Music], ['Pictures', 'Images', Image], ['Videos', 'Vidéos', Video]].map(([directory, label, Icon]) => <button key={directory} className={pathClass(`${ROOT}/${directory}`)} {...dropHandlers(`${ROOT}/${directory}`)} onDrop={(event) => handleFileDrop(event, `${ROOT}/${directory}`)} onClick={() => go(`${ROOT}/${directory}`)}><Icon size={17} />{label}</button>)}
+        <div className="ubuntu-files__sidebar-separator" />
+        <FolderBookmarks paths={bookmarks} files={files} cwd={cwd} onOpen={go} onRemove={toggleBookmark} labelFor={bookmarkLabel} />
         <div className="ubuntu-files__sidebar-separator" />
         <button className={pathClass('trash')} {...dropHandlers('trash')} onDrop={(event) => handleFileDrop(event, 'trash')} onClick={() => go('trash')}><Trash2 size={17} /> Corbeille</button>
         <button className={pathClass('/')} {...dropHandlers('/')} onDrop={(event) => handleFileDrop(event, '/')} onClick={() => go('/')}><Monitor size={17} /> Ordinateur</button>
@@ -646,6 +675,7 @@ export default function FileManager({ files, setFiles, onOpenFile, onOpenTermina
         <button disabled={!entries.length} onClick={() => restoreSelection(Object.keys(trash))}><Folder size={15} /> Tout restaurer</button>
         <button disabled={!entries.length} onClick={clearTrash}><Trash2 size={15} /> Vider la corbeille</button>
       </> : <>
+        {(!menuPath || isDirectory(files, menuPath)) && <button onClick={() => toggleBookmark(menuPath || cwd)}><Star size={15} />{bookmarks.includes(menuPath || cwd) ? 'Retirer des favoris' : 'Ajouter aux favoris'}</button>}
         {menuPath && <button onClick={() => { selection.forEach((path) => openEntry(path, isDirectory(files, path) ? 'dir' : 'file')); setContextMenu(null); }}><Home size={15} /> Ouvrir{selection.length > 1 ? ` ${selection.length} éléments` : ''}</button>}
         {menuPath && isDirectory(files, menuPath) && onOpenTerminal && <button onClick={() => { onOpenTerminal(menuPath); setContextMenu(null); }}><Terminal size={15} /> Ouvrir dans le terminal</button>}
         {!menuPath && <><button onClick={() => createEntry('folder')}><FolderPlus size={15} /> Nouveau dossier</button><button onClick={() => createEntry('file')}><FilePlus2 size={15} /> Nouveau document</button>{onOpenTerminal && <button onClick={() => { onOpenTerminal(cwd); setContextMenu(null); }}><Terminal size={15} /> Ouvrir dans le terminal</button>}</>}

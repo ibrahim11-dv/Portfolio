@@ -1,5 +1,15 @@
 # Outils du bureau
 
+## Dossiers favoris dans Fichiers
+
+L’étoile de la barre d’outils ajoute ou retire le dossier courant. Le menu contextuel d’un dossier et le menu de Fichiers proposent également cette action. Le panneau **Favoris** ouvre les dossiers en un clic ; sa croix retire uniquement le raccourci, jamais le dossier. Sur mobile, ce panneau reste accessible avec le bouton du panneau latéral et se referme après navigation.
+
+Jusqu’à vingt chemins de dossiers virtuels sont conservés dans le navigateur et synchronisés entre les fenêtres de Fichiers. Aucun fichier de l’ordinateur n’est consulté. Si le stockage est refusé ou saturé, les changements restent disponibles pendant la session et le message d’action le précise. Les favoris ne modifient pas la protection des documents du portfolio.
+
+Un dossier supprimé, déplacé ou renommé laisse un favori marqué **Indisponible**, qui peut être retiré. Une restauration au même emplacement le rend utilisable de nouveau. Les favoris suivent les chemins, pas l’identité des dossiers : après un déplacement ou un renommage, ajoutez le nouvel emplacement.
+
+Validation : ajout par étoile et menu contextuel, ouverture au clavier, suppression du raccourci, rechargement, synchronisation de deux fenêtres, mise à la corbeille puis restauration d’un dossier de test. Vérification clair/sombre et mobile à 319 px ; contrôle des débordements à 390, 900 et 1280 px et dans une fenêtre étroite. Tests unitaires des données invalides, doublons, limites et échecs de stockage. La synchronisation entre onglets distincts n’a pas fait l’objet d’un test manuel.
+
 ## Alarmes de session
 
 Dans **Horloge → Alarmes**, programmez jusqu’à dix rappels avec un nom et une heure locale. Chaque alarme vise la prochaine occurrence de cette heure (aujourd’hui ou demain), sans répétition quotidienne automatique. Elle peut être désactivée, réactivée ou supprimée. Lorsqu’elle arrive à échéance, elle propose **Arrêter** ou **Reporter de 5 min**.
