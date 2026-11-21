@@ -15,3 +15,5 @@
 .calculator-app summary { min-height: 44px; cursor: pointer; padding-block: 8px; }
 .calculator-app ol { list-style: none; padding: 0; display: grid; gap: 8px; margin-block: 12px; }
 .calculator-app li button { display: grid; width: 100%; text-align: left; overflow-wrap: anywhere; }
+.calculator-app__memory { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; }
+.calculator-app__memory-value { overflow-wrap: anywhere; }
