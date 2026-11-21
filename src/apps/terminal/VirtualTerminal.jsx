@@ -1,5 +1,6 @@
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import TerminalWindow from './TerminalWindow';
+import CommandHistory from './CommandHistory';
 import { displayPath, isDirectory, ROOT, writeFiles } from '../../shared/filesystem/virtualFs';
 import { completeShell, executeShell } from './terminalShell';
 import { PROFILE } from '../../data/portfolioData';
@@ -14,6 +15,8 @@ function TerminalSession({ ref, files, setFiles, windows = [], onOpenFile, onWin
   const [cwd, setCwd] = useState(initialSession?.cwd || initialDirectory);
   const [lines, setLines] = useState(initialSession?.lines || [`${PROFILE.name} — ${PROFILE.role}`, 'Bienvenue sur mon bureau. Tapez projects, skills, contact ou help.', '']);
   const [command, setCommand] = useState(initialSession?.command || '');
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyEntries, setHistoryEntries] = useState([]);
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
   const historyRef = useRef(initialSession?.history || []);
@@ -89,6 +92,7 @@ function TerminalSession({ ref, files, setFiles, windows = [], onOpenFile, onWin
 
   function handleKeyDown(event) {
     if (event.metaKey || event.altKey) return;
+    if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === 'r') { event.preventDefault(); setHistoryEntries([...historyRef.current]); setShowHistory(true); return; }
     if (event.key !== 'Tab') completionRef.current = null;
     if (event.ctrlKey && event.key.toLowerCase() === 'l') { event.preventDefault(); setLines([]); }
     if (event.ctrlKey && event.key.toLowerCase() === 'c' && !event.shiftKey) {
@@ -121,6 +125,8 @@ function TerminalSession({ ref, files, setFiles, windows = [], onOpenFile, onWin
   }
 
   return <div className="ubuntu-terminal__pane" onClick={() => { if (!window.getSelection()?.toString()) inputRef.current?.focus(); }}>
+    <button className="terminal-history-toggle" onClick={(event) => { event.stopPropagation(); setHistoryEntries([...historyRef.current]); setShowHistory(!showHistory); }} aria-expanded={showHistory} title="Historique des commandes (Ctrl+R)">Historique</button>
+    {showHistory && <CommandHistory history={historyEntries} onClose={() => { setShowHistory(false); inputRef.current?.focus(); }} onSelect={(value) => { setCommand(value); historyIndex.current = -1; completionRef.current = null; setShowHistory(false); inputRef.current?.focus(); }} />}
     <div className="ubuntu-terminal__output" ref={scrollRef} aria-live="polite">
       {lines.map((line, index) => <div key={`${index}-${line}`} data-line-index={index} className="ubuntu-terminal__line">{highlightedLine(line, index, matches, searchIndex)}</div>)}
       <div className="ubuntu-terminal__input-line"><span><b>ibrahim@ubuntu</b>:<strong>{displayPath(cwd)}</strong>$</span><input ref={inputRef} value={command} onChange={(event) => { setCommand(event.target.value); historyIndex.current = -1; completionRef.current = null; }} onKeyDown={handleKeyDown} aria-label="Commande du terminal" spellCheck="false" autoComplete="off" /></div>

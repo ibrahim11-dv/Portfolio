@@ -54,3 +54,9 @@ Le lecteur propose un diaporama manuel à démarrer, avec une durée de 3, 5 ou 
 Le bouton **Vignettes** affiche les images du dossier dans une bande horizontale repliable, également utilisable au clavier. L’image courante possède une bordure et un état accessible. Sélectionner une vignette ouvre cette image et arrête le diaporama. Les miniatures conservent leurs proportions et sont chargées à la demande ; la bande est masquée par défaut pour préserver la place de lecture sur mobile.
 
 Validation des vignettes : sélection par Entrée, mise à jour de l’image courante et arrêt du diaporama après sélection manuelle vérifiés dans le navigateur. À 319 × 720 px en thème sombre, les commandes restent visibles et la page ne déborde pas horizontalement. Aucune erreur de console observée pendant ce parcours. Les autres tailles et le thème clair n’ont pas été revérifiés pour cette extension. Lint, 143 tests et compilation réussis.
+
+## Historique recherchable du terminal
+
+Le bouton Historique ou Ctrl+R depuis la ligne de commande ouvre les commandes de l’onglet courant. La recherche filtre sans distinction de casse. Choisir un résultat remet la commande dans la saisie, sans l’exécuter ; Entrée reste nécessaire pour lancer la commande. Fermer ou Échap conserve la saisie et lui rend le focus. Aucun nouveau stockage permanent n’est ajouté.
+
+Validation : lint, 143 tests et compilation réussis. Dans le navigateur : ouverture par Ctrl+R et bouton, recherche insensible à la casse, résultat vide, sélection par Entrée sans exécution et fermeture par Échap avec brouillon conservé. Panneau contrôlé à 319 × 720 px en sombre, sans débordement horizontal de la page ni erreur de console observée. Thème clair et autres tailles non revérifiés pour cette extension.
