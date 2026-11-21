@@ -9,6 +9,15 @@
 .loupe button:hover:not(:disabled) { background: var(--app-hover, #0000000d); }
 .loupe button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: -2px; }
 .loupe button:disabled { opacity: .35; }
+.loupe__playback { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; flex-shrink: 0; border-top: 1px solid var(--app-line); background: var(--app-surface); font-size: 13px; max-height: 40%; overflow: auto; }
+.loupe__playback button, .loupe__playback a { min-height: 44px; padding: 6px 8px; box-sizing: border-box; }
+.loupe__playback button[aria-pressed="true"] { background: var(--brand-action); color: var(--brand-on-action); }
+.loupe__playback label, .loupe__playback a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.loupe__playback a { color: inherit; text-underline-offset: 3px; }
+.loupe__playback select { min-height: 44px; color: inherit; background: var(--app-panel); border: 1px solid var(--app-line); border-radius: 5px; font: inherit; padding: 4px; }
+.loupe__playback input { accent-color: var(--brand-action); width: 18px; height: 18px; }
+.loupe__playback small { flex-basis: 100%; color: var(--app-muted); }
+.loupe__playback :focus-visible { outline: 2px solid var(--app-accent); outline-offset: 2px; }
 .loupe__toolbar { position: relative; flex-shrink: 0; display: flex; align-items: center; height: 48px; padding: 0 112px 0 6px; gap: 4px; background: var(--app-surface, #f2f0ee); box-shadow: 0 1px #00000014; z-index: 3; touch-action: none; }
 .loupe__toolbar > button { width: 34px; height: 34px; }
 .loupe__toolbar > button:first-child { margin-right: auto; }

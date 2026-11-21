@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, ChevronDown, FolderOpen, Image, Info, Maximize, Menu, Minimize, Minus, Plus, RotateCcw, RotateCw, X, ZoomIn } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Download, FolderOpen, Image, Info, Maximize, Menu, Minimize, Minus, Pause, Play, Plus, RotateCcw, RotateCw, X, ZoomIn } from 'lucide-react';
 import { canDeletePath, normalizePath, ROOT, trashPaths, uniquePath, writeFiles } from '../../shared/filesystem/virtualFs';
 import { fitImage, imageFile, readImage } from '../../shared/filesystem/imageFiles';
 import { formatFileSize } from '../../shared/filesystem/fileMetadata';
 import EditorDialog from '../../shared/components/EditorDialog';
 import { MIME_FILES, readFileDrag } from '../../shared/filesystem/dragDrop';
 import './ImageViewer.css';
+import { SLIDESHOW_DELAYS } from './slideshow';
+import { useSlideshow } from './useSlideshow';
 
 const clampZoom = (value) => Math.min(20, Math.max(.05, value));
 const basename = (path) => path?.split('/').at(-1) || '';
 
-export default function ImageViewer({ files, setFiles, filePath, onNavigate, onOpenDirectory, onNewWindow, onClose }) {
+export default function ImageViewer({ files, setFiles, filePath, onNavigate, onOpenDirectory, onNewWindow, onClose, isActive = true }) {
   const [path, setPath] = useState(filePath || null);
   const [metadata, setMetadata] = useState(null);
   const [rotation, setRotation] = useState(0);
@@ -25,6 +27,9 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
   const [error, setError] = useState('');
   const [dragging, setDragging] = useState(false);
   const [loadGeneration, setLoadGeneration] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [slideSeconds, setSlideSeconds] = useState(5);
+  const [slideLoop, setSlideLoop] = useState(false);
   const rootRef = useRef(null), stageRef = useRef(null), scrollRef = useRef(null), imageRef = useRef(null), menuRef = useRef(null), inputRef = useRef(null), dragRef = useRef(null), filesRef = useRef(files);
   const image = useMemo(() => readImage(files[path]), [files, path]);
   const imageSource = image?.src;
@@ -38,6 +43,13 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
   const images = useMemo(() => Object.keys(files).filter((candidate) => readImage(files[candidate]) && normalizePath('..', candidate) === directory).sort((a, b) => a.localeCompare(b, 'fr', { numeric: true })), [files, directory]);
   const index = images.indexOf(path);
   const editable = image && canDeletePath(files, path);
+
+  useSlideshow({
+    enabled: playing && isActive && !menu && !dialog && !properties && !error && Boolean(dimensions.width) && images.length > 1,
+    paths: images, path, seconds: slideSeconds, loop: slideLoop,
+    onAdvance: (next) => selectImage(next, true),
+    onFinish: () => { setPlaying(false); setNotice('Diaporama terminé.'); },
+  });
 
   useEffect(() => { filesRef.current = files; }, [files]);
   useEffect(() => {
@@ -75,6 +87,7 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
     function wheel(event) {
       if (!event.ctrlKey) return;
       event.preventDefault();
+      setPlaying(false);
       setZoom(clampZoom(scale * (event.deltaY < 0 ? 1.1 : 1 / 1.1)));
     }
     scroller.addEventListener('wheel', wheel, { passive: false });
@@ -82,10 +95,16 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
   }, [scale]);
 
   function focusImage() { requestAnimationFrame(() => rootRef.current?.focus({ preventScroll: true })); }
-  function selectImage(nextPath) { setPath(nextPath); onNavigate?.(nextPath); setMetadata(null); setRotation(0); setZoom(null); setError(''); setMenu(null); setDialog(null); focusImage(); }
+  function selectImage(nextPath, automatic = false) { setPath(nextPath); onNavigate?.(nextPath); setMetadata(null); setRotation(0); setZoom(null); setError(''); setMenu(null); setDialog(null); if (!automatic) { setPlaying(false); focusImage(); } }
   function navigate(step) { const next = images[index + step]; if (next) selectImage(next); }
-  function setScale(value) { setZoom(value === null ? null : clampZoom(value)); setMenu(null); focusImage(); }
-  function rotate(step) { setRotation((current) => (current + step + 360) % 360); focusImage(); }
+  function setScale(value) { setPlaying(false); setZoom(value === null ? null : clampZoom(value)); setMenu(null); focusImage(); }
+  function rotate(step) { setPlaying(false); setRotation((current) => (current + step + 360) % 360); focusImage(); }
+  function toggleSlideshow() {
+    if (playing) { setPlaying(false); return; }
+    if (images.length < 2 || !image || error) return;
+    if (index === images.length - 1) selectImage(images[0]);
+    setZoom(null); setPlaying(true);
+  }
   async function toggleFullscreen() {
     try { if (document.fullscreenElement === rootRef.current) await document.exitFullscreen(); else await rootRef.current.requestFullscreen(); focusImage(); }
     catch { setNotice('Le plein écran n’est pas disponible.'); }
@@ -130,11 +149,12 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
     } catch { setNotice('La copie de l’image n’est pas disponible dans ce navigateur.'); }
   }
   function keyDown(event) {
-    if (event.target.closest('input, textarea, [role="menu"]')) return;
+    if (event.target.closest('input, textarea, select, [role="menu"]')) return;
     const key = event.key.toLowerCase();
     if (event.altKey && event.key !== 'Enter' || event.metaKey || event.ctrlKey && event.shiftKey && !['r', 'w'].includes(key)) return;
     if (event.key === 'F11') { event.preventDefault(); toggleFullscreen(); }
-    else if (event.key === 'Escape') { event.preventDefault(); if (menu) setMenu(null); else if (fullscreen) toggleFullscreen(); else if (properties) setProperties(false); }
+    else if (event.key === 'Escape') { event.preventDefault(); if (menu) setMenu(null); else if (playing) setPlaying(false); else if (fullscreen) toggleFullscreen(); else if (properties) setProperties(false); }
+    else if (event.key === ' ' && !event.target.closest('button, a')) { event.preventDefault(); toggleSlideshow(); }
     else if (event.key === 'F9' || event.altKey && event.key === 'Enter') { event.preventDefault(); setProperties(!properties); }
     else if (event.key === 'F10') { event.preventDefault(); setMenu(menu ? null : 'main'); }
     else if (event.key === 'F5') { event.preventDefault(); setError(''); setMetadata(null); setZoom(null); setLoadGeneration((current) => current + 1); }
@@ -163,6 +183,7 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
   }
   function beginPan(event) {
     if (event.button !== 0 || !image || event.target.closest('button, input')) return;
+    setPlaying(false);
     rootRef.current.focus({ preventScroll: true });
     dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, left: scrollRef.current.scrollLeft, top: scrollRef.current.scrollTop, moved: false };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -183,16 +204,25 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
     <header className="loupe__toolbar"><button aria-label={fullscreen ? 'Quitter le plein écran' : 'Plein écran'} title="Plein écran (F11)" onClick={toggleFullscreen}>{fullscreen ? <Minimize size={18} /> : <Maximize size={18} />}</button><strong title={path || ''}>{basename(path) || 'Visionneur d’images'}</strong><button aria-label="Propriétés de l’image" aria-pressed={properties} disabled={!image} title="Propriétés de l’image (F9)" onClick={() => { setProperties(!properties); focusImage(); }}><Info size={19} /></button><button data-loupe-menu aria-label="Menu du visionneur" aria-expanded={menu === 'main'} onClick={() => setMenu(menu === 'main' ? null : 'main')}><Menu size={18} /></button></header>
     <div className="loupe__body"><div ref={stageRef} className="loupe__stage" onDragOver={(event) => { if (Array.from(event.dataTransfer.types).some((type) => type === 'Files' || type === MIME_FILES)) event.preventDefault(); }} onDrop={(event) => { event.preventDefault(); const dropped = readFileDrag(event).find((candidate) => readImage(files[candidate])); if (dropped) selectImage(dropped); else importImages(event.dataTransfer.files); }}>
       <div ref={scrollRef} className={`loupe__scroll ${dragging ? 'is-panning' : ''}`} onPointerDown={beginPan} onPointerMove={pan} onPointerUp={endPan} onPointerCancel={endPan} onDoubleClick={() => setScale(zoom === null ? 1 : null)}>
-        {image && !error ? <div className="loupe__space" style={{ width: Math.max(viewport.width, width + 24), height: Math.max(viewport.height, height + 24) }}><img ref={imageRef} key={`${path}-${loadGeneration}`} src={image.src} alt={basename(path)} draggable={false} onLoad={(event) => setMetadata({ path, src: image.src, width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })} onError={() => setError('Cette image ne peut pas être affichée.')} style={{ width: dimensions.width * scale || undefined, height: dimensions.height * scale || undefined, transform: `translate(-50%, -50%) rotate(${rotation}deg)` }} /></div> : <div className="loupe__empty"><Image size={80} strokeWidth={1.25} /><h2>{error || (path ? 'Image introuvable' : 'Afficher des images')}</h2><p>{path ? 'Ouvrez une autre image pour continuer.' : 'Glissez et déposez des images ici'}</p><button onClick={() => setDialog('open')}>Ouvrir des fichiers…</button></div>}
+        {image && !error ? <div className="loupe__space" style={{ width: Math.max(viewport.width, width + 24), height: Math.max(viewport.height, height + 24) }}><img ref={imageRef} key={`${path}-${loadGeneration}`} src={image.src} alt={basename(path)} draggable={false} onLoad={(event) => setMetadata({ path, src: image.src, width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })} onError={() => { setError('Cette image ne peut pas être affichée.'); setPlaying(false); }} style={{ width: dimensions.width * scale || undefined, height: dimensions.height * scale || undefined, transform: `translate(-50%, -50%) rotate(${rotation}deg)` }} /></div> : <div className="loupe__empty"><Image size={80} strokeWidth={1.25} /><h2>{error || (path ? 'Image introuvable' : 'Afficher des images')}</h2><p>{path ? 'Ouvrez une autre image pour continuer.' : 'Glissez et déposez des images ici'}</p><button onClick={() => setDialog('open')}>Ouvrir des fichiers…</button></div>}
       </div>
       {image && !error && <><div className="loupe__osd loupe__navigation"><button aria-label="Image précédente" disabled={index <= 0} onClick={() => navigate(-1)}><ArrowLeft size={19} /></button><button aria-label="Image suivante" disabled={index < 0 || index >= images.length - 1} onClick={() => navigate(1)}><ArrowRight size={19} /></button></div><div className="loupe__osd loupe__zoom">{zoomControls && <><button aria-label="Réduire l’image" disabled={scale <= .05} onClick={() => setScale(scale * .8)}><Minus size={20} /></button><button aria-label="Agrandir l’image" disabled={scale >= 20} onClick={() => setScale(scale * 1.25)}><Plus size={20} /></button></>}<button aria-label="Basculer le zoom" title="Basculer le zoom" aria-pressed={zoomControls} onClick={() => setScale(zoomControls ? null : scale * 1.25)}><ZoomIn size={19} /></button><button data-loupe-menu aria-label="Choisir le niveau de zoom" aria-expanded={menu === 'zoom'} onClick={() => { setZoomEntry(String(Math.round(scale * 100))); setMenu(menu === 'zoom' ? null : 'zoom'); }}><span>{Math.round(scale * 100)} %</span><ChevronDown size={13} /></button></div></>}
       {menu === 'zoom' && <div ref={menuRef} className="loupe__menu loupe__zoom-menu" role="menu" aria-label="Niveaux de zoom" onKeyDown={menuKeys}>{[3, 2, 1, .66, .5].map((value) => <button role="menuitem" key={value} onClick={() => setScale(value)}>{value * 100} %{value >= 1 && <kbd>Ctrl+{value}</kbd>}</button>)}<form onSubmit={(event) => { event.preventDefault(); const value = Number(zoomEntry.replace(',', '.')); if (value >= 5 && value <= 2000) setScale(value / 100); }}><input aria-label="Niveau de zoom personnalisé" type="text" inputMode="decimal" value={zoomEntry} onChange={(event) => setZoomEntry(event.target.value)} /><button aria-label="Appliquer le zoom" disabled={!Number.isFinite(Number(zoomEntry.replace(',', '.'))) || Number(zoomEntry.replace(',', '.')) < 5 || Number(zoomEntry.replace(',', '.')) > 2000}><Check size={18} /></button></form><button role="menuitem" onClick={() => setScale(null)}>Ajustement optimal<kbd>Ctrl+0</kbd></button></div>}
     </div>
     {properties && image && <aside className="loupe__properties" aria-label="Propriétés de l’image"><div className="loupe__properties-title"><strong>Propriétés de l’image</strong><button aria-label="Fermer les propriétés" onClick={() => { setProperties(false); focusImage(); }}><X size={16} /></button></div><dl><div><dt>Dossier</dt><dd><span>{directory.replace(ROOT, '~')}</span><button aria-label="Ouvrir le dossier contenant l’image" onClick={() => onOpenDirectory(directory)}><FolderOpen size={18} /></button></dd></div><div><dt>URI</dt><dd>{`file://${path}`}</dd></div></dl><dl><div><dt>Dimensions de l’image</dt><dd>{dimensions.width} × {dimensions.height} pixels</dd></div><div><dt>Format de l’image</dt><dd>{image.mime.split('/')[1].replace('svg+xml', 'SVG').toUpperCase()}</dd></div><div><dt>Taille du fichier</dt><dd>{formatFileSize(image.size)}</dd></div></dl></aside>}
     </div>
+    {image && <footer className="loupe__playback" aria-label="Diaporama du dossier">
+      <span>{index >= 0 ? `${index + 1} / ${images.length}` : 'Image indisponible'}</span>
+      <button disabled={images.length < 2 || Boolean(error)} aria-label={playing ? 'Mettre le diaporama en pause' : 'Lire le diaporama'} aria-pressed={playing} onClick={toggleSlideshow}>{playing ? <Pause size={17} /> : <Play size={17} />}{playing ? 'Pause' : 'Diaporama'}</button>
+      <label>Durée<select value={slideSeconds} onChange={(event) => setSlideSeconds(Number(event.target.value))}>{SLIDESHOW_DELAYS.map((seconds) => <option key={seconds} value={seconds}>{seconds} s</option>)}</select></label>
+      <label><input type="checkbox" checked={slideLoop} onChange={(event) => setSlideLoop(event.target.checked)} />Répéter</label>
+      <a href={image.src} download={basename(path)} onClick={() => { setPlaying(false); setNotice('Téléchargement de l’image originale demandé.'); }}><Download size={17} />Télécharger l’original</a>
+      {images.length < 2 && <small>Ajoutez une autre image dans ce dossier pour lancer un diaporama.</small>}
+      {playing && (menu || dialog || properties) && <small>Lecture suspendue pendant la consultation des commandes.</small>}
+    </footer>}
     {menu === 'main' && <div ref={menuRef} className="loupe__menu loupe__main-menu" role="menu" aria-label="Actions du visionneur" onKeyDown={menuKeys}><button role="menuitem" onClick={() => { setMenu(null); onNewWindow(); }}>Nouvelle fenêtre<kbd>Ctrl+N</kbd></button><button role="menuitem" onClick={() => { setMenu(null); setDialog('open'); }}>Ouvrir…<kbd>Ctrl+O</kbd></button><hr /><div className="loupe__rotate"><span>Rotation</span><button aria-label="Tourner à gauche" disabled={!image} onClick={() => rotate(-90)}><RotateCcw size={19} /></button><button aria-label="Tourner à droite" disabled={!image} onClick={() => rotate(90)}><RotateCw size={19} /></button></div><button role="menuitem" disabled={!editable} onClick={deleteImage}>Supprimer<kbd>Suppr</kbd></button><hr /><button role="menuitem" onClick={() => { setMenu(null); setDialog('shortcuts'); }}>Raccourcis clavier</button><button role="menuitem" onClick={() => { setMenu(null); setDialog('about'); }}>À propos du Visionneur d’images</button></div>}
     <input hidden ref={inputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/svg+xml" onChange={(event) => { importImages(event.target.files); event.target.value = ''; }} />
-    {dialog && <EditorDialog title={dialog === 'open' ? 'Ouvrir une image' : dialog === 'about' ? 'Visionneur d’images' : 'Raccourcis clavier'} onCancel={() => { setDialog(null); focusImage(); }} actions={[{ label: 'Fermer', defaultAction: true, onClick: () => { setDialog(null); focusImage(); } }]}>{dialog === 'open' ? <div className="loupe__picker">{Object.keys(files).filter((candidate) => readImage(files[candidate])).map((candidate) => <button key={candidate} onClick={() => selectImage(candidate)}><img src={readImage(files[candidate]).src} alt="" /><span>{basename(candidate)}<small>{normalizePath('..', candidate).replace(ROOT, '~')}</small></span></button>)}<button className="loupe__import" onClick={() => inputRef.current.click()}><FolderOpen size={19} />Ouvrir depuis cet ordinateur…</button></div> : dialog === 'about' ? <div className="loupe__about"><img src="/ubuntu-apps/loupe.svg" alt="" /><p>Afficher des images</p><p>Parcourez vos images, ajustez le zoom et consultez leurs propriétés.</p></div> : <dl className="loupe__shortcuts">{[['Image précédente / suivante', '← / →'], ['Première / dernière image', 'Début / Fin'], ['Zoom avant / arrière', '+ / −'], ['Ajustement optimal', 'Ctrl+0'], ['Taille réelle / 200 % / 300 %', 'Ctrl+1 / 2 / 3'], ['Déplacer la vue', 'Ctrl+Flèches'], ['Tourner à droite / gauche', 'Ctrl+R / Ctrl+Maj+R'], ['Propriétés', 'F9 / Alt+Entrée'], ['Plein écran', 'F11'], ['Copier l’image', 'Ctrl+C']].map(([label, keys]) => <div key={label}><dt>{label}</dt><dd><kbd>{keys}</kbd></dd></div>)}</dl>}</EditorDialog>}
+    {dialog && <EditorDialog title={dialog === 'open' ? 'Ouvrir une image' : dialog === 'about' ? 'Visionneur d’images' : 'Raccourcis clavier'} onCancel={() => { setDialog(null); focusImage(); }} actions={[{ label: 'Fermer', defaultAction: true, onClick: () => { setDialog(null); focusImage(); } }]}>{dialog === 'open' ? <div className="loupe__picker">{Object.keys(files).filter((candidate) => readImage(files[candidate])).map((candidate) => <button key={candidate} onClick={() => selectImage(candidate)}><img src={readImage(files[candidate]).src} alt="" /><span>{basename(candidate)}<small>{normalizePath('..', candidate).replace(ROOT, '~')}</small></span></button>)}<button className="loupe__import" onClick={() => inputRef.current.click()}><FolderOpen size={19} />Ouvrir depuis cet ordinateur…</button></div> : dialog === 'about' ? <div className="loupe__about"><img src="/ubuntu-apps/loupe.svg" alt="" /><p>Afficher des images</p><p>Parcourez vos images, ajustez le zoom et consultez leurs propriétés.</p></div> : <dl className="loupe__shortcuts">{[['Lecture / pause du diaporama', 'Espace'], ['Arrêter le diaporama', 'Échap'], ['Image précédente / suivante', '← / →'], ['Première / dernière image', 'Début / Fin'], ['Zoom avant / arrière', '+ / −'], ['Ajustement optimal', 'Ctrl+0'], ['Taille réelle / 200 % / 300 %', 'Ctrl+1 / 2 / 3'], ['Déplacer la vue', 'Ctrl+Flèches'], ['Tourner à droite / gauche', 'Ctrl+R / Ctrl+Maj+R'], ['Propriétés', 'F9 / Alt+Entrée'], ['Plein écran', 'F11'], ['Copier l’image', 'Ctrl+C']].map(([label, keys]) => <div key={label}><dt>{label}</dt><dd><kbd>{keys}</kbd></dd></div>)}</dl>}</EditorDialog>}
     {notice && <div className="loupe__notice" role="status">{notice}<button aria-label="Masquer la notification" onClick={() => { setNotice(''); focusImage(); }}><X size={16} /></button></div>}
   </div>;
 }
