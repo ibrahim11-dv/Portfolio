@@ -8,6 +8,8 @@ import { parseInlineTokens, parseMarkdownBlocks } from './markdownPreview';
 import EditorDialog from '../../shared/components/EditorDialog';
 import EditorSaveDialog from './EditorSaveDialog';
 import EditorSearch from './EditorSearch';
+import { linePosition } from './linePosition';
+import { revealTextPosition } from './revealTextPosition';
 import './TextEditor.css';
 
 export default function EditorApp({ files, filePath, setFiles, windowId = 'editor', navigationRequest = 0, openRequests, initialDocument, onNewWindow, onOpenDirectory, onClose }) {
@@ -37,6 +39,7 @@ export default function EditorApp({ files, filePath, setFiles, windowId = 'edito
   const [saveDialog, setSaveDialog] = useState(null);
   const [saveError, setSaveError] = useState('');
   const [confirmation, setConfirmation] = useState(null);
+  const [lineEntry, setLineEntry] = useState(null);
   const [fullscreen, setFullscreen] = useState(false);
   const rootRef = useRef(null), textareaRef = useRef(null), highlightsRef = useRef(null), menuRef = useRef(null);
   const bypassClose = useRef(false);
@@ -213,11 +216,24 @@ export default function EditorApp({ files, filePath, setFiles, windowId = 'edito
     else requestAnimationFrame(() => rootRef.current?.querySelector('.editor-properties header button')?.focus());
   }
   function changeText(text, start, end) { if (!readOnly) updateTab(active.id, (tab) => editDocument(tab, text, start, end)); }
+  function goToLine() {
+    const position = linePosition(active.text, lineEntry);
+    if (position === null) return;
+    const next = { ...active, selectionStart: position, selectionEnd: position };
+    updateTab(active.id, () => next);
+    setLineEntry(null); setPreviewMarkdown(false); focusDocument(next);
+    requestAnimationFrame(() => {
+      const view = textareaRef.current;
+      if (!view) return;
+      revealTextPosition(view, position);
+    });
+  }
   function keyDown(event) {
     if (event.target.closest('dialog') || event.nativeEvent.isComposing) return;
     if (event.key === 'Escape') { setMenu(null); if (properties) { setProperties(false); focusDocument(); return; } if (searchVisible) closeSearch(); return; }
     if (event.key === 'F9' && !event.altKey && !event.ctrlKey) { event.preventDefault(); toggleProperties(); return; }
     if (event.key === 'F11') { event.preventDefault(); toggleFullscreen(); return; }
+    if (event.ctrlKey && !event.altKey && event.key.toLowerCase() === 'j') { event.preventDefault(); setLineEntry(String(cursor.line)); return; }
     if (event.altKey && event.key.toLowerCase() === 'w') { event.preventDefault(); setWrap(!wrap); return; }
     if (event.altKey && event.key.toLowerCase() === 'p' && isMarkdown) { event.preventDefault(); setPreviewMarkdown((value) => !value); return; }
     if (!event.ctrlKey || event.altKey && !['PageUp', 'PageDown'].includes(event.key)) return;
@@ -255,7 +271,8 @@ export default function EditorApp({ files, filePath, setFiles, windowId = 'edito
     }} aria-label="Contenu du fichier" spellCheck="false" /></>}</div>
     {searchVisible && <EditorSearch closing={searchClosing} focusRequest={searchFocus} query={query} onQuery={(value) => { setQuery(value); setMatchIndex(0); }} replacement={replacement} onReplacement={setReplacement} replaceMode={replaceMode} onReplaceMode={setReplaceMode} options={searchOptions} onOptions={(value) => { setSearchOptions(value); setMatchIndex(0); }} matchCount={matches.length} matchIndex={currentIndex} error={found.error} readOnly={readOnly} onNavigate={(direction) => selectMatch(currentIndex + direction)} onAccept={() => selectMatch(currentIndex, true)} onReplace={() => replaceMatches()} onReplaceAll={() => replaceMatches(true)} onClose={closeSearch} />}
     </div>{properties && <><button className="editor-properties-backdrop" aria-label="Fermer les propriétés du document" onClick={() => { setProperties(false); focusDocument(); }} /><aside className="editor-properties" aria-label="Propriétés du document"><header><h2>Propriétés</h2><button aria-label="Fermer les propriétés" onClick={() => { setProperties(false); focusDocument(); }}><X size={17} /></button></header><div className="editor-properties__group"><div><span>Nom du fichier</span><strong>{active.draft ? 'Sans titre' : active.path.split('/').at(-1)}</strong></div><button onClick={() => onOpenDirectory?.(active.path.slice(0, active.path.lastIndexOf('/')))}><span>Emplacement</span><strong>{active.draft ? 'Brouillon non enregistré' : active.path.slice(0, active.path.lastIndexOf('/')).replace(ROOT, '~')}</strong></button><div><span>Type de document</span><strong>{active.path.endsWith('.md') ? 'Markdown' : 'Texte brut'}</strong></div><div><span>Encodage</span><strong>UTF-8</strong></div><div><span>Fin de ligne</span><strong>{active.text.includes('\r\n') ? 'Windows (CR LF)' : 'Unix (LF)'}</strong></div></div><div className="editor-properties__group"><label>Indentation automatique<input type="checkbox" checked={autoIndent} onChange={(event) => setAutoIndent(event.target.checked)} /></label><label>Espaces par tabulation<select value={indentWidth} onChange={(event) => setIndentWidth(Number(event.target.value))}>{[2, 4, 8].map((width) => <option key={width}>{width}</option>)}</select></label></div><h3>Statistiques</h3><div className="editor-properties__group">{[['Lignes', statistics.lines], ['Mots', statistics.words], ['Caractères sans espaces', statistics.nonWhitespace], ['Tous les caractères', statistics.characters]].map(([label, value]) => <div className="editor-properties__stat" key={label}><span>{label}</span><strong>{value}</strong></div>)}</div></aside></>}</div>
-    <footer className="ubuntu-editor__status"><span role="status">{active.notice || (readOnly ? 'Lecture seule · portfolio' : active.draft ? 'Brouillon' : '')}</span><span>Ln {cursor.line}, Col {cursor.column}</span><span>UTF-8</span></footer>
+    <footer className="ubuntu-editor__status"><span role="status">{active.notice || (readOnly ? 'Lecture seule · portfolio' : active.draft ? 'Brouillon' : '')}</span><button aria-label="Aller à la ligne" title="Aller à la ligne (Ctrl+J)" onClick={() => setLineEntry(String(cursor.line))}>Ln {cursor.line}, Col {cursor.column}</button><span>UTF-8</span></footer>
+    {lineEntry !== null && <EditorDialog title="Aller à la ligne" onCancel={() => { setLineEntry(null); focusDocument(); }} actions={[{ label: 'Annuler', onClick: () => { setLineEntry(null); focusDocument(); } }]}><form onSubmit={(event) => { event.preventDefault(); goToLine(); }}><label>Ligne (1 à {active.text.split('\n').length})<input autoFocus type="number" min="1" max={active.text.split('\n').length} step="1" required value={lineEntry} onChange={(event) => setLineEntry(event.target.value)} /></label><button type="submit" disabled={linePosition(active.text, lineEntry) === null}>Aller</button></form></EditorDialog>}
     {pendingAction && !saveDialog && !confirmation && <EditorDialog title="Enregistrer les modifications ?" onCancel={() => { setPendingAction(null); focusDocument(); }} actions={[{ label: 'Annuler', onClick: () => { setPendingAction(null); focusDocument(); } }, { label: pendingAction.ids.length > 1 ? 'Tout abandonner' : 'Abandonner', style: 'destructive', onClick: () => { const pending = pendingAction; setPendingAction(null); pending.action(tabs); } }, { label: 'Enregistrer', style: 'suggested', defaultAction: true, onClick: () => { const pending = { ...pendingAction, saving: true }; setPendingAction(pending); continueSaving(tabs, files, pending); } }]}><p>Les modifications non enregistrées seront perdues.</p><ul className="editor-dirty-list">{tabs.filter((tab) => pendingAction.ids.includes(tab.id) && documentDirty(tab)).map((tab) => <li key={tab.id}>{tab.draft ? 'Sans titre' : tab.path.split('/').at(-1)}</li>)}</ul></EditorDialog>}
     {saveDialog && <EditorSaveDialog key={saveDialog.id} files={files} document={tabs.find((tab) => tab.id === saveDialog.id)} error={saveError} onSave={(destination) => performSave(saveDialog.id, destination)} onCancel={cancelSave} />}
     {confirmation && <EditorDialog title={confirmation.type === 'reload' ? 'Abandonner les modifications ?' : confirmation.kind === 'external' ? 'Le document a changé' : 'Remplacer le fichier ?'} onCancel={() => setConfirmation(null)} actions={[{ label: 'Annuler', defaultAction: true, onClick: () => setConfirmation(null) }, { label: confirmation.type === 'reload' ? 'Abandonner' : 'Remplacer', style: 'destructive', onClick: () => confirmation.type === 'reload' ? reloadDocument(confirmation.id) : performSave(confirmation.id, confirmation.destination, { confirmed: true, expectedContent: confirmation.content }) }]}><p>{confirmation.type === 'reload' ? 'Recharger le document supprimera vos modifications non enregistrées.' : `« ${confirmation.destination.split('/').at(-1)} » ${confirmation.kind === 'external' ? 'a été modifié ou supprimé depuis son ouverture. Votre version remplacera son contenu actuel.' : 'existe déjà. Votre document remplacera son contenu.'}`}</p></EditorDialog>}

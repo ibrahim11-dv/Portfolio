@@ -60,3 +60,11 @@ Validation des vignettes : sélection par Entrée, mise à jour de l’image cou
 Le bouton Historique ou Ctrl+R depuis la ligne de commande ouvre les commandes de l’onglet courant. La recherche filtre sans distinction de casse. Choisir un résultat remet la commande dans la saisie, sans l’exécuter ; Entrée reste nécessaire pour lancer la commande. Fermer ou Échap conserve la saisie et lui rend le focus. Aucun nouveau stockage permanent n’est ajouté.
 
 Validation : lint, 143 tests et compilation réussis. Dans le navigateur : ouverture par Ctrl+R et bouton, recherche insensible à la casse, résultat vide, sélection par Entrée sans exécution et fermeture par Échap avec brouillon conservé. Panneau contrôlé à 319 × 720 px en sombre, sans débordement horizontal de la page ni erreur de console observée. Thème clair et autres tailles non revérifiés pour cette extension.
+
+## Aller à la ligne dans l’éditeur
+
+La position Ln/Col dans la barre d’état et Ctrl+J ouvrent une saisie de numéro de ligne. Les valeurs hors du document sont refusées. Le curseur est déplacé sans modifier le texte, même en lecture seule ; l’aperçu Markdown revient au texte. Le défilement mesure le texte rendu pour tenir compte des lignes repliées.
+
+Validation : lint, 145 tests et compilation réussis ; tests des offsets Unicode, CRLF, dernière ligne vide et valeurs invalides.
+
+Dans le navigateur : dialogue testé par Ctrl+J et clic, déplacement à la ligne 10 en lecture seule, rejet de la ligne 99 et annulation par Échap. Contrôle sombre à 1280 et 319 px, aucune erreur de console observée. Sur un brouillon de 100 longs paragraphes à 1280 px, la ligne 75 apparaît au centre ; curseur et défilement sont conservés après changement d’onglet. Le thème clair et les performances sur des fichiers de plusieurs mégaoctets n’ont pas été revérifiés.
