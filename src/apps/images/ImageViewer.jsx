@@ -30,6 +30,7 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
   const [playing, setPlaying] = useState(false);
   const [slideSeconds, setSlideSeconds] = useState(5);
   const [slideLoop, setSlideLoop] = useState(false);
+  const [showThumbnails, setShowThumbnails] = useState(false);
   const rootRef = useRef(null), stageRef = useRef(null), scrollRef = useRef(null), imageRef = useRef(null), menuRef = useRef(null), inputRef = useRef(null), dragRef = useRef(null), filesRef = useRef(files);
   const image = useMemo(() => readImage(files[path]), [files, path]);
   const imageSource = image?.src;
@@ -211,8 +212,15 @@ export default function ImageViewer({ files, setFiles, filePath, onNavigate, onO
     </div>
     {properties && image && <aside className="loupe__properties" aria-label="Propriétés de l’image"><div className="loupe__properties-title"><strong>Propriétés de l’image</strong><button aria-label="Fermer les propriétés" onClick={() => { setProperties(false); focusImage(); }}><X size={16} /></button></div><dl><div><dt>Dossier</dt><dd><span>{directory.replace(ROOT, '~')}</span><button aria-label="Ouvrir le dossier contenant l’image" onClick={() => onOpenDirectory(directory)}><FolderOpen size={18} /></button></dd></div><div><dt>URI</dt><dd>{`file://${path}`}</dd></div></dl><dl><div><dt>Dimensions de l’image</dt><dd>{dimensions.width} × {dimensions.height} pixels</dd></div><div><dt>Format de l’image</dt><dd>{image.mime.split('/')[1].replace('svg+xml', 'SVG').toUpperCase()}</dd></div><div><dt>Taille du fichier</dt><dd>{formatFileSize(image.size)}</dd></div></dl></aside>}
     </div>
+    {image && showThumbnails && <nav className="loupe__filmstrip" aria-label="Images du dossier">
+      {images.map((candidate) => <button key={candidate} aria-label={`Afficher ${basename(candidate)}`} aria-current={candidate === path ? 'true' : undefined} title={basename(candidate)} onClick={() => selectImage(candidate)}>
+        <img src={readImage(files[candidate]).src} alt="" loading="lazy" draggable={false} />
+        <span>{basename(candidate)}</span>
+      </button>)}
+    </nav>}
     {image && <footer className="loupe__playback" aria-label="Diaporama du dossier">
       <span>{index >= 0 ? `${index + 1} / ${images.length}` : 'Image indisponible'}</span>
+      <button aria-expanded={showThumbnails} onClick={() => setShowThumbnails(!showThumbnails)}>Vignettes</button>
       <button disabled={images.length < 2 || Boolean(error)} aria-label={playing ? 'Mettre le diaporama en pause' : 'Lire le diaporama'} aria-pressed={playing} onClick={toggleSlideshow}>{playing ? <Pause size={17} /> : <Play size={17} />}{playing ? 'Pause' : 'Diaporama'}</button>
       <label>Durée<select value={slideSeconds} onChange={(event) => setSlideSeconds(Number(event.target.value))}>{SLIDESHOW_DELAYS.map((seconds) => <option key={seconds} value={seconds}>{seconds} s</option>)}</select></label>
       <label><input type="checkbox" checked={slideLoop} onChange={(event) => setSlideLoop(event.target.checked)} />Répéter</label>

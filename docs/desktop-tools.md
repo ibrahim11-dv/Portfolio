@@ -46,3 +46,11 @@ La barre supérieure affiche également le nom et l’icône de la fenêtre acti
 La fermeture passe par l’événement habituel `portfolio:window-close`, qui conserve la confirmation des documents non enregistrés. La réduction conserve également son animation habituelle. La liste se met à jour depuis l’état du bureau. Le dock par défaut reste inchangé.
 
 Les raccourcis peuvent être interceptés par le système hôte : tous disposent donc d’un accès visible à la souris ou au toucher. Les nouveaux panneaux n’ajoutent pas d’animations et suivent le thème existant. Le gestionnaire s’adapte à la largeur de sa fenêtre, même sur grand écran.
+
+## Images : diaporama et vignettes
+
+Le lecteur propose un diaporama manuel à démarrer, avec une durée de 3, 5 ou 10 secondes et une répétition facultative. La lecture est suspendue lorsque la fenêtre est inactive, lorsque la page est masquée ou pendant la consultation des menus et propriétés. La navigation manuelle, le zoom et la rotation arrêtent la lecture. Le téléchargement récupère l’image originale.
+
+Le bouton **Vignettes** affiche les images du dossier dans une bande horizontale repliable, également utilisable au clavier. L’image courante possède une bordure et un état accessible. Sélectionner une vignette ouvre cette image et arrête le diaporama. Les miniatures conservent leurs proportions et sont chargées à la demande ; la bande est masquée par défaut pour préserver la place de lecture sur mobile.
+
+Validation des vignettes : sélection par Entrée, mise à jour de l’image courante et arrêt du diaporama après sélection manuelle vérifiés dans le navigateur. À 319 × 720 px en thème sombre, les commandes restent visibles et la page ne déborde pas horizontalement. Aucune erreur de console observée pendant ce parcours. Les autres tailles et le thème clair n’ont pas été revérifiés pour cette extension. Lint, 143 tests et compilation réussis.
