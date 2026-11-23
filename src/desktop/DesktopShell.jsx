@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import SystemApp from '../apps/system/SystemApp';
 import WindowManager from '../apps/system/WindowManager';
 import CalculatorApp from '../apps/calculator/CalculatorApp';
+import { recordCalculation } from '../apps/calculator/calculatorSession';
 import ClockApp from '../apps/clock/ClockApp';
 import { useClock } from '../apps/clock/useClock';
 import QuickLauncher from './launcher/QuickLauncher';
@@ -182,10 +183,7 @@ export default function DesktopShell() {
       const { expression, result } = payload.calculation;
       setAppSessions((current) => ({
         ...current,
-        calculator: {
-          expression: result,
-          history: [{ expression, result }, ...(current.calculator?.history || [])].slice(0, 20),
-        },
+        calculator: recordCalculation(current.calculator, expression, result),
       }));
       setDesktopNotice(`Résultat : ${result}`);
     }

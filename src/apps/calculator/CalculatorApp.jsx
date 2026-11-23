@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { calculate } from './calculator';
 import { updateMemory } from './calculatorMemory';
+import { recordCalculation } from './calculatorSession';
 import './CalculatorApp.css';
 
 const KEYS = ['(', ')', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '−', '1', '2', '3', '+', 'C', '0', ',', '='];
@@ -14,7 +15,7 @@ export default function CalculatorApp({ session = {}, onSaveSession, onNotify })
   function solve() {
     try {
       const result = calculate(expression);
-      onSaveSession('calculator', { ...session, expression: result, history: [{ expression, result }, ...history].slice(0, 20) });
+      onSaveSession('calculator', recordCalculation(session, expression, result));
       setError(''); setAnswer(`Résultat : ${result}`);
     } catch (failure) { setError(failure.message); }
   }

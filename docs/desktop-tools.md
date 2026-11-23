@@ -68,3 +68,9 @@ La position Ln/Col dans la barre d’état et Ctrl+J ouvrent une saisie de numé
 Validation : lint, 145 tests et compilation réussis ; tests des offsets Unicode, CRLF, dernière ligne vide et valeurs invalides.
 
 Dans le navigateur : dialogue testé par Ctrl+J et clic, déplacement à la ligne 10 en lecture seule, rejet de la ligne 99 et annulation par Échap. Contrôle sombre à 1280 et 319 px, aucune erreur de console observée. Sur un brouillon de 100 longs paragraphes à 1280 px, la ligne 75 apparaît au centre ; curseur et défilement sont conservés après changement d’onglet. Le thème clair et les performances sur des fichiers de plusieurs mégaoctets n’ont pas été revérifiés.
+
+## Mémoire de la calculatrice
+
+M+ ajoute le calcul courant à la mémoire ; M− le soustrait ; MR rappelle la valeur dans la saisie et MC efface uniquement cette mémoire. Une expression invalide laisse la mémoire inchangée. Elle appartient à la session du bureau, sans stockage permanent supplémentaire. Un calcul ouvert depuis le lanceur conserve cette mémoire et ajoute son résultat aux vingt dernières opérations.
+
+Validation : lint, 149 tests et compilation réussis. Tests ciblés des calculs avec mémoire, des erreurs, de la conservation de session depuis le lanceur et de la limite de vingt résultats. Le parcours mémoire et réouverture reste à vérifier dans le navigateur.
