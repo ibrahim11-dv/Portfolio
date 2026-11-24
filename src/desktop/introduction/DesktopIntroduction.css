@@ -57,7 +57,10 @@
 .ib-introduction__destinations svg { flex-shrink: 0; }
 .ib-introduction--presentation .ib-introduction__destinations button { min-height: 50px; font-size: 17px; }
 .ib-introduction__explore-copy { margin: 24px 0 0; padding-top: 20px; border-top: 1px solid var(--theme-line); color: var(--theme-muted); font-size: 14px; line-height: 1.5; }
-.ib-introduction--presentation .ib-introduction__explore-actions { margin-top: 12px; }
+.ib-introduction--presentation .ib-introduction__explore-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+.ib-introduction--presentation .ib-introduction__guide-cta { width: 100%; min-height: 54px; padding: 12px 20px; border: 2px solid var(--app-accent); border-radius: 9px; background: var(--brand-selection); color: var(--theme-ink); font-size: 17px; font-weight: 600; transition: background var(--motion-feedback) var(--motion-ease), color var(--motion-feedback) var(--motion-ease), border-color var(--motion-feedback) var(--motion-ease); }
+.ib-introduction--presentation .ib-introduction__guide-cta:hover { background: var(--brand-action); border-color: var(--brand-action); color: var(--brand-on-action); }
+.ib-introduction--presentation .ib-introduction__guide-cta svg { flex-shrink: 0; }
 .ib-introduction--presentation .ib-introduction__close { width: 44px; height: 44px; }
 @media (max-width: 620px) {
   .ib-introduction--presentation { padding: 12px; }

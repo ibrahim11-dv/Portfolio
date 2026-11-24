@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, FileText, FolderOpen, Grid2X2, Mail, MonitorDot, UserRound, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Compass, FileText, FolderOpen, Grid2X2, Mail, MonitorDot, UserRound, X } from 'lucide-react';
 import { INTRODUCTION_STEPS } from './introJourney';
 import './DesktopIntroduction.css';
 
@@ -134,7 +134,7 @@ export default function DesktopIntroduction({ phase, step, onBootComplete, onSki
         </div>
         <p className="ib-introduction__explore-copy">Ce bureau inspiré d’Ubuntu est mon portfolio. Explorez-le librement ou laissez-vous guider.</p>
         <div className="ib-introduction__actions ib-introduction__explore-actions">
-          <button className="ib-introduction__secondary" type="button" onClick={onStartGuide}>Me guider</button>
+          <button className="ib-introduction__guide-cta" type="button" onClick={onStartGuide}><Compass size={20} aria-hidden="true" /> Me guider dans le bureau</button>
           <button type="button" className="ib-introduction__secondary" onClick={onExplore}>Passer l’introduction <ArrowRight size={17} aria-hidden="true" /></button>
         </div>
       </> : <>

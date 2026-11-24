@@ -12,7 +12,7 @@ export const PROFILE = {
   github: 'https://github.com/ibrahim11-dv',
   linkedin: 'https://www.linkedin.com/in/ibrahim-chehlafi-88101a35b/',
   cvUrl: '/cv.pdf',
-  cvSize: 243850,
+  cvSize: 271452,
   availability: 'À la recherche d’un stage en développement informatique',
   skills: [
     { category: 'Backend & API', items: ['Spring Boot', 'Spring Security', 'Spring Data JPA', 'Laravel', 'Node.js', 'API REST', 'JWT'] },

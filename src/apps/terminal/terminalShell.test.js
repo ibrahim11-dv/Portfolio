@@ -137,7 +137,7 @@ test('tree, find, du and df inspect the virtual filesystem accurately', () => {
 
   const duResult = run('du -sh ~/Documents/CV.pdf');
   assert.equal(duResult.status, 0);
-  assert.match(duResult.output, /243,9 ko/);
+  assert.match(duResult.output, /271,5 ko/);
 
   const dfResult = run('df -h');
   assert.equal(dfResult.status, 0);

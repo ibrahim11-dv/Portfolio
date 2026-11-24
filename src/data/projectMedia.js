@@ -25,6 +25,21 @@ import citadelPuzzles from '../assets/projects/citadel/citadel-tactique-sacrific
 import citadelInvitation from '../assets/projects/citadel/citadel-invitation-en-ligne.webp';
 import citadelRematch from '../assets/projects/citadel/citadel-revanche-en-ligne.webp';
 import citadelAppearance from '../assets/projects/citadel/citadel-personnalisation.webp';
+import ytHome from '../assets/projects/youtube-downloader/youtube-downloader-accueil.png';
+import ytInspector from '../assets/projects/youtube-downloader/youtube-downloader-inspecteur.jpg';
+import ytProgress from '../assets/projects/youtube-downloader/youtube-downloader-telechargement.png';
+import ytFile from '../assets/projects/youtube-downloader/youtube-downloader-fichier.png';
+import internDashboard from '../assets/projects/intern-management/intern-dashboard.jpg';
+import internStagiaires from '../assets/projects/intern-management/intern-stagiaires.jpg';
+import internDossier from '../assets/projects/intern-management/intern-dossier.jpg';
+import internCandidatures from '../assets/projects/intern-management/intern-candidatures.jpg';
+import internEncadrants from '../assets/projects/intern-management/intern-encadrants.jpg';
+import internOffres from '../assets/projects/intern-management/intern-offres.jpg';
+import internDivisions from '../assets/projects/intern-management/intern-divisions.jpg';
+import internJournal from '../assets/projects/intern-management/intern-journal.jpg';
+import internFormulaire from '../assets/projects/intern-management/intern-formulaire.png';
+import internConnexion from '../assets/projects/intern-management/intern-connexion.jpg';
+import internPortail from '../assets/projects/intern-management/intern-portail.jpg';
 
 // Original screenshots supplied by Ibrahim. Captured values are not outcome metrics.
 export const PROJECT_MEDIA = {
@@ -62,5 +77,24 @@ export const PROJECT_MEDIA = {
     { src: campusTeacher, title: 'Espace enseignant', caption: 'Détail d’un module, répartition des notes et liste des étudiants inscrits.' },
     { src: campusStudent, title: 'Espace étudiant', caption: 'Consultation des résultats, des rattrapages et des réclamations.' },
     { src: campusDepartment, title: 'Chef de département', caption: 'Vue des modules du département, avec filière, semestre, enseignant et statut.' },
+  ],
+  'youtube-downloader': [
+    { src: ytHome, title: 'Interface principale et formats', caption: 'Saisie de l’URL source, matrice des formats vidéo et audio (MP4, MP3, M4A, FLAC, WAV) et options de traitement.' },
+    { src: ytInspector, title: 'Inspection de la vidéo et découpe', caption: 'Aperçu des métadonnées, découpe sur la ligne de temps, extraction de sous-titres et tailles estimées par format.' },
+    { src: ytProgress, title: 'File de téléchargement en direct', caption: 'Suivi de la progression du flux en temps réel avec pourcentage, débit et temps restant estimé.' },
+    { src: ytFile, title: 'Fichier téléchargé', caption: 'Vidéo enregistrée au format MP4 et prête à être ouverte depuis le navigateur.' },
+  ],
+  'intern-management': [
+    { src: internDashboard, title: 'Tableau de bord', caption: 'Vue globale de la plateforme Wilaya Stages : stagiaires actifs, encadrants, candidatures à traiter, graphiques par service et type de stage, et fil d’activités.' },
+    { src: internStagiaires, title: 'Gestion des stagiaires', caption: 'Annuaire filtrable par nom, CIN, statut, service et type de stage, avec suivi des périodes, notes et export CSV.' },
+    { src: internDossier, title: 'Dossier du stagiaire et attestations', caption: 'Fiche complète : affectation, assiduité et pointage, évaluation sur cinq critères et génération de l’attestation de fin de stage (avec QR code) et de la convention tripartite.' },
+    { src: internCandidatures, title: 'Gestion des candidatures', caption: 'Suivi des dossiers soumis en ligne par statut (en attente, en examen, acceptées, refusées), consultation du CV et de la lettre de motivation.' },
+    { src: internEncadrants, title: 'Gestion des encadrants', caption: 'Répertoire des tuteurs et cadres administratifs par division, avec coordonnées, nombre de stagiaires assignés et export CSV.' },
+    { src: internOffres, title: 'Offres et sujets de stage', caption: 'Catalogue des sujets proposés par les divisions de la Wilaya, avec type de stage, période recommandée et disponibilité.' },
+    { src: internDivisions, title: 'Divisions et services de la Wilaya', caption: 'Vue des départements d’accueil avec responsable de service, nombre d’encadrants, stagiaires affectés et taux d’occupation.' },
+    { src: internJournal, title: 'Journal d’audit et activités', caption: 'Historique chronologique des opérations administratives : connexions, candidatures, évaluations validées et attestations émises.' },
+    { src: internFormulaire, title: 'Formulaire de dépôt de candidature', caption: 'Constitution du dossier en ligne : identité, établissement, choix du stage et dépôt des pièces justificatives (CV, lettre, CIN, photo).' },
+    { src: internConnexion, title: 'Connexion multi-rôles', caption: 'Authentification dédiée aux quatre espaces de la plateforme : administrateur, encadrant, stagiaire et candidat.' },
+    { src: internPortail, title: 'Portail public Wilaya Stages', caption: 'Page d’accueil publique de la Wilaya de la Région de l’Oriental : dépôt de candidature, suivi de dossier par CIN et accès personnel ou encadrant.' },
   ],
 };
