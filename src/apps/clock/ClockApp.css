@@ -37,3 +37,5 @@
 .clock-app__alarm-heading span { font-size: 24px; font-variant-numeric: tabular-nums; }
 .clock-app__alarm-list p { color: var(--theme-muted); }
 .clock-app [role="switch"][aria-checked="true"] { border-color: var(--app-accent); font-weight: 700; }
+.clock-app__lap-summary { border-block: 1px solid var(--theme-line); margin-top: 16px; padding: 8px 0; overflow-wrap: anywhere; }
+.clock-app__laps li > span small { display: block; font-size: 12px; }

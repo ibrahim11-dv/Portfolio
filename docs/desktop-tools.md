@@ -80,3 +80,9 @@ Vérification navigateur de la mémoire : 2×3 mémorisé, calcul 15×2 ouvert d
 Correction des expressions : Effacer au curseur retire la sélection ou le caractère précédent ; Modifier le calcul dans l’historique rappelle l’expression sans la recalculer. Tests unitaires des sélections, du début de saisie et du champ vide. Dans le navigateur, 12+34 corrigé en 1+34 depuis le milieu, calculé puis repris depuis l’historique sans exécution. Lint, 151 tests et compilation réussis.
 
 Export de calculs : le lien Télécharger l’historique (.txt) génère un fichier texte UTF-8, du calcul le plus ancien au plus récent, sans modifier la liste ni la mémoire. Le retour indique uniquement que le téléchargement est demandé. Validation du contenu et de l’ordre par test unitaire ; lint, 152 tests et compilation réussis. Le contrôle du téléchargement dans le navigateur a été interrompu avant confirmation : réception effective du fichier non vérifiée.
+
+## Comparaison des tours du chronomètre
+
+Chaque ligne affiche la durée du tour et le temps total séparément. Un résumé indique la moyenne des tours enregistrés. Dès que deux durées diffèrent, des libellés identifient les tours les plus rapides et les plus lents ; les égalités sont conservées. Le tour encore en cours ne participe pas à la moyenne. Réinitialiser le chronomètre efface également ces statistiques, sans nouveau stockage.
+
+Validation : lint, 154 tests et compilation réussis, dont tests des durées cumulées, des égalités et des listes vides. Contrôle navigateur : enregistrement de deux tours, pause, moyenne et libellés rapide/lent, puis réinitialisation du résumé. À 319 px en sombre, commandes accessibles et absence de débordement horizontal de la page. Aucune erreur de console observée. Thème clair non revérifié pour cette extension.

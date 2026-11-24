@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { formatDuration, formatWorldCity, stopwatchElapsed, timerRemaining, WORLD_CITIES } from './clockState';
 import './ClockApp.css';
 import AlarmPanel from './AlarmPanel';
+import { lapStatistics } from './lapStatistics';
 
 export default function ClockApp({ state, onAction }) {
   const [now, setNow] = useState(() => Date.now());
@@ -10,6 +11,7 @@ export default function ClockApp({ state, onAction }) {
   const [error, setError] = useState('');
   const [cityFilter, setCityFilter] = useState('');
   const { tab, timer, stopwatch } = state;
+  const laps = lapStatistics(stopwatch.laps);
   const timerActive = ['running', 'paused'].includes(timer.status);
   useEffect(() => {
     if (timer.status !== 'running' && stopwatch.startedAt === null && tab !== 'world') return undefined;
@@ -42,7 +44,8 @@ export default function ClockApp({ state, onAction }) {
     </> : tab === 'stopwatch' ? <>
       <h1>Chronomètre</h1><div className="clock-app__display" role="timer" aria-label="Temps écoulé">{formatDuration(stopwatchElapsed(stopwatch, now), true)}</div><p role="status">{stopwatch.startedAt !== null ? 'En cours' : stopwatch.elapsed ? 'En pause' : 'Prêt'}</p>
       <div className="clock-app__actions"><button className="is-primary" onClick={() => act(stopwatch.startedAt === null ? 'start-watch' : 'pause-watch')}>{stopwatch.startedAt === null ? stopwatch.elapsed ? 'Reprendre' : 'Démarrer' : 'Pause'}</button><button disabled={stopwatch.startedAt === null || stopwatch.laps.length >= 50} onClick={() => act('lap')}>Tour</button><button onClick={() => act('reset-watch')}>Réinitialiser</button></div>
-      <ol className="clock-app__laps" aria-label="Temps intermédiaires">{stopwatch.laps.map((elapsed, index) => <li key={index}><span>Tour {index + 1}</span><strong>{formatDuration(elapsed, true)}</strong><small>+ {formatDuration(elapsed - (stopwatch.laps[index - 1] || 0), true)}</small></li>)}</ol>
+      {stopwatch.laps.length > 0 && <div className="clock-app__lap-summary" aria-label="Résumé des tours"><p>{stopwatch.laps.length} tour{stopwatch.laps.length > 1 ? 's' : ''} enregistré{stopwatch.laps.length > 1 ? 's' : ''}</p><p>Moyenne par tour : <strong>{formatDuration(laps.average, true)}</strong></p></div>}
+      <ol className="clock-app__laps" aria-label="Temps intermédiaires">{stopwatch.laps.map((elapsed, index) => <li key={index}><span>Tour {index + 1}{stopwatch.laps.length > 1 && laps.fastest !== laps.slowest && <small>{laps.durations[index] === laps.fastest ? 'Le plus rapide' : laps.durations[index] === laps.slowest ? 'Le plus lent' : ''}</small>}</span><strong aria-label={`Durée du tour : ${formatDuration(laps.durations[index], true)}`}>{formatDuration(laps.durations[index], true)}</strong><small>Total : {formatDuration(elapsed, true)}</small></li>)}</ol>
       <p className="clock-app__note">Jusqu’à 50 tours. Le chronomètre continue lorsque cette fenêtre est fermée, jusqu’au rechargement de la page.</p>
     </> : tab === 'alarms' ? <AlarmPanel alarms={state.alarms} onAction={onAction} /> : <>
       <h1>Horloges mondiales</h1>
