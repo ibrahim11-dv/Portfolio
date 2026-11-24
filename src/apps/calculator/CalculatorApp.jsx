@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { calculate } from './calculator';
 import { updateMemory } from './calculatorMemory';
-import { recordCalculation } from './calculatorSession';
+import { recordCalculation, formatCalculationHistory } from './calculatorSession';
+import { eraseCalculation } from './calculatorInput';
 import './CalculatorApp.css';
 
 const KEYS = ['(', ')', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '−', '1', '2', '3', '+', 'C', '0', ',', '='];
@@ -36,6 +37,11 @@ export default function CalculatorApp({ session = {}, onSaveSession, onNotify })
       setError(''); setAnswer(`Mémoire : ${next}`);
     } catch (failure) { setError(failure.message); }
   }
+  function erase() {
+    const next = eraseCalculation(expression, input.current.selectionStart ?? expression.length, input.current.selectionEnd ?? expression.length);
+    update(next.expression);
+    requestAnimationFrame(() => { input.current.focus(); input.current.setSelectionRange(next.cursor, next.cursor); });
+  }
   async function copy() {
     try { await navigator.clipboard.writeText(expression); onNotify('Résultat copié.'); }
     catch { input.current.focus(); input.current.select(); onNotify('Copie indisponible. Le résultat est sélectionné : utilisez Ctrl+C.'); }
@@ -51,8 +57,8 @@ export default function CalculatorApp({ session = {}, onSaveSession, onNotify })
     </div>
     {memory !== null && <p className="calculator-app__memory-value">Mémoire : {memory}</p>}
     <div className="calculator-app__keys">{KEYS.map((value) => <button key={value} className={value === '=' ? 'is-primary' : ''} aria-label={LABELS[value] || value} onMouseDown={(event) => event.preventDefault()} onClick={() => key(value)}>{value}</button>)}</div>
-    <div className="calculator-app__actions"><button onClick={() => { update(expression.slice(0, -1)); input.current.focus(); }}>Effacer un chiffre</button><button onClick={copy} disabled={!expression}>Copier</button></div>
+    <div className="calculator-app__actions"><button onMouseDown={(event) => event.preventDefault()} onClick={erase} title="Effacer la sélection ou le caractère avant le curseur">Effacer au curseur</button><button onClick={copy} disabled={!expression}>Copier</button></div>
     <p id="calculator-hint">Parenthèses et priorités usuelles. 10 % = 0,1 ; pour ajouter 10 %, utilisez × 1,1.</p>
-    <details><summary>Historique · {history.length} calcul{history.length !== 1 ? 's' : ''}</summary>{history.length ? <><button onClick={() => onSaveSession('calculator', { ...session, history: [] })}>Effacer l’historique</button><ol>{history.map((item, index) => <li key={index}><button onClick={() => { update(item.result); input.current.focus(); }} aria-label={`Réutiliser ${item.result}`}><span>{item.expression}</span><strong>= {item.result}</strong></button></li>)}</ol></> : <p>Vos calculs apparaîtront ici pendant cette session.</p>}</details>
+    <details><summary>Historique · {history.length} calcul{history.length !== 1 ? 's' : ''}</summary>{history.length ? <><a className="calculator-app__export" href={`data:text/plain;charset=utf-8,${encodeURIComponent(formatCalculationHistory(history))}`} download="ibrahimos-calculs.txt" onClick={() => onNotify('Téléchargement de l’historique demandé.')}>Télécharger l’historique (.txt)</a><button onClick={() => onSaveSession('calculator', { ...session, history: [] })}>Effacer l’historique</button><ol>{history.map((item, index) => <li key={index}><button onClick={() => { update(item.result); input.current.focus(); }} aria-label={`Réutiliser ${item.result}`}><span>{item.expression}</span><strong>= {item.result}</strong></button><button onClick={() => { update(item.expression); input.current.focus(); }} aria-label={`Modifier le calcul ${item.expression}`}>Modifier le calcul</button></li>)}</ol></> : <p>Vos calculs apparaîtront ici pendant cette session.</p>}</details>
   </section>;
 }

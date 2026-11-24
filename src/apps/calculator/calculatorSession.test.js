@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { recordCalculation } from './calculatorSession.js';
+import { recordCalculation, formatCalculationHistory } from './calculatorSession.js';
 
 test('a launcher calculation preserves memory and does not mutate its session', () => {
   const session = { memory: '-4', expression: '8', history: [{ expression: '4+4', result: '8' }] };
@@ -17,4 +17,11 @@ test('calculation history is bounded and a first launch needs no session', () =>
   assert.equal(next.history.length, 20);
   assert.equal(next.memory, '0');
   assert.equal(next.history.at(-1).result, '18');
+});
+
+test('text export orders calculations chronologically without changing history', () => {
+  const history = [{ expression: '2 × 3', result: '6' }, { expression: '0,1+0,2', result: '0.3' }];
+  assert.equal(formatCalculationHistory(history), 'IbrahimOS — Historique de calculs\nDu plus ancien au plus récent\n\n0,1+0,2 = 0.3\n2 × 3 = 6\n');
+  assert.equal(history[0].result, '6');
+  assert.equal(formatCalculationHistory([]).includes('undefined'), false);
 });

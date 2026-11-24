@@ -74,3 +74,9 @@ Dans le navigateur : dialogue testé par Ctrl+J et clic, déplacement à la lign
 M+ ajoute le calcul courant à la mémoire ; M− le soustrait ; MR rappelle la valeur dans la saisie et MC efface uniquement cette mémoire. Une expression invalide laisse la mémoire inchangée. Elle appartient à la session du bureau, sans stockage permanent supplémentaire. Un calcul ouvert depuis le lanceur conserve cette mémoire et ajoute son résultat aux vingt dernières opérations.
 
 Validation : lint, 149 tests et compilation réussis. Tests ciblés des calculs avec mémoire, des erreurs, de la conservation de session depuis le lanceur et de la limite de vingt résultats. Le parcours mémoire et réouverture reste à vérifier dans le navigateur.
+
+Vérification navigateur de la mémoire : 2×3 mémorisé, calcul 15×2 ouvert depuis le lanceur, rappel de 6, fermeture et réouverture, puis division par zéro refusée sans perte de mémoire. Historique conservé et aucune erreur de console observée pendant ce parcours. Les tailles mobiles et le thème clair restent à vérifier pour cette extension.
+
+Correction des expressions : Effacer au curseur retire la sélection ou le caractère précédent ; Modifier le calcul dans l’historique rappelle l’expression sans la recalculer. Tests unitaires des sélections, du début de saisie et du champ vide. Dans le navigateur, 12+34 corrigé en 1+34 depuis le milieu, calculé puis repris depuis l’historique sans exécution. Lint, 151 tests et compilation réussis.
+
+Export de calculs : le lien Télécharger l’historique (.txt) génère un fichier texte UTF-8, du calcul le plus ancien au plus récent, sans modifier la liste ni la mémoire. Le retour indique uniquement que le téléchargement est demandé. Validation du contenu et de l’ordre par test unitaire ; lint, 152 tests et compilation réussis. Le contrôle du téléchargement dans le navigateur a été interrompu avant confirmation : réception effective du fichier non vérifiée.
