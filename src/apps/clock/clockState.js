@@ -3,6 +3,7 @@ import { updateAlarms } from './alarms.js';
 export const INITIAL_CLOCK = {
   tab: 'timer',
   alarms: [],
+  favoriteCities: [],
   timer: { status: 'idle', duration: 300000, remaining: 300000, endsAt: null, run: 0 },
   stopwatch: { elapsed: 0, startedAt: null, laps: [] },
 };
@@ -16,6 +17,13 @@ export const WORLD_CITIES = [
   { id: 'new_york', name: 'New York', country: 'États-Unis', timeZone: 'America/New_York' },
   { id: 'tokyo', name: 'Tokyo', country: 'Japon', timeZone: 'Asia/Tokyo' },
 ];
+
+export function findWorldCities(query, favorites = []) {
+  const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+  const needle = normalize(query.trim());
+  return WORLD_CITIES.filter((city) => normalize(`${city.name} ${city.country}`).includes(needle))
+    .sort((a, b) => Number(favorites.includes(b.id)) - Number(favorites.includes(a.id)));
+}
 
 export function formatWorldCity(city, now = Date.now()) {
   const date = new Date(now);
@@ -54,6 +62,11 @@ export function clockReducer(state, action) {
   const { timer, stopwatch } = state;
   const now = action.now;
   switch (action.type) {
+    case 'toggle-city-favorite': {
+      if (!WORLD_CITIES.some((city) => city.id === action.id)) return state;
+      const favorites = state.favoriteCities || [];
+      return { ...state, favoriteCities: favorites.includes(action.id) ? favorites.filter((id) => id !== action.id) : [...favorites, action.id] };
+    }
     case 'tab': return ['timer', 'stopwatch', 'world', 'alarms'].includes(action.tab) ? { ...state, tab: action.tab } : state;
     case 'start-timer': {
       if (!Number.isInteger(action.duration) || action.duration < 1000 || action.duration > 86400000 || timer.status === 'running') return state;

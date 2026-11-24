@@ -39,3 +39,8 @@
 .clock-app [role="switch"][aria-checked="true"] { border-color: var(--app-accent); font-weight: 700; }
 .clock-app__lap-summary { border-block: 1px solid var(--theme-line); margin-top: 16px; padding: 8px 0; overflow-wrap: anywhere; }
 .clock-app__laps li > span small { display: block; font-size: 12px; }
+
+.clock-app__world-card { flex-wrap: wrap; }
+.clock-app__world-card > div { min-width: 0; overflow-wrap: anywhere; }
+.clock-app .clock-app__city-favorite { display: block; min-height: 44px; margin-top: 6px; font-size: 13px; }
+.clock-app__city-favorite[aria-pressed="true"] { border-color: var(--app-accent); font-weight: 700; }

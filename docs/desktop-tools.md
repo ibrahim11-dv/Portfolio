@@ -92,3 +92,9 @@ Validation : lint, 154 tests et compilation réussis, dont tests des durées cum
 Le bouton +1 min ajoute une minute au temps restant d’un minuteur en cours ou en pause, sans créer une nouvelle session ni relancer la pause. Il ne réactive pas un minuteur déjà expiré et respecte un maximum de 24 heures restantes. Réinitialiser conserve la durée choisie au démarrage.
 
 Validation : lint, 157 tests et compilation réussis. Tests ciblés de la nouvelle échéance, de la pause/reprise, de la réinitialisation et du refus des prolongations après expiration ou au-delà de 24 heures. Contrôle navigateur effectué : prolongation en pause de 5 à 6 minutes, reprise puis prolongation au clavier, nouvelle pause et réinitialisation à 5 minutes. À 319 px en sombre, bouton accessible sans débordement horizontal ; aucune erreur de console observée. Thème clair non revérifié pour cette extension.
+
+## Villes favorites
+
+Dans Horloge → Monde, les étoiles ajoutent ou retirent les villes favorites. Les favoris apparaissent en tête parmi les résultats, sans cacher les autres villes ; leur sélection reste dans la session du bureau après fermeture de la fenêtre. Aucun stockage permanent. La recherche accepte les noms sans accents (Montreal pour Montréal) et propose un effacement quand aucun résultat ne correspond.
+
+Validation : lint, 159 tests et compilation réussis. Tests du classement, de la recherche accentuée, des identifiants invalides et de la conservation du minuteur. Contrôle navigateur du 25 novembre 2026 : Tokyo ajouté avec Entrée, retrouvé en tête après fermeture et réouverture ; Montreal trouve Montréal ; recherche vide de résultats et effacement fonctionnels. Affichage sombre contrôlé à 319 px sans débordement horizontal de la page.

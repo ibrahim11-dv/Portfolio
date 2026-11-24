@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { formatDuration, formatWorldCity, stopwatchElapsed, timerRemaining, WORLD_CITIES } from './clockState';
+import { findWorldCities, formatDuration, formatWorldCity, stopwatchElapsed, timerRemaining } from './clockState';
 import './ClockApp.css';
 import AlarmPanel from './AlarmPanel';
 import { lapStatistics } from './lapStatistics';
@@ -27,7 +27,7 @@ export default function ClockApp({ state, onAction }) {
     setError(''); act('start-timer', { duration });
   }
   const statuses = { idle: 'Prêt', running: 'En cours', paused: 'En pause', finished: 'Minuteur terminé' };
-  const visibleCities = WORLD_CITIES.filter((city) => `${city.name} ${city.country}`.toLocaleLowerCase().includes(cityFilter.trim().toLocaleLowerCase()));
+  const visibleCities = findWorldCities(cityFilter, state.favoriteCities);
   return <section className="clock-app" aria-label="Horloge">
     <nav aria-label="Outils de l’horloge">
       <button aria-pressed={tab === 'timer'} onClick={() => act('tab', { tab: 'timer' })}>Minuteur</button>
@@ -52,6 +52,8 @@ export default function ClockApp({ state, onAction }) {
       <label className="clock-app__world-search">Filtrer une ville
         <input type="search" value={cityFilter} onChange={(event) => setCityFilter(event.target.value)} placeholder="Perpignan, Oujda, Montréal, Tokyo…" />
       </label>
+      <p className="clock-app__note">Les villes favorites restent en tête pendant cette session.</p>
+      {!visibleCities.length && <p role="status">Aucune ville pour « {cityFilter} ». <button onClick={() => setCityFilter('')}>Effacer la recherche</button></p>}
       <ul className="clock-app__world-list" aria-label="Fuseaux horaires">
         {visibleCities.map((city) => {
           const info = formatWorldCity(city, now);
@@ -59,6 +61,7 @@ export default function ClockApp({ state, onAction }) {
             <div>
               <strong>{info.name}</strong>
               <small>{info.country} · {info.dayLabel}</small>
+              <button className="clock-app__city-favorite" aria-label={`Ville favorite : ${info.name}`} aria-pressed={(state.favoriteCities || []).includes(city.id)} onClick={() => act('toggle-city-favorite', { id: city.id })}>{(state.favoriteCities || []).includes(city.id) ? '★ Favorite' : '☆ Ajouter aux favoris'}</button>
             </div>
             <div className="clock-app__world-time">
               <span>{info.time}</span>
