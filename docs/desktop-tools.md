@@ -86,3 +86,9 @@ Export de calculs : le lien Télécharger l’historique (.txt) génère un fich
 Chaque ligne affiche la durée du tour et le temps total séparément. Un résumé indique la moyenne des tours enregistrés. Dès que deux durées diffèrent, des libellés identifient les tours les plus rapides et les plus lents ; les égalités sont conservées. Le tour encore en cours ne participe pas à la moyenne. Réinitialiser le chronomètre efface également ces statistiques, sans nouveau stockage.
 
 Validation : lint, 154 tests et compilation réussis, dont tests des durées cumulées, des égalités et des listes vides. Contrôle navigateur : enregistrement de deux tours, pause, moyenne et libellés rapide/lent, puis réinitialisation du résumé. À 319 px en sombre, commandes accessibles et absence de débordement horizontal de la page. Aucune erreur de console observée. Thème clair non revérifié pour cette extension.
+
+## Prolonger un minuteur
+
+Le bouton +1 min ajoute une minute au temps restant d’un minuteur en cours ou en pause, sans créer une nouvelle session ni relancer la pause. Il ne réactive pas un minuteur déjà expiré et respecte un maximum de 24 heures restantes. Réinitialiser conserve la durée choisie au démarrage.
+
+Validation : lint, 157 tests et compilation réussis. Tests ciblés de la nouvelle échéance, de la pause/reprise, de la réinitialisation et du refus des prolongations après expiration ou au-delà de 24 heures. Contrôle navigateur effectué : prolongation en pause de 5 à 6 minutes, reprise puis prolongation au clavier, nouvelle pause et réinitialisation à 5 minutes. À 319 px en sombre, bouton accessible sans débordement horizontal ; aucune erreur de console observée. Thème clair non revérifié pour cette extension.

@@ -64,6 +64,12 @@ export function clockReducer(state, action) {
       const remaining = timerRemaining(timer, now);
       return { ...state, timer: { ...timer, remaining, endsAt: null, status: remaining ? 'paused' : 'finished' } };
     }
+    case 'extend-timer': {
+      if (!['running', 'paused'].includes(timer.status) || !Number.isFinite(now)) return state;
+      const remaining = timerRemaining(timer, now);
+      if (remaining <= 0 || remaining + 60000 > 86400000) return state;
+      return { ...state, timer: { ...timer, remaining: remaining + 60000, endsAt: timer.status === 'running' ? timer.endsAt + 60000 : null } };
+    }
     case 'resume-timer': return timer.status === 'paused' ? { ...state, timer: { ...timer, endsAt: now + timer.remaining, status: 'running' } } : state;
     case 'reset-timer': return { ...state, timer: { ...timer, remaining: timer.duration, endsAt: null, status: 'idle' } };
     case 'tick': return timer.status === 'running' && now >= timer.endsAt ? { ...state, timer: { ...timer, remaining: 0, endsAt: null, status: 'finished' } } : state;

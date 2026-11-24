@@ -50,6 +50,34 @@ test('duration formatting handles hours, fractions and zero', () => {
   assert.equal(formatDuration(-1), '00:00:00');
 });
 
+test('extending a running timer moves its deadline without starting a new run', () => {
+  const started = clockReducer(INITIAL_CLOCK, { type: 'start-timer', now: 1000, duration: 5000 });
+  const extended = clockReducer(started, { type: 'extend-timer', now: 3000 });
+  assert.equal(extended.timer.endsAt, 66000);
+  assert.equal(timerRemaining(extended.timer, 3000), 63000);
+  assert.equal(extended.timer.run, started.timer.run);
+  assert.equal(extended.timer.duration, 5000);
+  assert.equal(clockReducer(extended, { type: 'tick', now: 6000 }).timer.status, 'running');
+  assert.equal(clockReducer(extended, { type: 'tick', now: 66000 }).timer.status, 'finished');
+});
+test('extending a paused timer keeps it paused and reset keeps the configured duration', () => {
+  let state = clockReducer(INITIAL_CLOCK, { type: 'start-timer', now: 0, duration: 10000 });
+  state = clockReducer(state, { type: 'pause-timer', now: 3000 });
+  state = clockReducer(state, { type: 'extend-timer', now: 100000 });
+  assert.equal(state.timer.status, 'paused');
+  assert.equal(state.timer.remaining, 67000);
+  assert.equal(state.timer.endsAt, null);
+  assert.equal(clockReducer(state, { type: 'resume-timer', now: 200000 }).timer.endsAt, 267000);
+  assert.equal(clockReducer(state, { type: 'reset-timer', now: 200000 }).timer.remaining, 10000);
+});
+test('extension cannot revive an expired timer or exceed 24 hours remaining', () => {
+  assert.equal(clockReducer(INITIAL_CLOCK, { type: 'extend-timer', now: 0 }), INITIAL_CLOCK);
+  const started = clockReducer(INITIAL_CLOCK, { type: 'start-timer', now: 0, duration: 1000 });
+  assert.equal(clockReducer(started, { type: 'extend-timer', now: 1000 }), started);
+  const full = clockReducer(INITIAL_CLOCK, { type: 'start-timer', now: 0, duration: 86400000 });
+  assert.equal(clockReducer(full, { type: 'extend-timer', now: 1000 }), full);
+});
+
 test('world clocks tab and city formatting return localized time and period', () => {
   const switched = clockReducer(INITIAL_CLOCK, { type: 'tab', tab: 'world' });
   assert.equal(switched.tab, 'world');
